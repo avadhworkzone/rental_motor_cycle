@@ -1,0 +1,13 @@
+class AppRoutes {
+  static const String root = '/';
+  static const String splashScreen = '/splashScreen';
+  static const String onBoardingScreen = '/onBoardingScreen';
+  static const String bottomNavigationBarScreen = '/bottomNavigationBarScreen';
+  static const String bookBikeScreen = '/bookBikeScreen';
+  static const String calendarScreen = '/calendarScreen';
+  static const String loginScreen = '/loginScreen';
+  static const String myBikesScreen = '/myBikesScreen';
+  static const String settingsScreen = '/settingsScreen';
+  static const String signupScreen = '/signupScreen';
+  static const String userScreen = '/userScreen';
+}
