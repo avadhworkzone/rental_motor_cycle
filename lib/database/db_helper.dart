@@ -2,6 +2,7 @@
 
 import 'dart:developer';
 
+import 'package:rental_motor_cycle/utils/string_utils.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -27,66 +28,66 @@ class DBHelper {
 
   static Future<void> _createDB(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE Users (
+        CREATE TABLE Users (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          fullname TEXT NOT NULL,
+          userId TEXT NOT NULL,
+          mobileNumber TEXT NOT NULL
+        );
+      ''');
+
+    await db.execute('''
+        CREATE TABLE LoginUsers (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          username TEXT NOT NULL,
+          password TEXT NOT NULL,
+          fullname TEXT NOT NULL
+        );
+      ''');
+
+    await db.execute('''
+      CREATE TABLE Bikes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        fullname TEXT NOT NULL,
-        userId TEXT NOT NULL,
-        mobileNumber TEXT NOT NULL
+        name TEXT NOT NULL,  -- ✅ Fixed column name (previously 'room_name')
+        model TEXT,
+        numberPlate TEXT,
+        rentPerDay REAL,
+        location TEXT,
+        fuelType TEXT,
+        mileage REAL,
+        engineCC INTEGER,
+        description TEXT,
+        isAvailable INTEGER DEFAULT 1,  -- ✅ Changed BOOLEAN to INTEGER (0/1)
+        imageUrl TEXT,
+        userId INTEGER NOT NULL,
+        createdAt TEXT,
+        FOREIGN KEY (userId) REFERENCES LoginUsers(id)
       );
     ''');
 
     await db.execute('''
-      CREATE TABLE LoginUsers (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL,
-        password TEXT NOT NULL,
-        fullname TEXT NOT NULL
-      );
-    ''');
-
-    await db.execute('''
-    CREATE TABLE Bikes (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,  -- ✅ Fixed column name (previously 'room_name')
-      model TEXT,
-      numberPlate TEXT,
-      rentPerDay REAL,
-      location TEXT,
-      fuelType TEXT,
-      mileage REAL,
-      engineCC INTEGER,
-      description TEXT,
-      isAvailable INTEGER DEFAULT 1,  -- ✅ Changed BOOLEAN to INTEGER (0/1)
-      imageUrl TEXT,
-      userId INTEGER NOT NULL,
-      createdAt TEXT,
-      FOREIGN KEY (userId) REFERENCES LoginUsers(id)
-    );
-  ''');
-
-    await db.execute('''
-     CREATE TABLE IF NOT EXISTS Reservations (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER NOT NULL,
-  checkin TEXT NOT NULL,
-  checkout TEXT NOT NULL,
-  fullname TEXT NOT NULL,
-  phone TEXT NOT NULL,
-  email TEXT NOT NULL,
-  adult INTEGER NOT NULL,
-  child INTEGER NOT NULL,
-  pet INTEGER NOT NULL,
-  ratepernight REAL NOT NULL,
-  subtotal REAL NOT NULL,
-  discount REAL NOT NULL,
-  tax REAL NOT NULL,
-  grandtotal REAL NOT NULL,
-  prepayment REAL NOT NULL,
-  balance REAL NOT NULL,
-  FOREIGN KEY (user_id) REFERENCES LoginUsers(id) ON DELETE CASCADE
-);
-
-    ''');
+       CREATE TABLE IF NOT EXISTS Reservations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    checkin TEXT NOT NULL,
+    checkout TEXT NOT NULL,
+    fullname TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    email TEXT NOT NULL,
+    adult INTEGER NOT NULL,
+    child INTEGER NOT NULL,
+    pet INTEGER NOT NULL,
+    ratepernight REAL NOT NULL,
+    subtotal REAL NOT NULL,
+    discount REAL NOT NULL,
+    tax REAL NOT NULL,
+    grandtotal REAL NOT NULL,
+    prepayment REAL NOT NULL,
+    balance REAL NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES LoginUsers(id) ON DELETE CASCADE
+  );
+  
+      ''');
   }
 
   static Future<List<Map<String, dynamic>>> getLoginUsers() async {
@@ -115,31 +116,31 @@ class DBHelper {
   }
 
   /*  // CRUD Operations for Rooms
-  static Future<int> insertRoom(Map<String, dynamic> room) async {
-    final db = await database;
-    return await db.transaction((txn) async {
-      return await txn.insert('Rooms', room);
-    });
-  }
+    static Future<int> insertRoom(Map<String, dynamic> room) async {
+      final db = await database;
+      return await db.transaction((txn) async {
+        return await txn.insert('Rooms', room);
+      });
+    }
 
-  static Future<List<Map<String, dynamic>>> getRooms() async {
-    final db = await database;
-    return await db.query('Rooms');
-  }
+    static Future<List<Map<String, dynamic>>> getRooms() async {
+      final db = await database;
+      return await db.query('Rooms');
+    }
 
-  static Future<int> updateRoom(Map<String, dynamic> room, int id) async {
-    final db = await database;
-    return await db.transaction((txn) async {
-      return await txn.update('Rooms', room, where: 'id = ?', whereArgs: [id]);
-    });
-  }
+    static Future<int> updateRoom(Map<String, dynamic> room, int id) async {
+      final db = await database;
+      return await db.transaction((txn) async {
+        return await txn.update('Rooms', room, where: 'id = ?', whereArgs: [id]);
+      });
+    }
 
-  static Future<int> deleteRoom(int id) async {
-    final db = await database;
-    return await db.transaction((txn) async {
-      return await txn.rawDelete("DELETE FROM Rooms WHERE id = ?", [id]);
-    });
-  }*/
+    static Future<int> deleteRoom(int id) async {
+      final db = await database;
+      return await db.transaction((txn) async {
+        return await txn.rawDelete("DELETE FROM Rooms WHERE id = ?", [id]);
+      });
+    }*/
   // CRUD Operations for Bikes
   static Future<int> insertBike(Map<String, dynamic> bike) async {
     final db = await database;
@@ -151,6 +152,9 @@ class DBHelper {
   static Future<List<Map<String, dynamic>>> getBikes() async {
     final db = await database;
     final result = await db.query('Bikes');
+    for (var row in result) {
+      logs("SQLite Bike: ${row['name']}, Image URL: ${row['imageUrl']}");
+    }
 
     log('DB Query Result: ${result.length}'); // ✅ Debugging log
     return result;

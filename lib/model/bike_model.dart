@@ -1,3 +1,5 @@
+import 'package:rental_motor_cycle/utils/string_utils.dart';
+
 class BikeModel {
   int? id;
   String name;
@@ -53,6 +55,7 @@ class BikeModel {
 
   // Convert a Map to a BikeModel
   factory BikeModel.fromMap(Map<String, dynamic> map) {
+    logs("Loading Bike: ${map['name']}, Image URL: ${map['imageUrl']}");
     return BikeModel(
       id: map['id'],
       name: map['name'],

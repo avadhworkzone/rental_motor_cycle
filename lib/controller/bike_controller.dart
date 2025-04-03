@@ -91,7 +91,13 @@
 //     isProcessing.value = false;
 //   }
 // }
+import 'dart:io';
+
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:rental_motor_cycle/commonWidgets/custom_snackbar.dart';
 import 'package:rental_motor_cycle/model/bike_model.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import '../database/db_helper.dart';
@@ -157,7 +163,7 @@ class BikeController extends GetxController {
       });
     });
 
-    await fetchBikes(); // ✅ Refresh list after updating a bike
+    await fetchBikes();
     isProcessing.value = false;
   }
 
@@ -172,7 +178,90 @@ class BikeController extends GetxController {
       });
     });
 
-    await fetchBikes(); // ✅ Refresh list after deleting a bike
+    await fetchBikes();
     isProcessing.value = false;
+  }
+
+  Rx<File?> bikeImage = File('').obs;
+  var selectedImagePath = ''.obs;
+
+  Future<void> selectImage(BuildContext context) async {
+    File? image = await pickImageFromGallery(context);
+    if (image != null) {
+      bikeImage.value = image;
+      selectedImagePath.value = image.path; // ✅ Save path
+    }
+  }
+
+  Future<void> selectImageCamera(BuildContext context) async {
+    File? image = await pickImageFromCamera(context);
+    if (image != null) {
+      bikeImage.value = image;
+      selectedImagePath.value = image.path; // ✅ Save path
+    }
+  }
+
+  Future<bool> requestPermissions() async {
+    Map<Permission, PermissionStatus> statuses =
+        await [
+          Permission.camera,
+          Permission.storage, // For Android 12 and below
+          Permission.photos, // For Android 13+
+        ].request();
+
+    if (statuses[Permission.camera]!.isGranted &&
+        (statuses[Permission.storage]!.isGranted ||
+            statuses[Permission.photos]!.isGranted)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<File?> pickImageFromGallery(BuildContext context) async {
+    if (await requestPermissions()) {
+      return _pickImage(ImageSource.gallery);
+    } else {
+      showPermissionDialog(context);
+      return null;
+    }
+  }
+
+  Future<File?> pickImageFromCamera(BuildContext context) async {
+    if (await requestPermissions()) {
+      return _pickImage(ImageSource.camera);
+    } else {
+      showPermissionDialog(context);
+      return null;
+    }
+  }
+
+  Future<File?> _pickImage(ImageSource source) async {
+    try {
+      final pickedImage = await ImagePicker().pickImage(
+        source: source,
+        imageQuality: 25,
+      );
+      return pickedImage != null ? File(pickedImage.path) : null;
+    } catch (e) {
+      showCustomSnackBar(message: 'ERROR-----${e.toString()}', isError: true);
+      return null;
+    }
+  }
+
+  void showPermissionDialog(BuildContext context) {
+    Get.dialog(
+      AlertDialog(
+        title: Text("Permission Required"),
+        content: Text("Please enable permission from settings."),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: Text("Cancel")),
+          TextButton(
+            onPressed: () => openAppSettings(),
+            child: Text("Go to Settings"),
+          ),
+        ],
+      ),
+    );
   }
 }
