@@ -1,10 +1,12 @@
 import 'package:get/get.dart';
-import 'package:rental_motor_cycle/view/book_bike_screen.dart';
+import 'package:rental_motor_cycle/view/book_bike/book_bike_screen.dart';
+import 'package:rental_motor_cycle/view/book_bike/select_date_time_for_booking_screen.dart';
 import 'package:rental_motor_cycle/view/bottom_navigation_bar_screen.dart';
 import 'package:rental_motor_cycle/view/calendar_screen.dart';
 import 'package:rental_motor_cycle/view/login_screen.dart';
 import 'package:rental_motor_cycle/view/my_bike/bike_details_screen.dart';
 import 'package:rental_motor_cycle/view/my_bike/my_bike_screen.dart';
+import 'package:rental_motor_cycle/view/new_book_bike_screen.dart';
 import 'package:rental_motor_cycle/view/settings_screen.dart';
 import 'package:rental_motor_cycle/view/signup_screen.dart';
 import 'package:rental_motor_cycle/view/splash_screen.dart';
@@ -30,7 +32,8 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.bookBikeScreen,
-      page: () => BookBikeScreen(),
+      page: () => NewBookBikeScreen(),
+      // page: () => BookBikeScreen(),
       transition: Transition.cupertino,
     ),
     GetPage(
@@ -66,6 +69,10 @@ class AppPages {
     GetPage(
       name: AppRoutes.bikeDetailsScreen,
       page: () => BikeDetailsScreen(),
+      transition: Transition.cupertino,
+    ), GetPage(
+      name: AppRoutes.selectDateTimeForBookingScreen,
+      page: () => SelectDateTimeForBookingScreen(),
       transition: Transition.cupertino,
     ),
   ];

@@ -8,13 +8,22 @@ class BikeModel {
   double rentPerDay;
   String location;
   String fuelType;
-  double mileage;
-  int engineCC;
+  num mileage;
+  num engineCC;
   String description;
-  // bool isAvailable;
   String imageUrl;
-  int userId; // Owner of the bike
+  int userId;
   DateTime createdAt;
+
+  // NEW FIELDS
+  double deposit;
+  double extraPerKm;
+  double kmLimit;
+  int makeYear;
+  int tripsDone;
+  String transmission;
+  int seater;
+  String fuelIncluded;
 
   BikeModel({
     this.id,
@@ -27,13 +36,21 @@ class BikeModel {
     required this.mileage,
     required this.engineCC,
     required this.description,
-    // this.isAvailable = true,
     this.imageUrl = "",
     required this.userId,
     required this.createdAt,
+
+    // NEW FIELDS
+    required this.deposit,
+    required this.extraPerKm,
+    required this.kmLimit,
+    required this.makeYear,
+    required this.tripsDone,
+    required this.transmission,
+    required this.seater,
+    required this.fuelIncluded,
   });
 
-  // Convert a BikeModel to a Map
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -46,14 +63,22 @@ class BikeModel {
       'mileage': mileage,
       'engineCC': engineCC,
       'description': description,
-      // 'isAvailable': isAvailable,
       'imageUrl': imageUrl,
       'userId': userId,
       'createdAt': createdAt.toIso8601String(),
+
+      // NEW FIELDS
+      'deposit': deposit,
+      'extraPerKm': extraPerKm,
+      'kmLimit': kmLimit,
+      'makeYear': makeYear,
+      'tripsDone': tripsDone,
+      'transmission': transmission,
+      'seater': seater,
+      'fuelIncluded': fuelIncluded,
     };
   }
 
-  // Convert a Map to a BikeModel
   factory BikeModel.fromMap(Map<String, dynamic> map) {
     logs("Loading Bike: ${map['name']}, Image URL: ${map['imageUrl']}");
     return BikeModel(
@@ -67,12 +92,21 @@ class BikeModel {
       mileage: (map['mileage'] ?? 0).toDouble(),
       engineCC: map['engineCC'] ?? 0,
       description: map['description'],
-      // isAvailable: map['isAvailable'] ?? true,
       imageUrl: map['imageUrl'] ?? '',
       userId: map['userId'],
       createdAt: DateTime.parse(
         map['createdAt'] ?? DateTime.now().toIso8601String(),
       ),
+
+      // NEW FIELDS
+      deposit: (map['deposit'] ?? 0).toDouble(),
+      extraPerKm: (map['extraPerKm'] ?? 0).toDouble(),
+      kmLimit: (map['kmLimit'] ?? 0).toDouble(),
+      makeYear: map['makeYear'] ?? 0,
+      tripsDone: map['tripsDone'] ?? 0,
+      transmission: map['transmission'] ?? '',
+      seater: map['seater'] ?? 1,
+      fuelIncluded: map['fuelIncluded'] ?? '',
     );
   }
 }

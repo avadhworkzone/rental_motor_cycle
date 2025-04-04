@@ -11,4 +11,6 @@ class AppRoutes {
   static const String signupScreen = '/signupScreen';
   static const String userScreen = '/userScreen';
   static const String bikeDetailsScreen = '/bikeDetailsScreen';
+  static const String selectDateTimeForBookingScreen =
+      '/selectDateTimeForBookingScreen';
 }

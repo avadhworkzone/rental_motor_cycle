@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:rental_motor_cycle/controller/badge_controller.dart';
-import 'package:rental_motor_cycle/controller/reservation_controller.dart';
+import 'package:rental_motor_cycle/controller/bike_booking_controller.dart';
 import 'package:rental_motor_cycle/controller/bike_controller.dart';
 import 'package:rental_motor_cycle/controller/user_controller.dart';
 import 'routs/route_generator.dart';
@@ -14,7 +14,7 @@ Future<void> main() async {
 
   await Get.putAsync(() async => UserController());
   await Get.putAsync(() async => BikeController());
-  await Get.putAsync(() async => ReservationController());
+  await Get.putAsync(() async => BikeBookingController());
   await Get.putAsync(() async => BadgeController());
   runApp(const MyApp());
 }

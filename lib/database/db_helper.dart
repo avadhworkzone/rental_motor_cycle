@@ -16,14 +16,43 @@ class DBHelper {
     return _database!;
   }
 
+  // static Future<Database> _initDB() async {
+  //   final path = join(await getDatabasesPath(), dbName);
+  //   return await openDatabase(
+  //     path,
+  //     version: 1,
+  //     onCreate: _createDB,
+  //     singleInstance: true, // ✅ Ensure only one instance of the DB is used
+  //   );
+  // }
+
   static Future<Database> _initDB() async {
     final path = join(await getDatabasesPath(), dbName);
+
+    // Uncomment the line below ONLY once to delete the existing DB
+    // await deleteDatabase(path); // ⚠️ Use with caution in production
+
     return await openDatabase(
       path,
-      version: 1,
+      version: 2, // 🔼 Bumped version from 1 → 2
       onCreate: _createDB,
-      singleInstance: true, // ✅ Ensure only one instance of the DB is used
+      onUpgrade: _onUpgrade, // 🔄 Added upgrade callback
+      singleInstance: true,
     );
+  }
+
+  // 🔧 This function adds new columns if DB is upgrading
+  static Future<void> _onUpgrade(
+    Database db,
+    int oldVersion,
+    int newVersion,
+  ) async {
+    if (oldVersion < 2) {
+      // 🚀 Add the missing userId column with default 0
+      await db.execute(
+        "ALTER TABLE Bookings ADD COLUMN userId INTEGER NOT NULL DEFAULT 0",
+      );
+    }
   }
 
   static Future<void> _createDB(Database db, int version) async {
@@ -61,33 +90,44 @@ class DBHelper {
         imageUrl TEXT,
         userId INTEGER NOT NULL,
         createdAt TEXT,
+         deposit REAL,
+        extraPerKm REAL,
+        kmLimit REAL,
+        makeYear INTEGER,
+        tripsDone INTEGER,
+        transmission TEXT,
+        seater INTEGER,
+        fuelIncluded TEXT,
         FOREIGN KEY (userId) REFERENCES LoginUsers(id)
       );
     ''');
 
     await db.execute('''
-       CREATE TABLE IF NOT EXISTS Reservations (
+  CREATE TABLE IF NOT EXISTS Bookings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    checkin TEXT NOT NULL,
-    checkout TEXT NOT NULL,
-    fullname TEXT NOT NULL,
-    phone TEXT NOT NULL,
-    email TEXT NOT NULL,
-    adult INTEGER NOT NULL,
-    child INTEGER NOT NULL,
-    pet INTEGER NOT NULL,
-    ratepernight REAL NOT NULL,
-    subtotal REAL NOT NULL,
-    discount REAL NOT NULL,
-    tax REAL NOT NULL,
-    grandtotal REAL NOT NULL,
-    prepayment REAL NOT NULL,
-    balance REAL NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES LoginUsers(id) ON DELETE CASCADE
+    bikeId INTEGER NOT NULL,
+    userId INTEGER NOT NULL,
+    bikeName TEXT NOT NULL,
+    bikeModel TEXT NOT NULL,
+    userFullName TEXT NOT NULL,
+    userPhone TEXT NOT NULL,
+    userEmail TEXT NOT NULL,
+    pickupDate TEXT NOT NULL,
+    dropoffDate TEXT NOT NULL,
+    pickupTime TEXT NOT NULL,
+    dropoffTime TEXT NOT NULL,
+    pickupLocation TEXT NOT NULL,
+    dropoffLocation TEXT NOT NULL,
+    rentPerDay REAL NOT NULL,
+    totalDays INTEGER NOT NULL,
+    totalPrice REAL NOT NULL,
+    discount REAL DEFAULT 0,
+    tax REAL DEFAULT 0,
+    prepayment REAL DEFAULT 0,
+    isConfirmed INTEGER NOT NULL DEFAULT 0,
+    createdAt TEXT NOT NULL
   );
-  
-      ''');
+''');
   }
 
   static Future<List<Map<String, dynamic>>> getLoginUsers() async {
@@ -174,7 +214,7 @@ class DBHelper {
     });
   }
 
-  // CRUD Operations for Reservations
+  /*// CRUD Operations for Reservations
   static Future<int> insertReservation(Map<String, dynamic> reservation) async {
     final db = await database;
     return await db.transaction((txn) async {
@@ -206,6 +246,37 @@ class DBHelper {
     final db = await database;
     return await db.transaction((txn) async {
       return await txn.rawDelete("DELETE FROM Reservations WHERE id = ?", [id]);
+    });
+  }*/
+  // CRUD Operations for Bike Bookings
+  static Future<int> insertBooking(Map<String, dynamic> booking) async {
+    final db = await database;
+    return await db.transaction((txn) async {
+      return await txn.insert('Bookings', booking);
+    });
+  }
+
+  static Future<List<Map<String, dynamic>>> getBookings() async {
+    final db = await database;
+    return await db.query('Bookings');
+  }
+
+  static Future<int> updateBooking(Map<String, dynamic> booking, int id) async {
+    final db = await database;
+    return await db.transaction((txn) async {
+      return await txn.update(
+        'Bookings',
+        booking,
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    });
+  }
+
+  static Future<int> deleteBooking(int id) async {
+    final db = await database;
+    return await db.transaction((txn) async {
+      return await txn.rawDelete("DELETE FROM Bookings WHERE id = ?", [id]);
     });
   }
 }

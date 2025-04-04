@@ -154,18 +154,39 @@ class BikeController extends GetxController {
 
     await DBHelper.database.then((db) async {
       await db.transaction((txn) async {
-        await txn.update(
+        int count = await txn.update(
           'Bikes',
           bike.toMap(),
           where: 'id = ?',
           whereArgs: [bike.id],
         );
+        logs("Rows affected: $count");
       });
     });
 
     await fetchBikes();
     isProcessing.value = false;
   }
+
+  // Future<void> updateBike(BikeModel bike) async {
+  //   if (isProcessing.value) return;
+  //
+  //   try {
+  //     isProcessing.value = true;
+  //     final db = await DBHelper.database;
+  //     await db.update(
+  //       'Bikes',
+  //       bike.toMap(),
+  //       where: 'id = ?',
+  //       whereArgs: [bike.id],
+  //     );
+  //     await fetchBikes();
+  //   } catch (e) {
+  //     logs("Update error: $e");
+  //   } finally {
+  //     isProcessing.value = false;
+  //   }
+  // }
 
   /// ✅ **Delete a Bike Safely**
   Future<void> deleteBike(int id) async {

@@ -3,12 +3,13 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
+import 'package:rental_motor_cycle/model/booking_model.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import 'package:rental_motor_cycle/view/reservation_detail_screen.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import '../controller/reservation_controller.dart';
+import '../controller/bike_booking_controller.dart';
 import '../model/reservation_model.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -19,10 +20,10 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
-  final ReservationController reservationController = Get.find();
+  final BikeBookingController bikeBookingController = Get.find();
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
-  final Map<DateTime, List<ReservationModel>> _eventsMap = {};
+  final Map<DateTime, List<BookingModel>> _eventsMap = {};
   late Worker _reservationListener; // To store the listener reference
 
   @override
@@ -31,7 +32,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     _loadEvents();
 
     // Listen for reservation list changes
-    _reservationListener = ever(reservationController.reservationList, (_) {
+    _reservationListener = ever(bikeBookingController.bookingList, (_) {
       if (mounted) {
         _loadEvents();
       }
@@ -63,8 +64,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
     if (!mounted) return; // Prevent updating UI after dispose
     setState(() {
       _eventsMap.clear();
-      for (var res in reservationController.reservationList) {
-        DateTime parsedDate = _parseDate(res.checkin);
+      for (var res in bikeBookingController.bookingList) {
+        DateTime parsedDate = res.pickupDate;
         if (_eventsMap.containsKey(parsedDate)) {
           _eventsMap[parsedDate]!.add(res);
         } else {
@@ -162,10 +163,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  Widget _buildReservationCard(ReservationModel reservation) {
+  Widget _buildReservationCard(BookingModel booking) {
     return InkWell(
       onTap: () {
-        Get.to(() => ReservationDetailScreen(reservation: reservation));
+        Get.to(() => ReservationDetailScreen(booking: booking));
       },
       child: Card(
         elevation: 4,
@@ -180,33 +181,33 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    reservation.fullname,
+                    booking.userFullName,
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
               SizedBox(height: 8),
-              _buildInfoRow(Icons.phone, "Phone: ${reservation.phone}"),
-              _buildInfoRow(Icons.email, "Email: ${reservation.email}"),
+              _buildInfoRow(Icons.phone, "Phone: ${booking.userPhone}"),
+              _buildInfoRow(Icons.email, "Email: ${booking.userEmail}"),
               SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildGuestCount(Icons.person, "Adults", reservation.adult),
-                  _buildGuestCount(
-                    Icons.child_care,
-                    "Children",
-                    reservation.child,
-                  ),
-                  _buildGuestCount(Icons.pets, "Pets", reservation.pet),
-                ],
-              ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     _buildGuestCount(Icons.person, "Adults", booking.adult),
+              //     _buildGuestCount(
+              //       Icons.child_care,
+              //       "Children",
+              //       booking.child,
+              //     ),
+              //     _buildGuestCount(Icons.pets, "Pets", booking.pet),
+              //   ],
+              // ),
               Divider(thickness: 1, height: 16),
               // _buildPriceRow("Grand Total", reservation.grandTotal, isBold: true),
               // _buildPriceRow("Prepayment", reservation.prepayment),
               _buildPriceRow(
                 "Pending Amount",
-                reservation.balance,
+                booking.totalPrice,
                 isBold: true,
                 color: Colors.red,
               ),

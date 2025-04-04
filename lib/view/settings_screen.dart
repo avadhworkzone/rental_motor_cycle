@@ -7,7 +7,7 @@ import 'package:rental_motor_cycle/utils/string_utils.dart';
 import 'package:rental_motor_cycle/utils/download_db.dart';
 import '../controller/user_controller.dart';
 import '../controller/bike_controller.dart';
-import '../controller/reservation_controller.dart';
+import '../controller/bike_booking_controller.dart';
 import '../database/db_helper.dart';
 import '../controller/badge_controller.dart';
 import 'login_screen.dart';
@@ -19,7 +19,7 @@ class SettingsScreen extends StatelessWidget {
 
   final UserController userController = Get.find();
   final BikeController bikeController = Get.find();
-  final ReservationController reservationController = Get.find();
+  final BikeBookingController bikeBookingController = Get.find();
   final BadgeController badgeController = Get.find();
 
   /// Reset Specific Table or Entire Database
@@ -40,14 +40,14 @@ class SettingsScreen extends StatelessWidget {
           await bikeController.fetchBikes();
         } else if (table == "Reservations") {
           await txn.execute("DELETE FROM Reservations;");
-          await reservationController.fetchReservations();
+          await bikeBookingController.fetchBookings();
         } else {
           await txn.execute("DELETE FROM Reservations;");
           await txn.execute("DELETE FROM Rooms;");
           await txn.execute("DELETE FROM Users;");
           await userController.fetchUsers();
           await bikeController.fetchBikes();
-          await reservationController.fetchReservations();
+          await bikeBookingController.fetchBookings();
         }
 
         await txn.execute("PRAGMA foreign_keys = ON;");

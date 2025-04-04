@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:rental_motor_cycle/model/booking_model.dart';
 import '../model/reservation_model.dart';
 import 'package:get/get.dart';
-class ReservationDetailScreen extends StatelessWidget {
-  final ReservationModel reservation;
 
-  const ReservationDetailScreen({super.key, required this.reservation});
+class ReservationDetailScreen extends StatelessWidget {
+  final BookingModel booking;
+
+  const ReservationDetailScreen({super.key, required this.booking});
 
   @override
   Widget build(BuildContext context) {
@@ -17,51 +19,66 @@ class ReservationDetailScreen extends StatelessWidget {
           children: [
             Center(
               child: Text(
-                reservation.fullname,textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,),
+                booking.userFullName,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
             ),
             SizedBox(height: 10),
-            _buildInfoRow(Icons.phone, "Phone: ${reservation.phone}"),
-            _buildInfoRow(Icons.email, "Email: ${reservation.email}"),
-            _buildInfoRow(Icons.calendar_today, "Check-in: ${reservation.checkin}"),
-            _buildInfoRow(Icons.calendar_today, "Check-out: ${reservation.checkout}"),
+            _buildInfoRow(Icons.phone, "Phone: ${booking.userPhone}"),
+            _buildInfoRow(Icons.email, "Email: ${booking.userEmail}"),
+            // _buildInfoRow(Icons.calendar_today, "Check-in: ${booking.checkin}"),
+            // _buildInfoRow(Icons.calendar_today, "Check-out: ${booking.checkout}"),
             SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildGuestCount(Icons.person, "Adults", reservation.adult),
-                _buildGuestCount(Icons.child_care, "Children", reservation.child),
-                _buildGuestCount(Icons.pets, "Pets", reservation.pet),
-              ],
-            ),
 
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     _buildGuestCount(Icons.person, "Adults", booking.adult),
+            //     _buildGuestCount(Icons.child_care, "Children", booking.child),
+            //     _buildGuestCount(Icons.pets, "Pets", booking.pet),
+            //   ],
+            // ),
             Divider(thickness: 1, height: 24),
-            _buildPriceRow("Rate per Night", reservation.ratePerNight),
-            _buildPriceRow("Subtotal", reservation.subtotal),
-            _buildPriceRow("Tax (5%)", reservation.tax),
-            _buildPriceRow("Discount", reservation.discount),
-            _buildPriceRow("Grand Total", reservation.grandTotal, isBold: true),
-            _buildPriceRow("Prepayment", reservation.prepayment),
-            _buildPriceRow("Balance", reservation.balance,
-                isBold: true, color: Colors.red),
-SizedBox(height: 50,),
-          Center(
-            child: Container(
-            width: 200,
-              decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),border: Border.all(color: Colors.grey,width: 1),
+            _buildPriceRow("Rate per Night", booking.rentPerDay),
+            _buildPriceRow("Subtotal", booking.totalPrice),
+            _buildPriceRow("Tax (5%)", booking.tax),
+            _buildPriceRow("Discount", booking.discount),
+            _buildPriceRow("Grand Total", booking.totalPrice, isBold: true),
+            _buildPriceRow("Prepayment", booking.prepayment),
+            _buildPriceRow(
+              "Balance",
+              booking.prepayment,
+              isBold: true,
+              color: Colors.red,
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Center(child: InkWell(
-                  onTap: () {
-                    Get.back();
-                  },
-                  child: Text('Back',style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),)),),
+            SizedBox(height: 50),
+            Center(
+              child: Container(
+                width: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: Colors.grey, width: 1),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Center(
+                    child: InkWell(
+                      onTap: () {
+                        Get.back();
+                      },
+                      child: Text(
+                        'Back',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
-            ),
-          )
           ],
         ),
       ),
@@ -91,16 +108,31 @@ SizedBox(height: 50,),
     );
   }
 
-  Widget _buildPriceRow(String label, double amount, {bool isBold = false, Color? color}) {
+  Widget _buildPriceRow(
+    String label,
+    double amount, {
+    bool isBold = false,
+    Color? color,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(fontSize: 18, fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
           Text(
             "\$${amount.toStringAsFixed(2)}",
-            style: TextStyle(fontSize: 18, fontWeight: isBold ? FontWeight.bold : FontWeight.normal, color: color),
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              color: color,
+            ),
           ),
         ],
       ),

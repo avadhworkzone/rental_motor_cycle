@@ -215,8 +215,9 @@ import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import 'package:rental_motor_cycle/view/calendar_screen.dart';
-import 'package:rental_motor_cycle/view/book_bike_screen.dart';
+import 'package:rental_motor_cycle/view/book_bike/book_bike_screen.dart';
 import 'package:rental_motor_cycle/view/my_bike/my_bike_screen.dart';
+import 'package:rental_motor_cycle/view/new_book_bike_screen.dart';
 import 'package:rental_motor_cycle/view/settings_screen.dart';
 import 'package:rental_motor_cycle/view/user_screen.dart';
 
@@ -233,7 +234,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
   final screens = [
     CalendarScreen(),
     MyBikesScreen(),
-    BookBikeScreen(),
+    NewBookBikeScreen(),
     UserScreen(),
     SettingsScreen(),
   ];

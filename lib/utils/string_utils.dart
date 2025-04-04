@@ -70,6 +70,67 @@ class StringUtils {
   static const String rentPerDayWithoutDoller = "Rent per Day";
   static const String location = "Location";
   static const String description = "Description";
+  static const String pleaseChangeTheDataBeforeSaving =
+      "Please change the data before saving.";
+  static const String noBookedBikes = "No Booked Bikes found";
+  static const String phone = "Phone";
+  static const String email = "Email";
+  static const String ratePerDay = "Rate per Day";
+  static const String subtotal = "Subtotal";
+  static const String tax = "Tax";
+  static const String discount = "Discount";
+  static const String grandTotal = "Grand Total";
+  static const String prepayment = "Prepayment";
+  static const String deleteBooking = "Delete Booking";
+  static const String deleteConfirmationForBooking =
+      "Are you sure you want to delete this booking?";
+  static const String yes = "Yes";
+  static const String no = "No";
+  static const String selectBike = "Select Bike";
+  static const String selectABike = "Select a bike";
+  static const String fromDate = "From Date";
+  static const String toDate = "To Date";
+  static const String bookNow = "Book Now";
+  static const String updateBooking = "Update Booking";
+  static const String enter = "Enter";
+  static const String select = "Select";
+  static const String editBooking = "Edit Booking";
+  static const String trips = "Trips";
+  static const String seater = "Seater";
+  static const String availableAt = "Available at";
+  static const String kmLimit = "Km limit:";
+  static const String extra = "Extra:";
+  static const String fuel = "Fuel";
+  static const String deposit = "Deposit:";
+  static const String makeYear = "Make Year:";
+  static const String included = "Fuel Included";
+  static const String excluded = "Fuel Excluded";
+  static const String confirmBooking = "Confirm Booking";
+  static const String transmission = "Transmission";
+  static const String selectTransmission = "Select Transmission";
+  static const String automatic = "Automatic";
+  static const String manual = "Manual";
+  static const String semiAutomatic = "Semi-Automatic";
+  static const String selectSeater = "Select Seater";
+  static const String selectFuelOption = "Select Fuel Option";
+  static const String enterDepositAmount = "Enter deposit amount";
+  static const String deposite = "Deposit";
+  static const String enterExtraKmRate = "Enter extra km rate";
+  static const String extraPerKm = "Extra \$ per km";
+  static const String enterKmLimit = "Enter km limit";
+  static const String kmLimitWithoutCollen = "Km Limit";
+  static const String makeYearWithoutCollen = "Make Year";
+  static const String selectYear = "Select Year";
+  static const String enterMakeYear = "Enter make year";
+  static const String tripsDone = "Trips Done";
+  static const String enterTripsDone = "Enter trips done";
+  static const String selectTime = "Select Time";
+  static const String invalidSelection = "Invalid Selection";
+  static const String pleaseSelectBothTheDates = "Please select both dates";
+  static const String selectDates = "Select Date";
+  static const String confirm = "Confirm";
+  static const String dropOffMustBeOneHour =
+      "Drop-off must be at least 1 hour after pickup";
 }
 
 logs(String title) {

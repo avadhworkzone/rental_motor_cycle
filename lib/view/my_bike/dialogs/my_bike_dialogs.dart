@@ -21,15 +21,57 @@ void showAddBikeBottomSheet(
   required RxBool isProcessing,
 }) {
   final BikeController bikeController = Get.find<BikeController>();
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController modelController = TextEditingController();
-  final TextEditingController numberPlateController = TextEditingController();
-  final TextEditingController rentController = TextEditingController();
-  final TextEditingController locationController = TextEditingController();
-  final TextEditingController fuelTypeController = TextEditingController();
-  final TextEditingController mileageController = TextEditingController();
-  final TextEditingController ccController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController nameController = TextEditingController(
+    text: bike?.name ?? "",
+  );
+  final TextEditingController modelController = TextEditingController(
+    text: bike?.model ?? "",
+  );
+  final TextEditingController numberPlateController = TextEditingController(
+    text: bike?.numberPlate ?? "",
+  );
+  final TextEditingController rentController = TextEditingController(
+    text: bike?.rentPerDay.toStringAsFixed(0) ?? "",
+  );
+  final TextEditingController locationController = TextEditingController(
+    text: bike?.location ?? "",
+  );
+  final TextEditingController fuelTypeController = TextEditingController(
+    text: bike?.fuelType ?? "",
+  );
+  final TextEditingController mileageController = TextEditingController(
+    text: bike?.mileage.toStringAsFixed(0) ?? "",
+  );
+  final TextEditingController ccController = TextEditingController(
+    text: bike?.engineCC.toStringAsFixed(0) ?? "",
+  );
+  final TextEditingController descriptionController = TextEditingController(
+    text: bike?.description ?? "",
+  );
+  final TextEditingController depositController = TextEditingController(
+    text: bike?.deposit?.toStringAsFixed(0) ?? "",
+  );
+  final TextEditingController extraPerKmController = TextEditingController(
+    text: bike?.extraPerKm?.toStringAsFixed(0) ?? "",
+  );
+  final TextEditingController kmLimitController = TextEditingController(
+    text: bike?.kmLimit?.toStringAsFixed(0) ?? "",
+  );
+  final TextEditingController tripsDoneController = TextEditingController(
+    text: bike?.tripsDone?.toString() ?? "",
+  );
+  final TextEditingController makeYearController = TextEditingController(
+    text: bike?.makeYear?.toString() ?? "",
+  );
+
+  String? selectedTransmission = bike?.transmission;
+  String? selectedSeater = bike?.seater?.toString();
+  String? selectedFuelIncluded = bike?.fuelIncluded;
+
+  if (bike != null && bike.imageUrl.isNotEmpty) {
+    bikeController.bikeImage.value = File(bike.imageUrl);
+    bikeController.selectedImagePath.value = bike.imageUrl;
+  }
 
   var isValid = false.obs;
 
@@ -44,6 +86,14 @@ void showAddBikeBottomSheet(
         mileageController.text.trim().isNotEmpty &&
         ccController.text.trim().isNotEmpty &&
         descriptionController.text.trim().isNotEmpty &&
+        depositController.text.trim().isNotEmpty &&
+        extraPerKmController.text.trim().isNotEmpty &&
+        kmLimitController.text.trim().isNotEmpty &&
+        makeYearController.text.trim().isNotEmpty &&
+        tripsDoneController.text.trim().isNotEmpty &&
+        selectedTransmission != null &&
+        selectedSeater != null &&
+        selectedFuelIncluded != null &&
         (bikeController.bikeImage.value != null &&
             bikeController.bikeImage.value!.path.isNotEmpty);
   }
@@ -62,7 +112,7 @@ void showAddBikeBottomSheet(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CustomText(
-                StringUtils.addNewBike,
+                bike == null ? StringUtils.addNewBike : StringUtils.updateBike,
                 fontSize: 20.sp,
                 fontWeight: FontWeight.bold,
               ),
@@ -115,8 +165,6 @@ void showAddBikeBottomSheet(
                         Positioned(
                           right: -4.w,
                           bottom: -10.h,
-                          // right: -12,
-                          // bottom: -10,
                           child: IconButton(
                             onPressed: () {
                               profileScreenDialogBox(
@@ -148,8 +196,6 @@ void showAddBikeBottomSheet(
                 textEditController: nameController,
                 labelText: StringUtils.bikeName,
                 keyBoardType: TextInputType.name,
-                // isValidate: true,
-                // regularExpression: RegularExpression.noMultipleSpacePattern,
                 validator:
                     (value) =>
                         value!.isEmpty ? StringUtils.enterBikeName : null,
@@ -158,8 +204,6 @@ void showAddBikeBottomSheet(
               CommonTextField(
                 textEditController: modelController,
                 labelText: StringUtils.bikeModel,
-                // isValidate: true,
-                // regularExpression: RegularExpression.noMultipleSpacePattern,
                 keyBoardType: TextInputType.name,
                 validator:
                     (value) =>
@@ -169,8 +213,6 @@ void showAddBikeBottomSheet(
               CommonTextField(
                 textEditController: numberPlateController,
                 labelText: StringUtils.numberPlate,
-                // isValidate: true,
-                // regularExpression: RegularExpression.noSpaceAlphaNumPattern,
                 keyBoardType: TextInputType.name,
                 validator:
                     (value) =>
@@ -212,7 +254,6 @@ void showAddBikeBottomSheet(
                 },
                 validationMessage: StringUtils.selectFuelType,
               ),
-
               CommonTextField(
                 textEditController: mileageController,
                 labelText: StringUtils.mileage,
@@ -229,6 +270,116 @@ void showAddBikeBottomSheet(
                     (value) =>
                         value!.isEmpty ? StringUtils.enterEngineCC : null,
                 onChange: (_) => validateFields(),
+              ),
+              // CommonDropdown for Transmission
+              CommonDropdown(
+                items: [
+                  StringUtils.automatic,
+                  StringUtils.manual,
+                  StringUtils.semiAutomatic,
+                ],
+                labelText: StringUtils.transmission,
+                selectedValue: selectedTransmission,
+                onChanged: (value) {
+                  selectedTransmission = value;
+                  validateFields();
+                },
+                validationMessage: StringUtils.selectTransmission,
+              ),
+              CommonDropdown(
+                items: ["1", "2", "3", "4", "5", "6"],
+                labelText: StringUtils.seater,
+                selectedValue: selectedSeater,
+                onChanged: (value) {
+                  selectedSeater = value;
+                  validateFields();
+                },
+                validationMessage: StringUtils.selectSeater,
+              ),
+              CommonDropdown(
+                items: [StringUtils.included, StringUtils.excluded],
+                labelText: StringUtils.fuel,
+                selectedValue: selectedFuelIncluded,
+                onChanged: (value) {
+                  selectedFuelIncluded = value;
+                  validateFields();
+                },
+                validationMessage: StringUtils.selectFuelOption,
+              ),
+              CommonTextField(
+                textEditController: depositController,
+                labelText: "${StringUtils.deposit} (\$)",
+                keyBoardType: TextInputType.number,
+                onChange: (_) => validateFields(),
+                validator:
+                    (value) =>
+                        value!.isEmpty ? StringUtils.enterDepositAmount : null,
+              ),
+              CommonTextField(
+                textEditController: extraPerKmController,
+                labelText: StringUtils.extraPerKm,
+                keyBoardType: TextInputType.number,
+                onChange: (_) => validateFields(),
+                validator:
+                    (value) =>
+                        value!.isEmpty ? StringUtils.enterExtraKmRate : null,
+              ),
+              CommonTextField(
+                textEditController: kmLimitController,
+                labelText: StringUtils.kmLimit,
+                keyBoardType: TextInputType.number,
+                onChange: (_) => validateFields(),
+                validator:
+                    (value) => value!.isEmpty ? StringUtils.enterKmLimit : null,
+              ),
+              CommonTextField(
+                textEditController: makeYearController,
+                labelText: StringUtils.makeYear,
+                readOnly: true,
+                onTap: () async {
+                  final currentYear = DateTime.now().year;
+                  int? selectedYear = await showDialog<int>(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: CustomText(StringUtils.selectYear),
+                        content: SizedBox(
+                          height: 300,
+                          width: 300,
+                          child: YearPicker(
+                            firstDate: DateTime(1980),
+                            lastDate: DateTime(currentYear),
+                            initialDate: DateTime(currentYear),
+                            selectedDate:
+                                DateTime.tryParse(makeYearController.text) ??
+                                DateTime(currentYear),
+                            onChanged: (DateTime dateTime) {
+                              Navigator.of(context).pop(dateTime.year);
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  );
+
+                  if (selectedYear != null) {
+                    makeYearController.text = selectedYear.toString();
+                    validateFields();
+                  }
+                },
+
+                validator:
+                    (value) =>
+                        value!.isEmpty ? StringUtils.enterMakeYear : null,
+              ),
+              CommonTextField(
+                textEditController: tripsDoneController,
+                labelText: StringUtils.tripsDone,
+                keyBoardType: TextInputType.number,
+                onChange: (_) => validateFields(),
+                validator:
+                    (value) =>
+                        value!.isEmpty ? StringUtils.enterTripsDone : null,
               ),
               CommonTextField(
                 textEditController: descriptionController,
@@ -261,7 +412,9 @@ void showAddBikeBottomSheet(
                                     );
                                 logs('User ID ---> $userId');
                                 if (!isValid.value) return;
+
                                 BikeModel newBike = BikeModel(
+                                  id: bike?.id,
                                   name: nameController.text.trim(),
                                   model: modelController.text.trim(),
                                   numberPlate:
@@ -271,17 +424,55 @@ void showAddBikeBottomSheet(
                                   ),
                                   location: locationController.text.trim(),
                                   fuelType: fuelTypeController.text.trim(),
-                                  mileage: double.parse(
+                                  mileage: num.parse(
                                     mileageController.text.trim(),
                                   ),
-                                  engineCC: int.parse(ccController.text.trim()),
+                                  engineCC: num.parse(ccController.text.trim()),
                                   description:
                                       descriptionController.text.trim(),
                                   imageUrl:
                                       bikeController.selectedImagePath.value,
                                   createdAt: DateTime.now(),
                                   userId: int.parse(userId),
+                                  deposit: double.parse(
+                                    depositController.text.trim(),
+                                  ),
+                                  extraPerKm: double.parse(
+                                    extraPerKmController.text.trim(),
+                                  ),
+                                  kmLimit: double.parse(
+                                    kmLimitController.text.trim(),
+                                  ),
+                                  makeYear: int.parse(
+                                    makeYearController.text.trim(),
+                                  ),
+                                  tripsDone: int.parse(
+                                    tripsDoneController.text.trim(),
+                                  ),
+                                  transmission: selectedTransmission!,
+                                  seater: int.parse(selectedSeater!),
+                                  fuelIncluded: selectedFuelIncluded!,
                                 );
+
+                                if (bike != null &&
+                                    bike.name == newBike.name &&
+                                    bike.model == newBike.model &&
+                                    bike.numberPlate == newBike.numberPlate &&
+                                    bike.rentPerDay == newBike.rentPerDay &&
+                                    bike.location == newBike.location &&
+                                    bike.fuelType == newBike.fuelType &&
+                                    bike.mileage == newBike.mileage &&
+                                    bike.engineCC == newBike.engineCC &&
+                                    bike.description == newBike.description &&
+                                    bike.imageUrl == newBike.imageUrl) {
+                                  showCustomSnackBar(
+                                    message:
+                                        StringUtils
+                                            .pleaseChangeTheDataBeforeSaving,
+                                  );
+                                  isProcessing.value = false;
+                                  return;
+                                }
 
                                 if (bike == null) {
                                   await bikeController.addBike(newBike);
