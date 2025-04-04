@@ -31,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen> {
       SharedPreferenceUtils.isLoggedIn,
     );
 
-    logs("--onBoardingSeen: $hasSeenOnboarding, isLoggedIn: $isLoggedIn");
+    logs("--onBoardingSeen: ${SharedPreferenceUtils.getIsLogin()}");
 
     if (!hasSeenOnboarding) {
       await SharedPreferenceUtils.setValue(
