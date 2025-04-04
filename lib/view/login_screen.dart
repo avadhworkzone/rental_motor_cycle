@@ -42,10 +42,12 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (user != null) {
+        await SharedPreferenceUtils.setIsLogin(true);
         await SharedPreferenceUtils.setValue(
           SharedPreferenceUtils.isLoggedIn,
           true,
         );
+        print('=====login is =====>> ${SharedPreferenceUtils.getIsLogin()}');
         bool isLoggedIn = await SharedPreferenceUtils.getBool(
           SharedPreferenceUtils.isLoggedIn,
         );

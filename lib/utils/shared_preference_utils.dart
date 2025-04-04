@@ -6,11 +6,20 @@ class SharedPreferenceUtils {
   );
   static const onBoarding = "onBoarding";
   static const isLoggedIn = "isLoggedIn";
+  static const loggedIn = "loggedIn";
   static const username = "username";
   static const userId = "userId";
 
   static Future<void> setValue(String key, dynamic value) async {
     await getStorage.write(key, value);
+  }
+
+  static Future setIsLogin(bool? value) async {
+    await getStorage.write(loggedIn, value);
+  }
+
+  static bool getIsLogin() {
+    return getStorage.read(loggedIn) ?? false;
   }
 
   static Future<String> getString(String key) async {

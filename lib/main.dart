@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:rental_motor_cycle/controller/badge_controller.dart';
 import 'package:rental_motor_cycle/controller/reservation_controller.dart';
 import 'package:rental_motor_cycle/controller/bike_controller.dart';
@@ -11,7 +12,7 @@ import 'utils/Theme/app_theme.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // await GetSecureStorage.init(password: StringUtils.storagePassword);
-
+  await GetStorage.init();
   await Get.putAsync(() async => UserController());
   await Get.putAsync(() async => BikeController());
   await Get.putAsync(() async => ReservationController());
