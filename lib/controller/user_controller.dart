@@ -58,6 +58,8 @@ class UserController extends GetxController {
     if (isProcessing.value) return;
     isProcessing.value = true;
 
+    print('<<====== user.toMap() ====>> ${user.toMap()}');
+
     await DBHelper.database.then((db) async {
       await db.transaction((txn) async {
         await txn.insert('Users', user.toMap());

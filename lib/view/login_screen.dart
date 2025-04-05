@@ -41,6 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
         (user) => user.username == username && user.password == password,
       );
 
+      print('user--->> ${user}----> ${userController.loginUserList}');
       if (user != null) {
         await SharedPreferenceUtils.setValue(
           SharedPreferenceUtils.isLoggedIn,

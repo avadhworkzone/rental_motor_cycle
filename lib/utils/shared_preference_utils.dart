@@ -26,9 +26,9 @@ class SharedPreferenceUtils {
 
   static Future<void> clearPreference() async {
     await getStorage.erase();
-    SharedPreferenceUtils.setValue(SharedPreferenceUtils.onBoarding, false);
+    SharedPreferenceUtils.setValue(SharedPreferenceUtils.onBoarding, true);
     SharedPreferenceUtils.setValue(SharedPreferenceUtils.isLoggedIn, false);
-    SharedPreferenceUtils.setValue(SharedPreferenceUtils.username, false);
-    SharedPreferenceUtils.setValue(SharedPreferenceUtils.userId, false);
+    SharedPreferenceUtils.setValue(SharedPreferenceUtils.username, true);
+    SharedPreferenceUtils.setValue(SharedPreferenceUtils.userId, true);
   }
 }

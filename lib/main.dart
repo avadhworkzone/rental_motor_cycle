@@ -30,12 +30,14 @@ class MyApp extends StatelessWidget {
       designSize: const Size(393, 852),
       minTextAdapt: true,
       splitScreenMode: true,
+
       builder: (context, child) {
         return GetMaterialApp(
           title: 'Flutter Demo',
+          debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme, // Light theme
-          darkTheme: AppTheme.darkTheme, // Dark theme
-          themeMode: ThemeMode.system,
+          // darkTheme: AppTheme.darkTheme, // Dark theme
+          // themeMode: ThemeMode.system,
           getPages: AppPages.route,
           initialRoute: AppPages.initialRoute,
         );

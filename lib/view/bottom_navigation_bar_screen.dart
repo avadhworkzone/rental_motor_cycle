@@ -235,7 +235,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
     CalendarScreen(),
     MyBikesScreen(),
     NewBookBikeScreen(),
-    UserScreen(),
+    EmployeesScreen(),
     SettingsScreen(),
   ];
   void navigateToScreen(int index) {

@@ -3,24 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
+import 'package:rental_motor_cycle/commonWidgets/custom_text_field.dart';
+import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
+import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/shared_preference_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import '../controller/user_controller.dart';
 import '../model/user_model.dart';
 
-class UserScreen extends StatefulWidget {
-  UserScreen({super.key});
+class EmployeesScreen extends StatefulWidget {
+  const EmployeesScreen({super.key});
   @override
-  State<UserScreen> createState() => _UserScreenState();
+  State<EmployeesScreen> createState() => _EmployeesState();
 }
 
-class _UserScreenState extends State<UserScreen> {
+class _EmployeesState extends State<EmployeesScreen> {
   final UserController userController = Get.find<UserController>();
   // ✅ Use Get.find() to avoid multiple instances
   final TextEditingController mobileController = TextEditingController();
-
+  final TextEditingController emailController = TextEditingController();
   final TextEditingController fullnameController = TextEditingController();
-
+  final TextEditingController passwordController = TextEditingController();
+  String selectedRole = StringUtils.admin; // Default role
+  List employRoleList = [StringUtils.admin, StringUtils.manager];
   final _formKey = GlobalKey<FormState>();
 
   var isProcessing = false.obs;
@@ -30,9 +35,15 @@ class _UserScreenState extends State<UserScreen> {
     if (user != null) {
       mobileController.text = user.mobileNumber;
       fullnameController.text = user.fullname;
+      emailController.text = user.emailId;
+      passwordController.text = user.password ?? '';
+      selectedRole = user.role ?? StringUtils.admin;
     } else {
       mobileController.clear();
       fullnameController.clear();
+      emailController.clear();
+      passwordController.clear();
+      selectedRole = StringUtils.admin;
     }
 
     Get.bottomSheet(
@@ -48,46 +59,97 @@ class _UserScreenState extends State<UserScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  user == null ? "Add User" : "Edit User",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                CustomText(
+                  user == null
+                      ? StringUtils.addEmployee
+                      : StringUtils.editEmployee,
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 10.h),
 
                 // Full Name Field with Validation
-                TextFormField(
-                  controller: fullnameController,
-                  validator: (value) => value!.isEmpty ? "Enter name" : null,
-                  decoration: InputDecoration(
-                    labelText: "Full Name",
-                    border: OutlineInputBorder(), // ✅ Outline Border
-                    prefixIcon: Icon(Icons.person), // ✅ Icon for better UI
-                  ),
-                  keyboardType: TextInputType.name,
+                CommonTextField(
+                  textEditController: fullnameController,
+                  validator:
+                      (value) => value!.isEmpty ? StringUtils.enterName : null,
+
+                  keyBoardType: TextInputType.name,
+                  pIcon: Icon(Icons.person, color: ColorUtils.grey99),
+                  labelText: StringUtils.fullName,
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 10.h),
 
                 // Mobile Number Field with Validation
-                TextFormField(
-                  controller: mobileController,
+                CommonTextField(
+                  textEditController: mobileController,
                   validator: (value) {
                     if (value!.isEmpty) {
-                      return "Enter mobile number";
+                      return StringUtils.enterMobileNumber;
                     } else if (value.length < 10 || value.length > 10) {
-                      return "Phone number must be 10 digits";
+                      return StringUtils.mobileNumberValidation;
                     }
                     return null;
                   },
-                  decoration: InputDecoration(
-                    labelText: "Mobile Number",
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.phone),
-                  ),
-                  keyboardType: TextInputType.phone,
-                  maxLength: 10, // ✅ Limit to 10 digits
+                  pIcon: Icon(Icons.phone, color: ColorUtils.grey99),
+                  keyBoardType: TextInputType.phone,
+                  labelText: StringUtils.mobileNumber,
                 ),
-                SizedBox(height: 10),
-
+                SizedBox(height: 10.h),
+                CommonTextField(
+                  textEditController: emailController,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return StringUtils.enterEmailAddress;
+                    }
+                    return null;
+                  },
+                  pIcon: Icon(Icons.email, color: ColorUtils.grey99),
+                  keyBoardType: TextInputType.emailAddress,
+                  labelText: StringUtils.emailId,
+                ),
+                SizedBox(height: 10.h),
+                CommonTextField(
+                  textEditController: passwordController,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return StringUtils.enterPassword;
+                    } else if (value.length < 6) {
+                      return StringUtils.passwordValidation;
+                    }
+                    return null;
+                  },
+                  pIcon: Icon(Icons.lock, color: ColorUtils.grey99),
+                  labelText: StringUtils.password,
+                ),
+                SizedBox(height: 10.h),
+                DropdownButtonFormField<String>(
+                  value: selectedRole,
+                  items:
+                      employRoleList.map((role) {
+                        return DropdownMenuItem<String>(
+                          value: role,
+                          child: CustomText(role, color: Colors.black),
+                        );
+                      }).toList(),
+                  decoration: InputDecoration(
+                    labelText: StringUtils.role,
+                    prefixIcon: Icon(
+                      Icons.person_outline,
+                      color: ColorUtils.grey99,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        selectedRole = value;
+                      });
+                    }
+                  },
+                ),
                 Obx(
                   () => ElevatedButton(
                     onPressed:
@@ -102,8 +164,8 @@ class _UserScreenState extends State<UserScreen> {
 
                                 if (fullnameController.text.trim().isEmpty) {
                                   Get.snackbar(
-                                    "Error",
-                                    "Full Name is required",
+                                    StringUtils.error,
+                                    StringUtils.fullNameRequired,
                                   );
                                   return;
                                 }
@@ -111,8 +173,8 @@ class _UserScreenState extends State<UserScreen> {
                                   mobileController.text.trim(),
                                 )) {
                                   Get.snackbar(
-                                    "Error",
-                                    "Enter a valid 10-digit mobile number",
+                                    StringUtils.error,
+                                    StringUtils.validMobileRequired,
                                   );
                                   return;
                                 }
@@ -136,6 +198,11 @@ class _UserScreenState extends State<UserScreen> {
                                           mobileController.text.trim(),
                                       userId: await userId,
                                       fullname: fullnameController.text.trim(),
+                                      emailId: emailController.text.trim(),
+                                      password:
+                                          passwordController.text
+                                              .trim(), // ✅ added
+                                      role: selectedRole,
                                     ),
                                   );
                                 } else {
@@ -146,6 +213,11 @@ class _UserScreenState extends State<UserScreen> {
                                       mobileNumber:
                                           mobileController.text.trim(),
                                       fullname: fullnameController.text.trim(),
+                                      emailId: emailController.text.trim(),
+                                      password:
+                                          passwordController.text
+                                              .trim(), // ✅ added
+                                      role: selectedRole,
                                     ),
                                   );
                                 }
@@ -156,7 +228,11 @@ class _UserScreenState extends State<UserScreen> {
                                 Get.back();
                               }
                             },
-                    child: Text(user == null ? "Add User" : "Update User"),
+                    child: CustomText(
+                      user == null
+                          ? StringUtils.addEmployee
+                          : StringUtils.updateEmployee,
+                    ),
                   ),
                 ),
               ],
@@ -170,11 +246,12 @@ class _UserScreenState extends State<UserScreen> {
 
   void confirmDelete(int id) {
     Get.defaultDialog(
-      title: "Delete User",
-      middleText: "Are you sure you want to delete this user?",
-      textConfirm: "Delete",
-      textCancel: "Cancel",
-      confirmTextColor: Colors.white,
+      title: StringUtils.deleteUser,
+      middleText: StringUtils.confirmDeleteUser,
+      textConfirm: StringUtils.delete,
+      textCancel: StringUtils.cancel,
+      confirmTextColor: Colors.black,
+      cancelTextColor: Colors.black,
       onConfirm: () async {
         isProcessing.value = true; // ✅ Prevent multiple clicks
         await Future.delayed(Duration(milliseconds: 300)); // ✅ Delay execution
@@ -204,7 +281,7 @@ class _UserScreenState extends State<UserScreen> {
       body: Obx(
         () =>
             userController.userList.isEmpty
-                ? Center(child: Text("No users found. Add a new user!"))
+                ? Center(child: CustomText(StringUtils.noUsersFound))
                 : Column(
                   children: [
                     Expanded(
@@ -215,16 +292,27 @@ class _UserScreenState extends State<UserScreen> {
                           return Card(
                             elevation: 4,
                             margin: EdgeInsets.symmetric(
-                              vertical: 8,
-                              horizontal: 10,
+                              vertical: 8.h,
+                              horizontal: 10.w,
                             ),
                             child: ListTile(
-                              title: Text(
+                              title: CustomText(
                                 user.fullname,
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                                fontWeight: FontWeight.bold,
                               ),
-                              subtitle: Text(
-                                "Mobile Number: ${user.mobileNumber}",
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  CustomText(
+                                    "${StringUtils.mobileNumberPrefix} ${user.mobileNumber}",
+                                  ),
+                                  CustomText(
+                                    "${StringUtils.emailIdPrefix} ${user.emailId}",
+                                  ),
+                                  CustomText(
+                                    "${StringUtils.userRolePrefix} ${user.role}",
+                                  ),
+                                ],
                               ),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -251,7 +339,7 @@ class _UserScreenState extends State<UserScreen> {
                           // exportUsersAsPDF(userController.userList);
                           // Get.snackbar("Export Successful", "PDF saved in documents folder!");
                         },
-                        child: Text("Export Users as PDF"),
+                        child: CustomText(StringUtils.exportUsersAsPdf),
                       ),
                     ),
                   ],
