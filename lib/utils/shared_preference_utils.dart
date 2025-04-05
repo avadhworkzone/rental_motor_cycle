@@ -1,9 +1,7 @@
-import 'package:get_secure_storage/get_secure_storage.dart';
+import 'package:get_storage/get_storage.dart';
 
 class SharedPreferenceUtils {
-  static GetSecureStorage getStorage = GetSecureStorage(
-    // password: StringUtils.storagePassword,
-  );
+  static GetStorage getStorage = GetStorage();
   static const onBoarding = "onBoarding";
   static const isLoggedIn = "isLoggedIn";
   static const loggedIn = "loggedIn";
@@ -12,14 +10,6 @@ class SharedPreferenceUtils {
 
   static Future<void> setValue(String key, dynamic value) async {
     await getStorage.write(key, value);
-  }
-
-  static Future setIsLogin(bool? value) async {
-    await getStorage.write(loggedIn, value);
-  }
-
-  static bool getIsLogin() {
-    return getStorage.read(loggedIn) ?? false;
   }
 
   static Future<String> getString(String key) async {
@@ -37,7 +27,7 @@ class SharedPreferenceUtils {
   static Future<void> clearPreference() async {
     await getStorage.erase();
     SharedPreferenceUtils.setValue(SharedPreferenceUtils.onBoarding, true);
-    SharedPreferenceUtils.setValue(SharedPreferenceUtils.isLoggedIn, true);
+    SharedPreferenceUtils.setValue(SharedPreferenceUtils.isLoggedIn, false);
     SharedPreferenceUtils.setValue(SharedPreferenceUtils.username, true);
     SharedPreferenceUtils.setValue(SharedPreferenceUtils.userId, true);
   }

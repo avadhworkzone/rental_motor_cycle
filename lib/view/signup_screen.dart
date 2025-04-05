@@ -11,6 +11,7 @@ import 'package:rental_motor_cycle/routs/app_page.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/iamge_utils.dart';
+import 'package:rental_motor_cycle/utils/shared_preference_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import '../model/login_user_model.dart';
 import 'login_screen.dart';
@@ -45,6 +46,7 @@ class _SignupScreenState extends State<SignupScreen> {
           fullname: fullnameController.text.trim(),
         ),
       );
+
       isProcessing.value = false;
       showCustomSnackBar(message: StringUtils.signUpSuccessful);
       Get.offAllNamed(AppRoutes.loginScreen);

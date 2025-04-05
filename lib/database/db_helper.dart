@@ -61,7 +61,10 @@ class DBHelper {
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           fullname TEXT NOT NULL,
           userId TEXT NOT NULL,
-          mobileNumber TEXT NOT NULL
+          mobileNumber TEXT NOT NULL,
+          emailId TEXT NOT NULL,
+          password TEXT NOT NULL,
+          role TEXT NOT NULL
         );
       ''');
 

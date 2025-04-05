@@ -6,6 +6,35 @@ class StringUtils {
   ///BioMatric Confirmation
   static const fingerprintSetup = "Biometric setup";
 
+  /// krushangi
+  static const String admin = "Admin";
+  static const String manager = "Manager";
+  static const String addEmployee = "Add Employees";
+  static const String editEmployee = "Edit Employees";
+  static const String enterName = "Enter name";
+  static const String enterMobileNumber = "Enter mobile number";
+  static const String mobileNumberValidation = "Phone number must be 10 digits";
+  static const String mobileNumber = "Mobile Number";
+  static const String enterEmailAddress = "Enter Email Address";
+  static const String emailId = "Email Id";
+  static const String enterPassword = "Enter Password";
+  static const String passwordValidation =
+      "Password must be at least 6 characters";
+  static const String role = "Role";
+  static const String error = "Error";
+  static const String fullNameRequired = "Full Name is required";
+  static const String validMobileRequired =
+      "Enter a valid 10-digit mobile number";
+  static const String updateEmployee = "Update Employees";
+  static const String deleteUser = "Delete User";
+  static const String confirmDeleteUser =
+      "Are you sure you want to delete this user?";
+  static const String noUsersFound = "No users found. Add a new user!";
+  static const String mobileNumberPrefix = "Mobile Number: ";
+  static const String emailIdPrefix = "Email Id: ";
+  static const String userRolePrefix = "User Role: ";
+  static const String exportUsersAsPdf = "Export Users as PDF";
+
   ///
   static const onboadingTitle = "Ride Anytime, Anywhere";
   static const onboadingDetails =
@@ -28,7 +57,7 @@ class StringUtils {
   static const myBikes = "My Bikes";
   static const calendar = "Calendar";
   static const bookBike = "Book Bike";
-  static const users = "Users";
+  static const users = "Employees";
   static const settings = "Settings";
   static const takePhoto = "Take Photo";
   static const chooseFromGalary = "Choose From Galary";

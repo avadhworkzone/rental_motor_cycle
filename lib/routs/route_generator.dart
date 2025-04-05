@@ -63,14 +63,15 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.userScreen,
-      page: () => UserScreen(),
+      page: () => EmployeesScreen(),
       transition: Transition.cupertino,
     ),
     GetPage(
       name: AppRoutes.bikeDetailsScreen,
       page: () => BikeDetailsScreen(),
       transition: Transition.cupertino,
-    ), GetPage(
+    ),
+    GetPage(
       name: AppRoutes.selectDateTimeForBookingScreen,
       page: () => SelectDateTimeForBookingScreen(),
       transition: Transition.cupertino,
