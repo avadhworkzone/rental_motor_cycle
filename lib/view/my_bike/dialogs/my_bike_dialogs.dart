@@ -49,23 +49,23 @@ void showAddBikeBottomSheet(
     text: bike?.description ?? "",
   );
   final TextEditingController depositController = TextEditingController(
-    text: bike?.deposit?.toStringAsFixed(0) ?? "",
+    text: bike?.deposit.toStringAsFixed(0) ?? "",
   );
   final TextEditingController extraPerKmController = TextEditingController(
-    text: bike?.extraPerKm?.toStringAsFixed(0) ?? "",
+    text: bike?.extraPerKm.toStringAsFixed(0) ?? "",
   );
   final TextEditingController kmLimitController = TextEditingController(
-    text: bike?.kmLimit?.toStringAsFixed(0) ?? "",
+    text: bike?.kmLimit.toStringAsFixed(0) ?? "",
   );
   final TextEditingController tripsDoneController = TextEditingController(
-    text: bike?.tripsDone?.toString() ?? "",
+    text: bike?.tripsDone.toString() ?? "",
   );
   final TextEditingController makeYearController = TextEditingController(
-    text: bike?.makeYear?.toString() ?? "",
+    text: bike?.makeYear.toString() ?? "",
   );
 
   String? selectedTransmission = bike?.transmission;
-  String? selectedSeater = bike?.seater?.toString();
+  String? selectedSeater = bike?.seater.toString();
   String? selectedFuelIncluded = bike?.fuelIncluded;
 
   if (bike != null && bike.imageUrl.isNotEmpty) {
@@ -335,7 +335,7 @@ void showAddBikeBottomSheet(
               CommonTextField(
                 textEditController: makeYearController,
                 labelText: StringUtils.makeYear,
-                readOnly: true,
+                readOnly: false,
                 onTap: () async {
                   final currentYear = DateTime.now().year;
                   int? selectedYear = await showDialog<int>(

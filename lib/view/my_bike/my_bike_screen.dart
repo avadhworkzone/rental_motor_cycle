@@ -200,6 +200,7 @@ class _MyBikesScreenState extends State<MyBikesScreen> {
                                   backgroundColor: ColorUtils.primary,
                                   elevation: 2,
                                 ),
+                                SizedBox(width: 10.w),
                                 FloatingActionButton.extended(
                                   onPressed:
                                       () => confirmDelete(

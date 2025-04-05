@@ -14,13 +14,14 @@ class BookingModel {
   String pickupLocation;
   String dropoffLocation;
   double rentPerDay;
-  int totalDays;
-  double totalPrice;
-  double discount; // NEW
-  double tax; // NEW
+  double discount;
+  double tax;
   double prepayment;
   bool isConfirmed;
   DateTime createdAt;
+  double durationInHours;
+  double totalRent;
+  double finalAmountPayable;
 
   BookingModel({
     this.id,
@@ -38,13 +39,14 @@ class BookingModel {
     required this.pickupLocation,
     required this.dropoffLocation,
     required this.rentPerDay,
-    required this.totalDays,
-    required this.totalPrice,
-    this.discount = 0, // default
-    this.tax = 0, // default
+    this.discount = 0,
+    this.tax = 0,
     this.prepayment = 0,
     this.isConfirmed = false,
     required this.createdAt,
+    required this.durationInHours,
+    required this.totalRent,
+    required this.finalAmountPayable,
   });
 
   factory BookingModel.fromMap(Map<String, dynamic> map) {
@@ -64,13 +66,14 @@ class BookingModel {
       pickupLocation: map['pickupLocation'],
       dropoffLocation: map['dropoffLocation'],
       rentPerDay: (map['rentPerDay'] ?? 0).toDouble(),
-      totalDays: map['totalDays'],
-      totalPrice: (map['totalPrice'] ?? 0).toDouble(),
       discount: (map['discount'] ?? 0).toDouble(),
       tax: (map['tax'] ?? 0).toDouble(),
       prepayment: (map['prepayment'] ?? 0).toDouble(),
       isConfirmed: map['isConfirmed'] == 1,
       createdAt: DateTime.parse(map['createdAt']),
+      durationInHours: (map['durationInHours'] ?? 0).toDouble(),
+      totalRent: (map['totalRent'] ?? 0).toDouble(),
+      finalAmountPayable: (map['finalAmountPayable'] ?? 0).toDouble(),
     );
   }
 
@@ -91,13 +94,14 @@ class BookingModel {
       'pickupLocation': pickupLocation,
       'dropoffLocation': dropoffLocation,
       'rentPerDay': rentPerDay,
-      'totalDays': totalDays,
-      'totalPrice': totalPrice,
       'discount': discount,
       'tax': tax,
       'prepayment': prepayment,
       'isConfirmed': isConfirmed ? 1 : 0,
       'createdAt': createdAt.toIso8601String(),
+      'durationInHours': durationInHours,
+      'totalRent': totalRent,
+      'finalAmountPayable': finalAmountPayable,
     };
   }
 }

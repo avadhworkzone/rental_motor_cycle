@@ -10,7 +10,6 @@ import 'package:rental_motor_cycle/model/bike_model.dart';
 import 'package:rental_motor_cycle/model/booking_model.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
-import 'package:rental_motor_cycle/utils/iamge_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import '../../controller/bike_booking_controller.dart';
 import 'package:intl/intl.dart';
@@ -131,12 +130,12 @@ class _BookBikeScreenState extends State<BookBikeScreen> {
 
             /// 🔹 **Pricing Details**
             _buildPriceRow(StringUtils.ratePerDay, reservation.rentPerDay),
-            _buildPriceRow(StringUtils.subtotal, reservation.totalPrice),
+            _buildPriceRow(StringUtils.subtotal, reservation.totalRent),
             _buildPriceRow("${StringUtils.tax} (5%)", reservation.tax),
             _buildPriceRow(StringUtils.discount, reservation.discount),
             _buildPriceRow(
               StringUtils.grandTotal,
-              reservation.totalPrice,
+              reservation.finalAmountPayable,
               isBold: true,
             ),
             _buildPriceRow(StringUtils.prepayment, reservation.prepayment),
@@ -628,8 +627,9 @@ class _BookBikeScreenState extends State<BookBikeScreen> {
                           pickupLocation: '',
                           dropoffLocation: '',
                           rentPerDay: selectedBike.value!.rentPerDay,
-                          totalDays: 2,
-                          totalPrice: grandTotal.value,
+                          durationInHours: 5.0,
+                          totalRent: 500.00,
+                          finalAmountPayable: 1000.00,
                         );
 
                         if (booking == null) {

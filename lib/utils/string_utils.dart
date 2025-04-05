@@ -102,7 +102,7 @@ class StringUtils {
   static const String extra = "Extra:";
   static const String fuel = "Fuel";
   static const String deposit = "Deposit:";
-  static const String makeYear = "Make Year:";
+  static const String makeYear = "Make Year";
   static const String included = "Fuel Included";
   static const String excluded = "Fuel Excluded";
   static const String confirmBooking = "Confirm Booking";
@@ -128,9 +128,28 @@ class StringUtils {
   static const String invalidSelection = "Invalid Selection";
   static const String pleaseSelectBothTheDates = "Please select both dates";
   static const String selectDates = "Select Date";
-  static const String confirm = "Confirm";
+  static const String discountCantMoreThanTotal =
+      "Discount can't be more than total rent.";
   static const String dropOffMustBeOneHour =
       "Drop-off must be at least 1 hour after pickup";
+  static const String confirm = "Confirm";
+  static const String oneDay = "1 day";
+  static const String hours = "hours";
+  static const String days = "days";
+
+  static const String bookingSummary = "Booking Summary";
+  static const String totalRent = "Total Rent";
+  static const String depositPrepayment = "Deposit / Prepayment";
+  static const String amountPayable = "Amount Payable";
+
+  static const String bike = "Bike";
+  static const String from = "From";
+  static const String to = "To";
+  static const String duration = "Duration";
+  static const String depositAmount = "Deposit Amount";
+  static const String totalAmount = "Total Amount";
+
+  static const String bikeBookedSuccessfully = "Bike Booked Successfully!";
 }
 
 logs(String title) {

@@ -2,11 +2,18 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:rental_motor_cycle/commonWidgets/common_dropdown.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
+import 'package:rental_motor_cycle/commonWidgets/custom_text_field.dart';
+import 'package:rental_motor_cycle/controller/bike_booking_controller.dart';
+import 'package:rental_motor_cycle/model/booking_model.dart';
 import 'package:rental_motor_cycle/routs/app_page.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/model/bike_model.dart';
+import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
+import 'package:rental_motor_cycle/view/book_bike/book_bike_screen.dart';
 import '../controller/bike_controller.dart';
 
 class NewBookBikeScreen extends StatefulWidget {
@@ -33,13 +40,14 @@ class _NewBookBikeScreenState extends State<NewBookBikeScreen> {
   final toDate = Rxn<DateTime>();
   final fromDateController = TextEditingController();
   final toDateController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: commonAppBar(
         titleText: StringUtils.bookBike,
         context: context,
-        isLeading: true,
+        isLeading: false,
         isCenterTitle: true,
         fontSize: 20.sp,
         fontWeight: FontWeight.w600,
@@ -139,7 +147,7 @@ class _NewBookBikeScreenState extends State<NewBookBikeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CustomText(
-                      "₹ ${bike.rentPerDay.toStringAsFixed(0)}/day",
+                      "\$ ${bike.rentPerDay.toStringAsFixed(0)}/day",
                       fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.green,
@@ -195,7 +203,7 @@ class _NewBookBikeScreenState extends State<NewBookBikeScreen> {
                   "${StringUtils.deposit} ",
                   "\$${bike.deposit.toStringAsFixed(0)}",
                 ),
-                _textRow("${StringUtils.makeYear} ", bike.makeYear.toString()),
+                _textRow("${StringUtils.makeYear}: ", bike.makeYear.toString()),
               ],
             ),
           ],

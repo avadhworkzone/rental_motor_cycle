@@ -34,8 +34,8 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           title: 'Flutter Demo',
           theme: AppTheme.lightTheme, // Light theme
-          darkTheme: AppTheme.darkTheme, // Dark theme
-          themeMode: ThemeMode.system,
+          // darkTheme: AppTheme.darkTheme, // Dark theme
+          // themeMode: ThemeMode.system,
           getPages: AppPages.route,
           initialRoute: AppPages.initialRoute,
         );

@@ -41,10 +41,14 @@ class ReservationDetailScreen extends StatelessWidget {
             // ),
             Divider(thickness: 1, height: 24),
             _buildPriceRow("Rate per Night", booking.rentPerDay),
-            _buildPriceRow("Subtotal", booking.totalPrice),
+            _buildPriceRow("Subtotal", booking.totalRent),
             _buildPriceRow("Tax (5%)", booking.tax),
             _buildPriceRow("Discount", booking.discount),
-            _buildPriceRow("Grand Total", booking.totalPrice, isBold: true),
+            _buildPriceRow(
+              "Grand Total",
+              booking.finalAmountPayable,
+              isBold: true,
+            ),
             _buildPriceRow("Prepayment", booking.prepayment),
             _buildPriceRow(
               "Balance",

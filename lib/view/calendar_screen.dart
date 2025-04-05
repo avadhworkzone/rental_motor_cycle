@@ -207,7 +207,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               // _buildPriceRow("Prepayment", reservation.prepayment),
               _buildPriceRow(
                 "Pending Amount",
-                booking.totalPrice,
+                booking.finalAmountPayable,
                 isBold: true,
                 color: Colors.red,
               ),

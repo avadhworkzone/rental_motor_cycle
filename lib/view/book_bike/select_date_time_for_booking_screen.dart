@@ -6,6 +6,8 @@ import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_btn.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_snackbar.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_text_field.dart';
+import 'package:rental_motor_cycle/controller/bike_booking_controller.dart';
+import 'package:rental_motor_cycle/model/booking_model.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
@@ -23,10 +25,15 @@ class _SelectDateTimeForBookingScreenState
     extends State<SelectDateTimeForBookingScreen> {
   TextEditingController locationController = TextEditingController();
   TextEditingController fromDateController = TextEditingController();
+  TextEditingController discountController = TextEditingController();
   TextEditingController toDateController = TextEditingController();
+  final fullNameController = TextEditingController();
+  final phoneController = TextEditingController();
+  final emailController = TextEditingController();
   final bike = Get.arguments;
   final fromDate = Rxn<DateTime>();
   final toDate = Rxn<DateTime>();
+  final isValid = false.obs;
 
   @override
   void initState() {
@@ -37,7 +44,6 @@ class _SelectDateTimeForBookingScreenState
   Future<void> pickDateTime(bool isFrom) async {
     DateTime now = DateTime.now();
 
-    // 🗓 Date Picker
     final pickedDate = await showDatePicker(
       context: context,
       initialDate:
@@ -52,8 +58,8 @@ class _SelectDateTimeForBookingScreenState
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
               primary: ColorUtils.primary,
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
+              onPrimary: ColorUtils.white,
+              onSurface: ColorUtils.black,
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(foregroundColor: ColorUtils.primary),
@@ -65,7 +71,6 @@ class _SelectDateTimeForBookingScreenState
     );
 
     if (pickedDate != null) {
-      // 🕒 Generate Hourly Time Slots
       List<TimeOfDay> allTimes = List.generate(
         24,
         (index) => TimeOfDay(hour: index, minute: 0),
@@ -176,6 +181,15 @@ class _SelectDateTimeForBookingScreenState
     }
   }
 
+  void checkFormValidity() {
+    isValid.value =
+        fromDate.value != null &&
+        toDate.value != null &&
+        fullNameController.text.trim().isNotEmpty &&
+        phoneController.text.trim().isNotEmpty &&
+        emailController.text.trim().isNotEmpty;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -187,50 +201,175 @@ class _SelectDateTimeForBookingScreenState
         fontSize: 20.sp,
         fontWeight: FontWeight.w600,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Column(
-          children: [
-            CommonTextField(
-              textEditController: locationController,
-              labelText: StringUtils.location,
-              readOnly: true,
-              suffix: Icon(Icons.location_on, color: Colors.green),
-            ),
-            SizedBox(height: 16),
-
-            // From Date
-            GestureDetector(
-              onTap: () => pickDateTime(true),
-              child: AbsorbPointer(
-                child: CommonTextField(
-                  textEditController: fromDateController,
-                  labelText: StringUtils.fromDate,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(16.w),
+          child: Obx(() {
+            return Column(
+              children: [
+                CommonTextField(
+                  textEditController: locationController,
+                  labelText: StringUtils.location,
+                  readOnly: true,
+                  suffix: Icon(Icons.location_on, color: ColorUtils.primary),
                 ),
-              ),
-            ),
-            SizedBox(height: 16),
+                // SizedBox(height: 5.h),
 
-            // To Date
-            GestureDetector(
-              onTap: () => pickDateTime(false),
-              child: AbsorbPointer(
-                child: CommonTextField(
-                  textEditController: toDateController,
-                  labelText: StringUtils.toDate,
+                /// From Date
+                GestureDetector(
+                  onTap: () => pickDateTime(true),
+                  child: AbsorbPointer(
+                    child: CommonTextField(
+                      textEditController: fromDateController,
+                      labelText: StringUtils.fromDate,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            SizedBox(height: 80.h),
+                // SizedBox(height: 16.h),
 
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 25.w),
-              child: CustomBtn(
-                onTap: showBookingConfirmationDialog,
-                title: StringUtils.confirmBooking,
-              ),
-            ),
-          ],
+                /// To Date
+                GestureDetector(
+                  onTap: () => pickDateTime(false),
+                  child: AbsorbPointer(
+                    child: CommonTextField(
+                      textEditController: toDateController,
+                      labelText: StringUtils.toDate,
+                    ),
+                  ),
+                ),
+
+                // SizedBox(height: 16.h),
+                _buildTextField(
+                  fullNameController,
+                  StringUtils.fullName,
+                  onChange: (_) => checkFormValidity(),
+                ),
+                // SizedBox(height: 16.h),
+                _buildTextField(
+                  phoneController,
+                  StringUtils.phone,
+                  onChange: (_) => checkFormValidity(),
+                ),
+                // SizedBox(height: 16.h),
+                _buildTextField(
+                  emailController,
+                  StringUtils.email,
+                  onChange: (_) => checkFormValidity(),
+                ),
+                // SizedBox(height: 16.h),
+
+                /// Duration + Payment Info UI Section
+                Obx(() {
+                  final from = fromDate.value;
+                  final to = toDate.value;
+
+                  if (from == null || to == null) return SizedBox.shrink();
+                  if (!isValid.value) return SizedBox.shrink();
+
+                  final duration = to.difference(from);
+                  final durationInDays = duration.inHours / 24;
+                  final rentPerDay = bike.rentPerDay ?? 0.0;
+                  final deposit = bike.deposit ?? 0.0;
+                  final totalRent = durationInDays * rentPerDay;
+
+                  double discount =
+                      double.tryParse(discountController.text) ?? 0.0;
+
+                  // 🚫 Prevent discount greater than total rent
+                  if (discount > totalRent) {
+                    discount = totalRent;
+                    discountController.text = totalRent.toStringAsFixed(0);
+
+                    // Show warning
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      showCustomSnackBar(
+                        message: StringUtils.discountCantMoreThanTotal,
+                      );
+                    });
+                  }
+
+                  final payable = (totalRent - discount).clamp(
+                    0,
+                    double.infinity,
+                  );
+
+                  final durationText =
+                      duration.inHours == 24
+                          ? StringUtils.oneDay
+                          : "${duration.inHours} ${StringUtils.hours}${durationInDays >= 1 ? " (${durationInDays.toStringAsFixed(1)} ${StringUtils.days})" : ""}";
+
+                  return Container(
+                    padding: EdgeInsets.all(16.w),
+                    margin: EdgeInsets.only(top: 24.h),
+                    decoration: BoxDecoration(
+                      color: ColorUtils.white,
+                      borderRadius: BorderRadius.circular(12.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 6,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CustomText(
+                          StringUtils.bookingSummary,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        SizedBox(height: 10.h),
+                        _buildInfoRow(
+                          "${StringUtils.rentPerDay}:",
+                          "₹ ${rentPerDay.toStringAsFixed(2)}",
+                        ),
+                        _buildInfoRow("${StringUtils.duration}:", durationText),
+                        _buildInfoRow(
+                          "${StringUtils.totalRent}:",
+                          "₹ ${totalRent.toStringAsFixed(2)}",
+                        ),
+                        _buildInfoRow(
+                          "${StringUtils.depositPrepayment}:",
+                          "₹ ${deposit.toStringAsFixed(2)}",
+                          valueColor: Colors.orange,
+                        ),
+                        SizedBox(height: 12.h),
+                        CommonTextField(
+                          labelText: "${StringUtils.discount} (\$)",
+                          textEditController: discountController,
+                          keyBoardType: TextInputType.number,
+                          onChange: (_) => setState(() {}),
+                        ),
+                        SizedBox(height: 16.h),
+                        Divider(),
+                        _buildInfoRow(
+                          "${StringUtils.amountPayable}:",
+                          "\$ ${payable.toStringAsFixed(2)}",
+                          valueColor: ColorUtils.primary,
+                          isBold: true,
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+                SizedBox(height: 40.h),
+
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 25.w),
+                  child: CustomBtn(
+                    onTap: isValid.value ? showBookingConfirmationDialog : null,
+                    title: StringUtils.confirmBooking,
+                    bgColor:
+                        isValid.value
+                            ? ColorUtils.primary
+                            : ColorUtils.primary.withValues(alpha: 0.5),
+                  ),
+                ),
+              ],
+            );
+          }),
         ),
       ),
     );
@@ -245,12 +384,24 @@ class _SelectDateTimeForBookingScreenState
     final bikeName = bike.name ?? "N/A";
     final bikeModel = bike.model ?? "N/A";
     final location = locationController.text;
-    final rentPerDay = bike.rentPerDay?.toString() ?? "N/A";
+    final depositAmount = bike.deposit ?? 0.0;
 
     final from = fromDate.value!;
     final to = toDate.value!;
     final duration = to.difference(from);
     final durationInDays = duration.inHours / 24;
+    final rentPerDay = bike.rentPerDay ?? 0.0;
+    final totalRent = durationInDays * rentPerDay;
+    double discount = double.tryParse(discountController.text) ?? 0.0;
+    final payableAmount =
+        (totalRent - discount + depositAmount).clamp(0, double.infinity)
+            as double;
+
+    String formatAmount(double amount) {
+      return amount % 1 == 0
+          ? amount.toInt().toString()
+          : amount.toStringAsFixed(2);
+    }
 
     showDialog(
       context: context,
@@ -265,46 +416,101 @@ class _SelectDateTimeForBookingScreenState
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildInfoRow("Bike:", "$bikeName ($bikeModel)"),
-              _buildInfoRow("Location:", location),
+              _buildInfoRow("${StringUtils.bike}:", "$bikeName ($bikeModel)"),
+              _buildInfoRow("${StringUtils.location}:", location),
               _buildInfoRow(
-                "From:",
+                "${StringUtils.from}:",
                 DateFormat('MMMM d, yyyy hh:mm a').format(from),
               ),
               _buildInfoRow(
-                "To:",
+                "${StringUtils.to}:",
                 DateFormat('MMMM d, yyyy hh:mm a').format(to),
               ),
               _buildInfoRow(
-                "Duration:",
-                "${duration.inHours} hours (${durationInDays.toStringAsFixed(1)} days)",
+                "${StringUtils.duration}:",
+                "${duration.inHours} ${StringUtils.hours} (${durationInDays.toStringAsFixed(1)} ${StringUtils.days})",
               ),
-              _buildInfoRow("Rent per day:", "₹ $rentPerDay"),
-              SizedBox(height: 16.h),
-              CustomText(
-                "Are you sure you want to book this bike?",
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
+
+              _buildInfoRow(
+                "${StringUtils.totalRent}:",
+                "₹ ${formatAmount(totalRent)}",
+              ),
+              _buildInfoRow(
+                "${StringUtils.depositAmount}:",
+                "₹ ${formatAmount(depositAmount)}",
+              ),
+              _buildInfoRow(
+                "${StringUtils.totalAmount}: ",
+                "₹ ${formatAmount(payableAmount)}",
               ),
             ],
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: CustomText(StringUtils.cancel, color: Colors.red),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ColorUtils.primary,
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-                showCustomSnackBar(
-                  message: "Booking confirmed!",
-                  isError: false,
-                );
-              },
-              child: CustomText(StringUtils.confirm, color: Colors.white),
+            Row(
+              children: [
+                Expanded(
+                  child: CustomBtn(
+                    bgColor: ColorUtils.white,
+                    onTap: () => Navigator.pop(context),
+                    title: StringUtils.cancel,
+                    textColor: ColorUtils.black,
+                  ),
+                ),
+                SizedBox(width: 15.w),
+                Expanded(
+                  child: CustomBtn(
+                    onTap: () async {
+                      final from = fromDate.value!;
+                      final to = toDate.value!;
+
+                      final pickupDate = DateTime(
+                        from.year,
+                        from.month,
+                        from.day,
+                      );
+                      final dropoffDate = DateTime(to.year, to.month, to.day);
+                      final pickupTime = DateFormat('hh:mm a').format(from);
+                      final dropoffTime = DateFormat('hh:mm a').format(to);
+
+                      final newBooking = BookingModel(
+                        userId: 1,
+                        bikeId: bike.id!,
+                        bikeName: bike.name,
+                        bikeModel: bike.model,
+                        rentPerDay: rentPerDay,
+                        discount: discount,
+                        prepayment: depositAmount,
+                        tax: 0,
+                        userFullName: fullNameController.text,
+                        userPhone: phoneController.text,
+                        userEmail: emailController.text,
+                        pickupDate: pickupDate,
+                        dropoffDate: dropoffDate,
+                        pickupTime: pickupTime,
+                        dropoffTime: dropoffTime,
+                        pickupLocation: locationController.text,
+                        dropoffLocation: locationController.text,
+                        createdAt: DateTime.now(),
+                        durationInHours: duration.inHours.toDouble(),
+                        totalRent: totalRent,
+                        finalAmountPayable: payableAmount,
+                      );
+
+                      await Get.find<BikeBookingController>().addBooking(
+                        newBooking,
+                      );
+
+                      await Get.find<BikeBookingController>().fetchBookings();
+                      Get.back();
+                      Get.back();
+                      showCustomSnackBar(
+                        message: StringUtils.bikeBookedSuccessfully,
+                      );
+                    },
+                    title: StringUtils.confirm,
+                  ),
+                ),
+              ],
             ),
           ],
         );
@@ -312,15 +518,45 @@ class _SelectDateTimeForBookingScreenState
     );
   }
 
-  Widget _buildInfoRow(String title, String value) {
+  Widget _buildInfoRow(
+    String title,
+    String value, {
+    Color? valueColor,
+    bool isBold = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(child: CustomText(title, fontWeight: FontWeight.w600)),
-          Expanded(child: CustomText(value)),
+          Expanded(
+            child: CustomText(
+              value,
+              color: valueColor,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+            ),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTextField(
+    TextEditingController controller,
+    String label, {
+    void Function(String)? onChange,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 2.h),
+      child: CommonTextField(
+        textEditController: controller,
+        labelText: label,
+        keyBoardType: keyboardType,
+        onChange: onChange,
+        validator:
+            (value) => value!.isEmpty ? '${StringUtils.enter} $label' : null,
       ),
     );
   }
