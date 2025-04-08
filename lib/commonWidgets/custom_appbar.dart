@@ -17,9 +17,11 @@ AppBar commonAppBar({
   // bool isBackButton = true,
   bool isNotificationButton = true,
 }) {
+  // bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+
   return AppBar(
     centerTitle: isCenterTitle ?? true,
-    backgroundColor: ColorUtils.white,
+    // backgroundColor: isDarkTheme?ColorUtils.darkThemeBg:ColorUtils.white,
 
     // toolbarHeight: 7.5.h,
     // leading: SizedBox(),

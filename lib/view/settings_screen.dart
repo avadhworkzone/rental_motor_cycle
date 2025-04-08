@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
+import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/shared_preference_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import 'package:rental_motor_cycle/utils/download_db.dart';
@@ -87,6 +88,7 @@ class SettingsScreen extends StatelessWidget {
               onChanged: (value) {
                 isDarkMode.value = value;
                 Get.changeTheme(value ? ThemeData.dark() : ThemeData.light());
+
               },
             ),
           ),
@@ -100,7 +102,7 @@ class SettingsScreen extends StatelessWidget {
               children: [
                 ListTile(
                   leading: Icon(Icons.delete, color: Colors.red),
-                  title: Text("Reset Entire Database"),
+                  title: CustomText("Reset Entire Database"),
                   onTap: () => showResetOptions(),
                 ),
                 ListTile(

@@ -24,6 +24,7 @@ class CommonDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: DropdownButtonFormField<String>(
@@ -33,7 +34,7 @@ class CommonDropdown extends StatelessWidget {
             horizontal: 20.w,
             vertical: 14.h,
           ),
-          fillColor: Colors.white,
+          fillColor: isDarkTheme?ColorUtils.darkThemeBg:Colors.white,
           filled: true,
           labelText: labelText.tr,
           labelStyle: TextStyle(

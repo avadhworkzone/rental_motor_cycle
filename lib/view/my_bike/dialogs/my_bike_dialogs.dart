@@ -102,10 +102,11 @@ void showAddBikeBottomSheet(
     Container(
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: ColorUtils.white,
+        color: Theme.of(context).brightness == Brightness.dark?ColorUtils.darkThemeBg:ColorUtils.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      child: SingleChildScrollView(
+      child: FractionallySizedBox(
+        heightFactor: 0.75.w,
         child: Form(
           key: key,
           child: Column(
@@ -119,383 +120,391 @@ void showAddBikeBottomSheet(
               SizedBox(height: 10.h),
 
               ///Pick bike image
-              Align(
-                alignment: Alignment.center,
-                child: Container(
-                  padding: EdgeInsets.all(2.w),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: ColorUtils.primary, width: 2.w),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Container(
-                    height: 111.h,
-                    width: 111.w,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: ColorUtils.primary, width: 2.w),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Obx(() {
-                          return Center(
-                            child:
-                                (bikeController.bikeImage.value?.path.isEmpty ??
-                                        true)
-                                    ? Icon(
-                                      Icons.supervised_user_circle,
-                                      size: 50.sp,
-                                    )
-                                    : Container(
-                                      height: 111.h,
-                                      width: 111.w,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: DecorationImage(
-                                          image: FileImage(
-                                            bikeController.bikeImage.value ??
-                                                File(''),
-                                          ),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                          );
-                        }),
-                        Positioned(
-                          right: -4.w,
-                          bottom: -10.h,
-                          child: IconButton(
-                            onPressed: () {
-                              profileScreenDialogBox(
-                                context: context,
-                                text: StringUtils.addBikeImage,
-                                onTap: () async {
-                                  await bikeController.selectImageCamera(
-                                    context,
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
+                        child: Container(
+                          padding: EdgeInsets.all(2.w),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: ColorUtils.primary, width: 2.w),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Container(
+                            height: 111.h,
+                            width: 111.w,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: ColorUtils.primary, width: 2.w),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Obx(() {
+                                  return Center(
+                                    child:
+                                        (bikeController.bikeImage.value?.path.isEmpty ??
+                                                true)
+                                            ? Icon(
+                                              Icons.supervised_user_circle,
+                                              size: 50.sp,
+                                            )
+                                            : Container(
+                                              height: 111.h,
+                                              width: 111.w,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                image: DecorationImage(
+                                                  image: FileImage(
+                                                    bikeController.bikeImage.value ??
+                                                        File(''),
+                                                  ),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
                                   );
-                                  validateFields();
-                                },
-                                onTap2: () async {
-                                  await bikeController.selectImage(context);
-                                  validateFields();
-                                },
+                                }),
+                                Positioned(
+                                  right: -4.w,
+                                  bottom: -10.h,
+                                  child: IconButton(
+                                    onPressed: () {
+                                      profileScreenDialogBox(
+                                        context: context,
+                                        text: StringUtils.addBikeImage,
+                                        onTap: () async {
+                                          await bikeController.selectImageCamera(
+                                            context,
+                                          );
+                                          validateFields();
+                                        },
+                                        onTap2: () async {
+                                          await bikeController.selectImage(context);
+                                          validateFields();
+                                        },
+                                      );
+                                    },
+                                    icon: Icon(Icons.camera_alt_outlined),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10.h),
+
+                      CommonTextField(
+                        textEditController: nameController,
+                        labelText: StringUtils.bikeName,
+                        keyBoardType: TextInputType.name,
+                        validator:
+                            (value) =>
+                                value!.isEmpty ? StringUtils.enterBikeName : null,
+                        onChange: (_) => validateFields(),
+                      ),
+                      CommonTextField(
+                        textEditController: modelController,
+                        labelText: StringUtils.bikeModel,
+                        keyBoardType: TextInputType.name,
+                        validator:
+                            (value) =>
+                                value!.isEmpty ? StringUtils.enterBikeModel : null,
+                        onChange: (_) => validateFields(),
+                      ),
+                      CommonTextField(
+                        textEditController: numberPlateController,
+                        labelText: StringUtils.numberPlate,
+                        keyBoardType: TextInputType.name,
+                        validator:
+                            (value) =>
+                                value!.isEmpty ? StringUtils.enterNumberPlate : null,
+                        onChange: (_) => validateFields(),
+                      ),
+                      CommonTextField(
+                        textEditController: rentController,
+                        labelText: StringUtils.rentPerDay,
+                        keyBoardType: TextInputType.number,
+                        validator:
+                            (value) =>
+                                value!.isEmpty ? StringUtils.enterRentPrice : null,
+                        onChange: (_) => validateFields(),
+                      ),
+                      CommonTextField(
+                        textEditController: locationController,
+                        labelText: StringUtils.bikeLocation,
+                        keyBoardType: TextInputType.name,
+                        validator:
+                            (value) =>
+                                value!.isEmpty ? StringUtils.enterLocation : null,
+                        onChange: (_) => validateFields(),
+                      ),
+                      CommonDropdown(
+                        items: [
+                          StringUtils.petrol,
+                          StringUtils.diesel,
+                          StringUtils.electric,
+                        ],
+                        labelText: StringUtils.fuelType,
+                        selectedValue:
+                            fuelTypeController.text.isNotEmpty
+                                ? fuelTypeController.text
+                                : null,
+                        onChanged: (value) {
+                          fuelTypeController.text = value ?? "";
+                          validateFields();
+                        },
+                        validationMessage: StringUtils.selectFuelType,
+                      ),
+                      CommonTextField(
+                        textEditController: mileageController,
+                        labelText: StringUtils.mileage,
+                        keyBoardType: TextInputType.number,
+                        validator:
+                            (value) => value!.isEmpty ? StringUtils.enterMileage : null,
+                        onChange: (_) => validateFields(),
+                      ),
+                      CommonTextField(
+                        textEditController: ccController,
+                        labelText: StringUtils.engineCC,
+                        keyBoardType: TextInputType.number,
+                        validator:
+                            (value) =>
+                                value!.isEmpty ? StringUtils.enterEngineCC : null,
+                        onChange: (_) => validateFields(),
+                      ),
+                      // CommonDropdown for Transmission
+                      CommonDropdown(
+                        items: [
+                          StringUtils.automatic,
+                          StringUtils.manual,
+                          StringUtils.semiAutomatic,
+                        ],
+                        labelText: StringUtils.transmission,
+                        selectedValue: selectedTransmission,
+                        onChanged: (value) {
+                          selectedTransmission = value;
+                          validateFields();
+                        },
+                        validationMessage: StringUtils.selectTransmission,
+                      ),
+                      CommonDropdown(
+                        items: ["1", "2", "3", "4", "5", "6"],
+                        labelText: StringUtils.seater,
+                        selectedValue: selectedSeater,
+                        onChanged: (value) {
+                          selectedSeater = value;
+                          validateFields();
+                        },
+                        validationMessage: StringUtils.selectSeater,
+                      ),
+                      CommonDropdown(
+                        items: [StringUtils.included, StringUtils.excluded],
+                        labelText: StringUtils.fuel,
+                        selectedValue: selectedFuelIncluded,
+                        onChanged: (value) {
+                          selectedFuelIncluded = value;
+                          validateFields();
+                        },
+                        validationMessage: StringUtils.selectFuelOption,
+                      ),
+                      CommonTextField(
+                        textEditController: depositController,
+                        labelText: "${StringUtils.deposit} (\$)",
+                        keyBoardType: TextInputType.number,
+                        onChange: (_) => validateFields(),
+                        validator:
+                            (value) =>
+                                value!.isEmpty ? StringUtils.enterDepositAmount : null,
+                      ),
+                      CommonTextField(
+                        textEditController: extraPerKmController,
+                        labelText: StringUtils.extraPerKm,
+                        keyBoardType: TextInputType.number,
+                        onChange: (_) => validateFields(),
+                        validator:
+                            (value) =>
+                                value!.isEmpty ? StringUtils.enterExtraKmRate : null,
+                      ),
+                      CommonTextField(
+                        textEditController: kmLimitController,
+                        labelText: StringUtils.kmLimit,
+                        keyBoardType: TextInputType.number,
+                        onChange: (_) => validateFields(),
+                        validator:
+                            (value) => value!.isEmpty ? StringUtils.enterKmLimit : null,
+                      ),
+                      CommonTextField(
+                        textEditController: makeYearController,
+                        labelText: StringUtils.makeYear,
+                        readOnly: false,
+                        onTap: () async {
+                          final currentYear = DateTime.now().year;
+                          int? selectedYear = await showDialog<int>(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: CustomText(StringUtils.selectYear),
+                                content: SizedBox(
+                                  height: 300,
+                                  width: 300,
+                                  child: YearPicker(
+                                    firstDate: DateTime(1980),
+                                    lastDate: DateTime(currentYear),
+                                    initialDate: DateTime(currentYear),
+                                    selectedDate:
+                                        DateTime.tryParse(makeYearController.text) ??
+                                        DateTime(currentYear),
+                                    onChanged: (DateTime dateTime) {
+                                      Navigator.of(context).pop(dateTime.year);
+                                    },
+                                  ),
+                                ),
                               );
                             },
-                            icon: Icon(Icons.camera_alt_outlined),
-                          ),
+                          );
+
+                          if (selectedYear != null) {
+                            makeYearController.text = selectedYear.toString();
+                            validateFields();
+                          }
+                        },
+
+                        validator:
+                            (value) =>
+                                value!.isEmpty ? StringUtils.enterMakeYear : null,
+                      ),
+                      CommonTextField(
+                        textEditController: tripsDoneController,
+                        labelText: StringUtils.tripsDone,
+                        keyBoardType: TextInputType.number,
+                        onChange: (_) => validateFields(),
+                        validator:
+                            (value) =>
+                                value!.isEmpty ? StringUtils.enterTripsDone : null,
+                      ),
+                      CommonTextField(
+                        textEditController: descriptionController,
+                        labelText: StringUtils.bikeDescription,
+                        keyBoardType: TextInputType.name,
+                        onChange: (_) => validateFields(),
+                        validator:
+                            (value) =>
+                                value!.isEmpty ? StringUtils.enterDescription : null,
+                        maxLine: 3,
+                      ),
+                      SizedBox(height: 20),
+
+                      Obx(
+                        () => CustomBtn(
+                          title:
+                              bike == null
+                                  ? StringUtils.addBike
+                                  : StringUtils.updateBike,
+                          onTap:
+                              (isProcessing.value || !isValid.value)
+                                  ? null
+                                  : () async {
+                                    if (key.currentState?.validate() ?? false) {
+                                      try {
+                                        isProcessing.value = true;
+                                        var userId =
+                                            await SharedPreferenceUtils.getString(
+                                              SharedPreferenceUtils.userId,
+                                            );
+                                        logs('User ID ---> $userId');
+                                        if (!isValid.value) return;
+
+                                        BikeModel newBike = BikeModel(
+                                          id: bike?.id,
+                                          name: nameController.text.trim(),
+                                          model: modelController.text.trim(),
+                                          numberPlate:
+                                              numberPlateController.text.trim(),
+                                          rentPerDay: double.parse(
+                                            rentController.text.trim(),
+                                          ),
+                                          location: locationController.text.trim(),
+                                          fuelType: fuelTypeController.text.trim(),
+                                          mileage: num.parse(
+                                            mileageController.text.trim(),
+                                          ),
+                                          engineCC: num.parse(ccController.text.trim()),
+                                          description:
+                                              descriptionController.text.trim(),
+                                          imageUrl:
+                                              bikeController.selectedImagePath.value,
+                                          createdAt: DateTime.now(),
+                                          userId: int.parse(userId),
+                                          deposit: double.parse(
+                                            depositController.text.trim(),
+                                          ),
+                                          extraPerKm: double.parse(
+                                            extraPerKmController.text.trim(),
+                                          ),
+                                          kmLimit: double.parse(
+                                            kmLimitController.text.trim(),
+                                          ),
+                                          makeYear: int.parse(
+                                            makeYearController.text.trim(),
+                                          ),
+                                          tripsDone: int.parse(
+                                            tripsDoneController.text.trim(),
+                                          ),
+                                          transmission: selectedTransmission!,
+                                          seater: int.parse(selectedSeater!),
+                                          fuelIncluded: selectedFuelIncluded!,
+                                        );
+
+                                        if (bike != null &&
+                                            bike.name == newBike.name &&
+                                            bike.model == newBike.model &&
+                                            bike.numberPlate == newBike.numberPlate &&
+                                            bike.rentPerDay == newBike.rentPerDay &&
+                                            bike.location == newBike.location &&
+                                            bike.fuelType == newBike.fuelType &&
+                                            bike.mileage == newBike.mileage &&
+                                            bike.engineCC == newBike.engineCC &&
+                                            bike.description == newBike.description &&
+                                            bike.imageUrl == newBike.imageUrl) {
+                                          showCustomSnackBar(
+                                            message:
+                                                StringUtils
+                                                    .pleaseChangeTheDataBeforeSaving,
+                                          );
+                                          isProcessing.value = false;
+                                          return;
+                                        }
+
+                                        if (bike == null) {
+                                          await bikeController.addBike(newBike);
+                                        } else {
+                                          await bikeController.updateBike(newBike);
+                                        }
+                                        await bikeController.fetchBikes();
+                                        isProcessing.value = false;
+                                        Get.back();
+                                        showCustomSnackBar(
+                                          message: StringUtils.bikeAddedSuccessfully,
+                                        );
+                                      } catch (e) {
+                                        logs("----e---${e.toString()}");
+                                      }
+                                    } else {
+                                      logs("---NOT VALIDATE");
+                                    }
+                                  },
+                          bgColor:
+                              (isProcessing.value || !isValid.value)
+                                  ? ColorUtils.primary.withOpacity(0.4)
+                                  : ColorUtils.primary,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ),
-              ),
-              SizedBox(height: 10.h),
-
-              CommonTextField(
-                textEditController: nameController,
-                labelText: StringUtils.bikeName,
-                keyBoardType: TextInputType.name,
-                validator:
-                    (value) =>
-                        value!.isEmpty ? StringUtils.enterBikeName : null,
-                onChange: (_) => validateFields(),
-              ),
-              CommonTextField(
-                textEditController: modelController,
-                labelText: StringUtils.bikeModel,
-                keyBoardType: TextInputType.name,
-                validator:
-                    (value) =>
-                        value!.isEmpty ? StringUtils.enterBikeModel : null,
-                onChange: (_) => validateFields(),
-              ),
-              CommonTextField(
-                textEditController: numberPlateController,
-                labelText: StringUtils.numberPlate,
-                keyBoardType: TextInputType.name,
-                validator:
-                    (value) =>
-                        value!.isEmpty ? StringUtils.enterNumberPlate : null,
-                onChange: (_) => validateFields(),
-              ),
-              CommonTextField(
-                textEditController: rentController,
-                labelText: StringUtils.rentPerDay,
-                keyBoardType: TextInputType.number,
-                validator:
-                    (value) =>
-                        value!.isEmpty ? StringUtils.enterRentPrice : null,
-                onChange: (_) => validateFields(),
-              ),
-              CommonTextField(
-                textEditController: locationController,
-                labelText: StringUtils.bikeLocation,
-                keyBoardType: TextInputType.name,
-                validator:
-                    (value) =>
-                        value!.isEmpty ? StringUtils.enterLocation : null,
-                onChange: (_) => validateFields(),
-              ),
-              CommonDropdown(
-                items: [
-                  StringUtils.petrol,
-                  StringUtils.diesel,
-                  StringUtils.electric,
-                ],
-                labelText: StringUtils.fuelType,
-                selectedValue:
-                    fuelTypeController.text.isNotEmpty
-                        ? fuelTypeController.text
-                        : null,
-                onChanged: (value) {
-                  fuelTypeController.text = value ?? "";
-                  validateFields();
-                },
-                validationMessage: StringUtils.selectFuelType,
-              ),
-              CommonTextField(
-                textEditController: mileageController,
-                labelText: StringUtils.mileage,
-                keyBoardType: TextInputType.number,
-                validator:
-                    (value) => value!.isEmpty ? StringUtils.enterMileage : null,
-                onChange: (_) => validateFields(),
-              ),
-              CommonTextField(
-                textEditController: ccController,
-                labelText: StringUtils.engineCC,
-                keyBoardType: TextInputType.number,
-                validator:
-                    (value) =>
-                        value!.isEmpty ? StringUtils.enterEngineCC : null,
-                onChange: (_) => validateFields(),
-              ),
-              // CommonDropdown for Transmission
-              CommonDropdown(
-                items: [
-                  StringUtils.automatic,
-                  StringUtils.manual,
-                  StringUtils.semiAutomatic,
-                ],
-                labelText: StringUtils.transmission,
-                selectedValue: selectedTransmission,
-                onChanged: (value) {
-                  selectedTransmission = value;
-                  validateFields();
-                },
-                validationMessage: StringUtils.selectTransmission,
-              ),
-              CommonDropdown(
-                items: ["1", "2", "3", "4", "5", "6"],
-                labelText: StringUtils.seater,
-                selectedValue: selectedSeater,
-                onChanged: (value) {
-                  selectedSeater = value;
-                  validateFields();
-                },
-                validationMessage: StringUtils.selectSeater,
-              ),
-              CommonDropdown(
-                items: [StringUtils.included, StringUtils.excluded],
-                labelText: StringUtils.fuel,
-                selectedValue: selectedFuelIncluded,
-                onChanged: (value) {
-                  selectedFuelIncluded = value;
-                  validateFields();
-                },
-                validationMessage: StringUtils.selectFuelOption,
-              ),
-              CommonTextField(
-                textEditController: depositController,
-                labelText: "${StringUtils.deposit} (\$)",
-                keyBoardType: TextInputType.number,
-                onChange: (_) => validateFields(),
-                validator:
-                    (value) =>
-                        value!.isEmpty ? StringUtils.enterDepositAmount : null,
-              ),
-              CommonTextField(
-                textEditController: extraPerKmController,
-                labelText: StringUtils.extraPerKm,
-                keyBoardType: TextInputType.number,
-                onChange: (_) => validateFields(),
-                validator:
-                    (value) =>
-                        value!.isEmpty ? StringUtils.enterExtraKmRate : null,
-              ),
-              CommonTextField(
-                textEditController: kmLimitController,
-                labelText: StringUtils.kmLimit,
-                keyBoardType: TextInputType.number,
-                onChange: (_) => validateFields(),
-                validator:
-                    (value) => value!.isEmpty ? StringUtils.enterKmLimit : null,
-              ),
-              CommonTextField(
-                textEditController: makeYearController,
-                labelText: StringUtils.makeYear,
-                readOnly: false,
-                onTap: () async {
-                  final currentYear = DateTime.now().year;
-                  int? selectedYear = await showDialog<int>(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: CustomText(StringUtils.selectYear),
-                        content: SizedBox(
-                          height: 300,
-                          width: 300,
-                          child: YearPicker(
-                            firstDate: DateTime(1980),
-                            lastDate: DateTime(currentYear),
-                            initialDate: DateTime(currentYear),
-                            selectedDate:
-                                DateTime.tryParse(makeYearController.text) ??
-                                DateTime(currentYear),
-                            onChanged: (DateTime dateTime) {
-                              Navigator.of(context).pop(dateTime.year);
-                            },
-                          ),
-                        ),
-                      );
-                    },
-                  );
-
-                  if (selectedYear != null) {
-                    makeYearController.text = selectedYear.toString();
-                    validateFields();
-                  }
-                },
-
-                validator:
-                    (value) =>
-                        value!.isEmpty ? StringUtils.enterMakeYear : null,
-              ),
-              CommonTextField(
-                textEditController: tripsDoneController,
-                labelText: StringUtils.tripsDone,
-                keyBoardType: TextInputType.number,
-                onChange: (_) => validateFields(),
-                validator:
-                    (value) =>
-                        value!.isEmpty ? StringUtils.enterTripsDone : null,
-              ),
-              CommonTextField(
-                textEditController: descriptionController,
-                labelText: StringUtils.bikeDescription,
-                keyBoardType: TextInputType.name,
-                onChange: (_) => validateFields(),
-                validator:
-                    (value) =>
-                        value!.isEmpty ? StringUtils.enterDescription : null,
-                maxLine: 3,
-              ),
-              SizedBox(height: 20),
-
-              Obx(
-                () => CustomBtn(
-                  title:
-                      bike == null
-                          ? StringUtils.addBike
-                          : StringUtils.updateBike,
-                  onTap:
-                      (isProcessing.value || !isValid.value)
-                          ? null
-                          : () async {
-                            if (key.currentState?.validate() ?? false) {
-                              try {
-                                isProcessing.value = true;
-                                var userId =
-                                    await SharedPreferenceUtils.getString(
-                                      SharedPreferenceUtils.userId,
-                                    );
-                                logs('User ID ---> $userId');
-                                if (!isValid.value) return;
-
-                                BikeModel newBike = BikeModel(
-                                  id: bike?.id,
-                                  name: nameController.text.trim(),
-                                  model: modelController.text.trim(),
-                                  numberPlate:
-                                      numberPlateController.text.trim(),
-                                  rentPerDay: double.parse(
-                                    rentController.text.trim(),
-                                  ),
-                                  location: locationController.text.trim(),
-                                  fuelType: fuelTypeController.text.trim(),
-                                  mileage: num.parse(
-                                    mileageController.text.trim(),
-                                  ),
-                                  engineCC: num.parse(ccController.text.trim()),
-                                  description:
-                                      descriptionController.text.trim(),
-                                  imageUrl:
-                                      bikeController.selectedImagePath.value,
-                                  createdAt: DateTime.now(),
-                                  userId: int.parse(userId),
-                                  deposit: double.parse(
-                                    depositController.text.trim(),
-                                  ),
-                                  extraPerKm: double.parse(
-                                    extraPerKmController.text.trim(),
-                                  ),
-                                  kmLimit: double.parse(
-                                    kmLimitController.text.trim(),
-                                  ),
-                                  makeYear: int.parse(
-                                    makeYearController.text.trim(),
-                                  ),
-                                  tripsDone: int.parse(
-                                    tripsDoneController.text.trim(),
-                                  ),
-                                  transmission: selectedTransmission!,
-                                  seater: int.parse(selectedSeater!),
-                                  fuelIncluded: selectedFuelIncluded!,
-                                );
-
-                                if (bike != null &&
-                                    bike.name == newBike.name &&
-                                    bike.model == newBike.model &&
-                                    bike.numberPlate == newBike.numberPlate &&
-                                    bike.rentPerDay == newBike.rentPerDay &&
-                                    bike.location == newBike.location &&
-                                    bike.fuelType == newBike.fuelType &&
-                                    bike.mileage == newBike.mileage &&
-                                    bike.engineCC == newBike.engineCC &&
-                                    bike.description == newBike.description &&
-                                    bike.imageUrl == newBike.imageUrl) {
-                                  showCustomSnackBar(
-                                    message:
-                                        StringUtils
-                                            .pleaseChangeTheDataBeforeSaving,
-                                  );
-                                  isProcessing.value = false;
-                                  return;
-                                }
-
-                                if (bike == null) {
-                                  await bikeController.addBike(newBike);
-                                } else {
-                                  await bikeController.updateBike(newBike);
-                                }
-                                await bikeController.fetchBikes();
-                                isProcessing.value = false;
-                                Get.back();
-                                showCustomSnackBar(
-                                  message: StringUtils.bikeAddedSuccessfully,
-                                );
-                              } catch (e) {
-                                logs("----e---${e.toString()}");
-                              }
-                            } else {
-                              logs("---NOT VALIDATE");
-                            }
-                          },
-                  bgColor:
-                      (isProcessing.value || !isValid.value)
-                          ? ColorUtils.primary.withOpacity(0.4)
-                          : ColorUtils.primary,
                 ),
               ),
             ],
@@ -504,6 +513,7 @@ void showAddBikeBottomSheet(
       ),
     ),
     isScrollControlled: true,
+    
   ).then((value) {
     (bikeController.bikeImage.value = File(''));
   });

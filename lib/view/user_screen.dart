@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:rental_motor_cycle/commonWidgets/common_dropdown.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_text_field.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
@@ -25,7 +26,7 @@ class _EmployeesState extends State<EmployeesScreen> {
   final TextEditingController fullnameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   String selectedRole = StringUtils.admin; // Default role
-  List employRoleList = [StringUtils.admin, StringUtils.manager];
+  List<String> employRoleList = [StringUtils.admin, StringUtils.manager];
   final _formKey = GlobalKey<FormState>();
 
   var isProcessing = false.obs;
@@ -50,7 +51,7 @@ class _EmployeesState extends State<EmployeesScreen> {
       Container(
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).brightness == Brightness.dark?ColorUtils.darkThemeBg:Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: SingleChildScrollView(
@@ -123,25 +124,10 @@ class _EmployeesState extends State<EmployeesScreen> {
                   labelText: StringUtils.password,
                 ),
                 SizedBox(height: 10.h),
-                DropdownButtonFormField<String>(
-                  value: selectedRole,
-                  items:
-                      employRoleList.map((role) {
-                        return DropdownMenuItem<String>(
-                          value: role,
-                          child: CustomText(role, color: Colors.black),
-                        );
-                      }).toList(),
-                  decoration: InputDecoration(
-                    labelText: StringUtils.role,
-                    prefixIcon: Icon(
-                      Icons.person_outline,
-                      color: ColorUtils.grey99,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
+                CommonDropdown(
+                  items: employRoleList,
+                  labelText: StringUtils.seater,
+                  selectedValue: selectedRole,
                   onChanged: (value) {
                     if (value != null) {
                       setState(() {
@@ -149,7 +135,35 @@ class _EmployeesState extends State<EmployeesScreen> {
                       });
                     }
                   },
+                  validationMessage: StringUtils.selectSeater,
                 ),
+                // DropdownButtonFormField<String>(
+                //   value: selectedRole,
+                //   items:
+                //       employRoleList.map((role) {
+                //         return DropdownMenuItem<String>(
+                //           value: role,
+                //           child: CustomText(role, color: Colors.black),
+                //         );
+                //       }).toList(),
+                //   decoration: InputDecoration(
+                //     labelText: StringUtils.role,
+                //     prefixIcon: Icon(
+                //       Icons.person_outline,
+                //       color: ColorUtils.grey99,
+                //     ),
+                //     border: OutlineInputBorder(
+                //       borderRadius: BorderRadius.circular(8),
+                //     ),
+                //   ),
+                //   onChanged: (value) {
+                //     if (value != null) {
+                //       setState(() {
+                //         selectedRole = value;
+                //       });
+                //     }
+                //   },
+                // ),
                 Obx(
                   () => ElevatedButton(
                     onPressed:
