@@ -16,7 +16,7 @@ import 'package:rental_motor_cycle/utils/shared_preference_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import 'package:rental_motor_cycle/view/my_bike/dialogs/my_bike_dialogs.dart';
 import '../../controller/bike_controller.dart';
-import '../../controller/user_controller.dart';
+import '../../controller/employee_controller.dart';
 
 class MyBikesScreen extends StatefulWidget {
   const MyBikesScreen({super.key});
@@ -26,7 +26,7 @@ class MyBikesScreen extends StatefulWidget {
 
 class _MyBikesScreenState extends State<MyBikesScreen> {
   final BikeController bikeController = Get.find<BikeController>();
-  final UserController userController = Get.find<UserController>();
+  final EmployeeController employeeController = Get.find<EmployeeController>();
   final TextEditingController roomNameController = TextEditingController();
   final TextEditingController roomDescController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -90,9 +90,9 @@ class _MyBikesScreenState extends State<MyBikesScreen> {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child:
-                            bike.imageUrl.isNotEmpty
+                            bike.imageUrl?.isNotEmpty ?? false
                                 ? Image.file(
-                                  File(bike.imageUrl),
+                                  File(bike.imageUrl ?? ""),
                                   height: 100.w,
                                   width: 120.w,
                                   fit: BoxFit.cover,
@@ -117,7 +117,7 @@ class _MyBikesScreenState extends State<MyBikesScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             CustomText(
-                              bike.name,
+                              bike.name ?? "",
                               fontWeight: FontWeight.bold,
                               fontSize: 18.sp,
                               maxLines: 2,
@@ -131,7 +131,7 @@ class _MyBikesScreenState extends State<MyBikesScreen> {
                             ),
                             SizedBox(height: 4),
                             CustomText(
-                              "💰 ${bike.rentPerDay.toStringAsFixed(2)} ${StringUtils.perDay}",
+                              "💰 ${bike.rentPerDay?.toStringAsFixed(2)} ${StringUtils.perDay}",
                               fontWeight: FontWeight.bold,
                               fontSize: 15.sp,
                               color: ColorUtils.primary,

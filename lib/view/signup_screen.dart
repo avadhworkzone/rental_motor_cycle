@@ -5,7 +5,7 @@ import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_btn.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_snackbar.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_text_field.dart';
-import 'package:rental_motor_cycle/controller/user_controller.dart';
+import 'package:rental_motor_cycle/controller/employee_controller.dart';
 import 'package:rental_motor_cycle/database/db_helper.dart';
 import 'package:rental_motor_cycle/routs/app_page.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
@@ -30,7 +30,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController fullnameController = TextEditingController();
-  final UserController userController = Get.find<UserController>();
+  final EmployeeController employeeController = Get.find<EmployeeController>();
   var isProcessing = false.obs;
 
   void _signup() async {
@@ -39,7 +39,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
       // await DBHelper.insertUser();
 
-      await userController.addLoginUser(
+      await employeeController.addLoginUser(
         LoginUserModel(
           username: usernameController.text.trim(),
           password: passwordController.text.trim(),

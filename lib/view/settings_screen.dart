@@ -5,7 +5,7 @@ import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
 import 'package:rental_motor_cycle/utils/shared_preference_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import 'package:rental_motor_cycle/utils/download_db.dart';
-import '../controller/user_controller.dart';
+import '../controller/employee_controller.dart';
 import '../controller/bike_controller.dart';
 import '../controller/bike_booking_controller.dart';
 import '../database/db_helper.dart';
@@ -17,7 +17,7 @@ class SettingsScreen extends StatelessWidget {
   final isLoading =
       false.obs; // ✅ Prevents multiple database operations at once
 
-  final UserController userController = Get.find();
+  final EmployeeController employeeController = Get.find();
   final BikeController bikeController = Get.find();
   final BikeBookingController bikeBookingController = Get.find();
   final BadgeController badgeController = Get.find();
@@ -34,7 +34,7 @@ class SettingsScreen extends StatelessWidget {
 
         if (table == "Users") {
           await txn.execute("DELETE FROM Users;");
-          await userController.fetchUsers();
+          await employeeController.fetchUsers();
         } else if (table == "Rooms") {
           await txn.execute("DELETE FROM Rooms;");
           await bikeController.fetchBikes();
@@ -45,7 +45,7 @@ class SettingsScreen extends StatelessWidget {
           await txn.execute("DELETE FROM Reservations;");
           await txn.execute("DELETE FROM Rooms;");
           await txn.execute("DELETE FROM Users;");
-          await userController.fetchUsers();
+          await employeeController.fetchUsers();
           await bikeController.fetchBikes();
           await bikeBookingController.fetchBookings();
         }

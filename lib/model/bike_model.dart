@@ -2,53 +2,53 @@ import 'package:rental_motor_cycle/utils/string_utils.dart';
 
 class BikeModel {
   int? id;
-  String name;
-  String model;
-  String numberPlate;
-  double rentPerDay;
-  String location;
-  String fuelType;
-  num mileage;
-  num engineCC;
-  String description;
-  String imageUrl;
-  int userId;
-  DateTime createdAt;
+  String? name;
+  String? model;
+  String? numberPlate;
+  double? rentPerDay;
+  String? location;
+  String? fuelType;
+  num? mileage;
+  num? engineCC;
+  String? description;
+  String? imageUrl;
+  int? userId;
+  DateTime? createdAt;
 
   // NEW FIELDS
-  double deposit;
-  double extraPerKm;
-  double kmLimit;
-  int makeYear;
-  int tripsDone;
-  String transmission;
-  int seater;
-  String fuelIncluded;
+  double? deposit;
+  double? extraPerKm;
+  double? kmLimit;
+  int? makeYear;
+  int? tripsDone;
+  String? transmission;
+  int? seater;
+  String? fuelIncluded;
 
   BikeModel({
     this.id,
-    required this.name,
-    required this.model,
-    required this.numberPlate,
-    required this.rentPerDay,
-    required this.location,
-    required this.fuelType,
-    required this.mileage,
-    required this.engineCC,
-    required this.description,
+    this.name,
+    this.model,
+    this.numberPlate,
+    this.rentPerDay,
+    this.location,
+    this.fuelType,
+    this.mileage,
+    this.engineCC,
+    this.description,
     this.imageUrl = "",
-    required this.userId,
-    required this.createdAt,
+    this.userId,
+    this.createdAt,
 
     // NEW FIELDS
-    required this.deposit,
-    required this.extraPerKm,
-    required this.kmLimit,
-    required this.makeYear,
-    required this.tripsDone,
-    required this.transmission,
-    required this.seater,
-    required this.fuelIncluded,
+    this.deposit,
+    this.extraPerKm,
+    this.kmLimit,
+    this.makeYear,
+    this.tripsDone,
+    this.transmission,
+    this.seater,
+    this.fuelIncluded,
   });
 
   Map<String, dynamic> toMap() {
@@ -65,7 +65,7 @@ class BikeModel {
       'description': description,
       'imageUrl': imageUrl,
       'userId': userId,
-      'createdAt': createdAt.toIso8601String(),
+      'createdAt': createdAt?.toIso8601String(),
 
       // NEW FIELDS
       'deposit': deposit,

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -31,7 +30,7 @@ void showAddBikeBottomSheet(
     text: bike?.numberPlate ?? "",
   );
   final TextEditingController rentController = TextEditingController(
-    text: bike?.rentPerDay.toStringAsFixed(0) ?? "",
+    text: bike?.rentPerDay?.toStringAsFixed(0) ?? "",
   );
   final TextEditingController locationController = TextEditingController(
     text: bike?.location ?? "",
@@ -40,22 +39,22 @@ void showAddBikeBottomSheet(
     text: bike?.fuelType ?? "",
   );
   final TextEditingController mileageController = TextEditingController(
-    text: bike?.mileage.toStringAsFixed(0) ?? "",
+    text: bike?.mileage?.toStringAsFixed(0) ?? "",
   );
   final TextEditingController ccController = TextEditingController(
-    text: bike?.engineCC.toStringAsFixed(0) ?? "",
+    text: bike?.engineCC?.toStringAsFixed(0) ?? "",
   );
   final TextEditingController descriptionController = TextEditingController(
     text: bike?.description ?? "",
   );
   final TextEditingController depositController = TextEditingController(
-    text: bike?.deposit.toStringAsFixed(0) ?? "",
+    text: bike?.deposit?.toStringAsFixed(0) ?? "",
   );
   final TextEditingController extraPerKmController = TextEditingController(
-    text: bike?.extraPerKm.toStringAsFixed(0) ?? "",
+    text: bike?.extraPerKm?.toStringAsFixed(0) ?? "",
   );
   final TextEditingController kmLimitController = TextEditingController(
-    text: bike?.kmLimit.toStringAsFixed(0) ?? "",
+    text: bike?.kmLimit?.toStringAsFixed(0) ?? "",
   );
   final TextEditingController tripsDoneController = TextEditingController(
     text: bike?.tripsDone.toString() ?? "",
@@ -68,9 +67,9 @@ void showAddBikeBottomSheet(
   String? selectedSeater = bike?.seater.toString();
   String? selectedFuelIncluded = bike?.fuelIncluded;
 
-  if (bike != null && bike.imageUrl.isNotEmpty) {
-    bikeController.bikeImage.value = File(bike.imageUrl);
-    bikeController.selectedImagePath.value = bike.imageUrl;
+  if (bike != null && (bike.imageUrl?.isNotEmpty ?? false)) {
+    bikeController.bikeImage.value = File(bike.imageUrl ?? "");
+    bikeController.selectedImagePath.value = bike.imageUrl ?? "";
   }
 
   var isValid = false.obs;
@@ -212,11 +211,11 @@ void showAddBikeBottomSheet(
               ),
               CommonTextField(
                 textEditController: numberPlateController,
-                labelText: StringUtils.numberPlate,
+                labelText: StringUtils.vehicleNumber,
                 keyBoardType: TextInputType.name,
                 validator:
                     (value) =>
-                        value!.isEmpty ? StringUtils.enterNumberPlate : null,
+                        value!.isEmpty ? StringUtils.enterVehicleNumber : null,
                 onChange: (_) => validateFields(),
               ),
               CommonTextField(
@@ -308,7 +307,7 @@ void showAddBikeBottomSheet(
               ),
               CommonTextField(
                 textEditController: depositController,
-                labelText: "${StringUtils.deposit} (\$)",
+                labelText: "${StringUtils.deposit}: (\$)",
                 keyBoardType: TextInputType.number,
                 onChange: (_) => validateFields(),
                 validator:
@@ -494,7 +493,7 @@ void showAddBikeBottomSheet(
                           },
                   bgColor:
                       (isProcessing.value || !isValid.value)
-                          ? ColorUtils.primary.withOpacity(0.4)
+                          ? ColorUtils.primary.withValues(alpha: 0.4)
                           : ColorUtils.primary,
                 ),
               ),

@@ -8,17 +8,19 @@ import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/shared_preference_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
-import '../controller/user_controller.dart';
+import '../controller/employee_controller.dart';
 import '../model/user_model.dart';
 
 class EmployeesScreen extends StatefulWidget {
   const EmployeesScreen({super.key});
+
   @override
   State<EmployeesScreen> createState() => _EmployeesState();
 }
 
 class _EmployeesState extends State<EmployeesScreen> {
-  final UserController userController = Get.find<UserController>();
+  final EmployeeController employeeController = Get.find<EmployeeController>();
+
   // ✅ Use Get.find() to avoid multiple instances
   final TextEditingController mobileController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -86,8 +88,6 @@ class _EmployeesState extends State<EmployeesScreen> {
                   validator: (value) {
                     if (value!.isEmpty) {
                       return StringUtils.enterMobileNumber;
-                    } else if (value.length < 10 || value.length > 10) {
-                      return StringUtils.mobileNumberValidation;
                     }
                     return null;
                   },
@@ -158,9 +158,6 @@ class _EmployeesState extends State<EmployeesScreen> {
                             : () async {
                               if (_formKey.currentState!.validate()) {
                                 // ✅ Validation
-                                String mobilePattern =
-                                    r'^[0-9]{10}$'; // Only 10-digit numbers
-                                RegExp regExp = RegExp(mobilePattern);
 
                                 if (fullnameController.text.trim().isEmpty) {
                                   Get.snackbar(
@@ -169,21 +166,10 @@ class _EmployeesState extends State<EmployeesScreen> {
                                   );
                                   return;
                                 }
-                                if (!regExp.hasMatch(
-                                  mobileController.text.trim(),
-                                )) {
-                                  Get.snackbar(
-                                    StringUtils.error,
-                                    StringUtils.validMobileRequired,
-                                  );
-                                  return;
-                                }
-
-                                isProcessing.value =
-                                    true; // ✅ Prevent multiple clicks
+                                isProcessing.value = true;
                                 await Future.delayed(
                                   Duration(milliseconds: 300),
-                                ); // ✅ Ensure previous writes finish
+                                );
 
                                 var userId = SharedPreferenceUtils.getString(
                                   SharedPreferenceUtils.userId,
@@ -192,21 +178,19 @@ class _EmployeesState extends State<EmployeesScreen> {
                                 log('user id ---> $userId');
 
                                 if (user == null) {
-                                  await userController.addUser(
+                                  await employeeController.addUser(
                                     UserModel(
                                       mobileNumber:
                                           mobileController.text.trim(),
                                       userId: await userId,
                                       fullname: fullnameController.text.trim(),
                                       emailId: emailController.text.trim(),
-                                      password:
-                                          passwordController.text
-                                              .trim(), // ✅ added
+                                      password: passwordController.text.trim(),
                                       role: selectedRole,
                                     ),
                                   );
                                 } else {
-                                  await userController.updateUser(
+                                  await employeeController.updateUser(
                                     UserModel(
                                       id: user.id,
                                       userId: await userId,
@@ -214,16 +198,13 @@ class _EmployeesState extends State<EmployeesScreen> {
                                           mobileController.text.trim(),
                                       fullname: fullnameController.text.trim(),
                                       emailId: emailController.text.trim(),
-                                      password:
-                                          passwordController.text
-                                              .trim(), // ✅ added
+                                      password: passwordController.text.trim(),
                                       role: selectedRole,
                                     ),
                                   );
                                 }
 
-                                await userController
-                                    .fetchUsers(); // ✅ Update list immediately
+                                await employeeController.fetchUsers();
                                 isProcessing.value = false;
                                 Get.back();
                               }
@@ -253,10 +234,10 @@ class _EmployeesState extends State<EmployeesScreen> {
       confirmTextColor: Colors.black,
       cancelTextColor: Colors.black,
       onConfirm: () async {
-        isProcessing.value = true; // ✅ Prevent multiple clicks
-        await Future.delayed(Duration(milliseconds: 300)); // ✅ Delay execution
-        await userController.deleteUser(id);
-        await userController.fetchUsers(); // ✅ Refresh user list after delete
+        isProcessing.value = true;
+        await Future.delayed(Duration(milliseconds: 300));
+        await employeeController.deleteUser(id);
+        await employeeController.fetchUsers();
         isProcessing.value = false;
         Get.back();
       },
@@ -280,15 +261,15 @@ class _EmployeesState extends State<EmployeesScreen> {
       ),
       body: Obx(
         () =>
-            userController.userList.isEmpty
+            employeeController.userList.isEmpty
                 ? Center(child: CustomText(StringUtils.noUsersFound))
                 : Column(
                   children: [
                     Expanded(
                       child: ListView.builder(
-                        itemCount: userController.userList.length,
+                        itemCount: employeeController.userList.length,
                         itemBuilder: (context, index) {
-                          final user = userController.userList[index];
+                          final user = employeeController.userList[index];
                           return Card(
                             elevation: 4,
                             margin: EdgeInsets.symmetric(

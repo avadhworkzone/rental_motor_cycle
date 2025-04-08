@@ -48,7 +48,7 @@ class _NewBookBikeScreenState extends State<NewBookBikeScreen> {
         titleText: StringUtils.bookBike,
         context: context,
         isLeading: false,
-        isCenterTitle: true,
+        isCenterTitle: false,
         fontSize: 20.sp,
         fontWeight: FontWeight.w600,
       ),
@@ -88,7 +88,7 @@ class _NewBookBikeScreenState extends State<NewBookBikeScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                if (bike.tripsDone > 0)
+                if ((bike.tripsDone ?? 0) > 0)
                   Container(
                     padding: EdgeInsets.symmetric(
                       horizontal: 8.w,
@@ -110,7 +110,7 @@ class _NewBookBikeScreenState extends State<NewBookBikeScreen> {
             ClipRRect(
               borderRadius: BorderRadius.circular(10.r),
               child: Image.file(
-                File(bike.imageUrl),
+                File(bike.imageUrl ?? ""),
                 height: 180.h,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -120,12 +120,12 @@ class _NewBookBikeScreenState extends State<NewBookBikeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _iconText(Icons.settings, bike.transmission),
+                _iconText(Icons.settings, bike.transmission ?? ""),
                 _iconText(
                   Icons.event_seat,
                   "${bike.seater} ${StringUtils.seater}",
                 ),
-                _iconText(Icons.local_gas_station, bike.fuelType),
+                _iconText(Icons.local_gas_station, bike.fuelType ?? ""),
               ],
             ),
             Divider(height: 12.h, color: Colors.grey.shade300),
@@ -147,18 +147,21 @@ class _NewBookBikeScreenState extends State<NewBookBikeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CustomText(
-                      "\$ ${bike.rentPerDay.toStringAsFixed(0)}/day",
+                      "\$ ${bike.rentPerDay?.toStringAsFixed(0)}${StringUtils.perDay}",
                       fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.green,
                     ),
                     SizedBox(height: 4.h),
-                    _textRow("${StringUtils.kmLimit} ", "${bike.kmLimit} km"),
+                    _textRow(
+                      "${StringUtils.kmLimit} ",
+                      "${bike.kmLimit} ${StringUtils.km}",
+                    ),
                     _textRow(
                       "${StringUtils.extra} ",
-                      "\$${bike.extraPerKm}/km",
+                      "\$${bike.extraPerKm}/${StringUtils.km}",
                     ),
-                    _textRow("", bike.fuelIncluded),
+                    _textRow("", bike.fuelIncluded ?? ""),
                   ],
                 ),
                 ElevatedButton(
@@ -200,8 +203,8 @@ class _NewBookBikeScreenState extends State<NewBookBikeScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _textRow(
-                  "${StringUtils.deposit} ",
-                  "\$${bike.deposit.toStringAsFixed(0)}",
+                  "${StringUtils.deposit}: ",
+                  "\$${bike.deposit?.toStringAsFixed(0)}",
                 ),
                 _textRow("${StringUtils.makeYear}: ", bike.makeYear.toString()),
               ],

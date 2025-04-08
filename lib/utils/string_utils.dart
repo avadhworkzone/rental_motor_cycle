@@ -67,8 +67,8 @@ class StringUtils {
   static const enterBikeName = "Enter Bike Name";
   static const bikeModel = "Bike Model";
   static const enterBikeModel = "Enter Bike Model";
-  static const numberPlate = "Number Plate";
-  static const enterNumberPlate = "Enter Number Plate";
+  static const vehicleNumber = "Vehicle Number";
+  static const enterVehicleNumber = "Enter Vehicle Number";
   static const rentPerDay = "Rent Per Day (\$)";
   static const enterRentPrice = "Enter Rent Price";
   static const bikeLocation = "Bike Location";
@@ -130,7 +130,7 @@ class StringUtils {
   static const String kmLimit = "Km limit:";
   static const String extra = "Extra:";
   static const String fuel = "Fuel";
-  static const String deposit = "Deposit:";
+  static const String deposit = "Deposit";
   static const String makeYear = "Make Year";
   static const String included = "Fuel Included";
   static const String excluded = "Fuel Excluded";
@@ -165,20 +165,36 @@ class StringUtils {
   static const String oneDay = "1 day";
   static const String hours = "hours";
   static const String days = "days";
-
   static const String bookingSummary = "Booking Summary";
+  static const String bookingDetails = "Booking Details";
   static const String totalRent = "Total Rent";
   static const String depositPrepayment = "Deposit / Prepayment";
   static const String amountPayable = "Amount Payable";
-
   static const String bike = "Bike";
   static const String from = "From";
   static const String to = "To";
   static const String duration = "Duration";
   static const String depositAmount = "Deposit Amount";
   static const String totalAmount = "Total Amount";
-
+  static const String km = "km";
+  static const String rent = "Rent";
   static const String bikeBookedSuccessfully = "Bike Booked Successfully!";
+  static const String pickUp = "Pick Up";
+  static const String drop = "Drop";
+  static const String back = "Back";
+  static const String bookedOn = "Booked On";
+  static const String userInfo = "User Info";
+  static const String bikeDetails = "Bike Details";
+  static const String paymentDetails = "Payment Details";
+  static const String otherDetails = "Other Details";
+  static const String goToToday = "Go to today";
+  static const String todayBooking = "Today's Booking";
+  static const String today = "Today";
+  static const String noPickUpToday = "No PickUp for today";
+  static const String noDropOffToday = "No Drop off for today";
+  static const String noBikesAddedYet = "No Bikes added yet";
+  static const String noBookingAvailableForTheDay =
+      "No booking available for the day";
 }
 
 logs(String title) {

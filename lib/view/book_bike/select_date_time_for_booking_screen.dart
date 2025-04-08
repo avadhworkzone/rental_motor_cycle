@@ -7,11 +7,18 @@ import 'package:rental_motor_cycle/commonWidgets/custom_btn.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_snackbar.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_text_field.dart';
 import 'package:rental_motor_cycle/controller/bike_booking_controller.dart';
+import 'package:rental_motor_cycle/model/bike_model.dart';
 import 'package:rental_motor_cycle/model/booking_model.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import 'package:rental_motor_cycle/view/book_bike/book_bike_screen.dart';
+
+extension DateOnlyCompare on DateTime {
+  bool isSameDate(DateTime other) {
+    return year == other.year && month == other.month && day == other.day;
+  }
+}
 
 class SelectDateTimeForBookingScreen extends StatefulWidget {
   const SelectDateTimeForBookingScreen({super.key});
@@ -34,6 +41,7 @@ class _SelectDateTimeForBookingScreenState
   final fromDate = Rxn<DateTime>();
   final toDate = Rxn<DateTime>();
   final isValid = false.obs;
+  List<BikeModel> selectedBikesList = [];
 
   @override
   void initState() {
@@ -78,16 +86,19 @@ class _SelectDateTimeForBookingScreenState
       int minHour;
 
       if (isFrom) {
-        minHour = (pickedDate.isSameDate(now)) ? now.hour + 1 : 0;
+        minHour = (DateCompare(pickedDate).isSameDate(now)) ? now.hour + 1 : 0;
       } else {
         final from = fromDate.value;
         minHour =
-            (pickedDate.isSameDate(from ?? now)) ? ((from ?? now).hour + 1) : 0;
+            (DateCompare(pickedDate).isSameDate(from ?? now))
+                ? ((from ?? now).hour + 1)
+                : 0;
       }
 
       final currentDate = isFrom ? fromDate.value : toDate.value;
       final selectedHour =
-          (currentDate != null && pickedDate.isSameDate(currentDate))
+          (currentDate != null &&
+                  DateCompare(pickedDate).isSameDate(currentDate))
               ? currentDate.hour
               : null;
 
@@ -323,16 +334,16 @@ class _SelectDateTimeForBookingScreenState
                         SizedBox(height: 10.h),
                         _buildInfoRow(
                           "${StringUtils.rentPerDay}:",
-                          "₹ ${rentPerDay.toStringAsFixed(2)}",
+                          "\$ ${rentPerDay.toStringAsFixed(2)}",
                         ),
                         _buildInfoRow("${StringUtils.duration}:", durationText),
                         _buildInfoRow(
                           "${StringUtils.totalRent}:",
-                          "₹ ${totalRent.toStringAsFixed(2)}",
+                          "\$ ${totalRent.toStringAsFixed(2)}",
                         ),
                         _buildInfoRow(
                           "${StringUtils.depositPrepayment}:",
-                          "₹ ${deposit.toStringAsFixed(2)}",
+                          "\$ ${deposit.toStringAsFixed(2)}",
                           valueColor: Colors.orange,
                         ),
                         SizedBox(height: 12.h),
@@ -433,15 +444,15 @@ class _SelectDateTimeForBookingScreenState
 
               _buildInfoRow(
                 "${StringUtils.totalRent}:",
-                "₹ ${formatAmount(totalRent)}",
+                "\$ ${formatAmount(totalRent)}",
               ),
               _buildInfoRow(
                 "${StringUtils.depositAmount}:",
-                "₹ ${formatAmount(depositAmount)}",
+                "\$ ${formatAmount(depositAmount)}",
               ),
               _buildInfoRow(
                 "${StringUtils.totalAmount}: ",
-                "₹ ${formatAmount(payableAmount)}",
+                "\$ ${formatAmount(payableAmount)}",
               ),
             ],
           ),
@@ -462,15 +473,14 @@ class _SelectDateTimeForBookingScreenState
                     onTap: () async {
                       final from = fromDate.value!;
                       final to = toDate.value!;
-
                       final pickupDate = DateTime(
                         from.year,
                         from.month,
                         from.day,
                       );
-                      final dropoffDate = DateTime(to.year, to.month, to.day);
+                      final dropOffDate = DateTime(to.year, to.month, to.day);
                       final pickupTime = DateFormat('hh:mm a').format(from);
-                      final dropoffTime = DateFormat('hh:mm a').format(to);
+                      final dropOffTime = DateFormat('hh:mm a').format(to);
 
                       final newBooking = BookingModel(
                         userId: 1,
@@ -485,15 +495,16 @@ class _SelectDateTimeForBookingScreenState
                         userPhone: phoneController.text,
                         userEmail: emailController.text,
                         pickupDate: pickupDate,
-                        dropoffDate: dropoffDate,
+                        dropoffDate: dropOffDate,
                         pickupTime: pickupTime,
-                        dropoffTime: dropoffTime,
+                        dropoffTime: dropOffTime,
                         pickupLocation: locationController.text,
                         dropoffLocation: locationController.text,
                         createdAt: DateTime.now(),
                         durationInHours: duration.inHours.toDouble(),
                         totalRent: totalRent,
                         finalAmountPayable: payableAmount,
+                        bikes: [bike],
                       );
 
                       await Get.find<BikeBookingController>().addBooking(
