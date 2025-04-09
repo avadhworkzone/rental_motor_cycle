@@ -821,7 +821,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               horizontal: 5.w,
                             ),
                             child: CustomText(
-                              bike.name ?? '',
+                              bike.brandName ?? '',
                               fontWeight: FontWeight.w500,
                               fontSize: 16.sp,
                             ),
@@ -855,7 +855,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 /// Booking Bars for this bike
                                 ...bikeBookingController.bookingList
                                     .where((booking) {
-                                      return booking.bikeName == bike.name;
+                                      return booking.bikeName == bike.brandName;
                                     })
                                     .map((booking) {
                                       final startIndex = calenderDates

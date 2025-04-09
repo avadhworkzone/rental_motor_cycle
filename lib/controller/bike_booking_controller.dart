@@ -151,8 +151,7 @@ class BikeBookingController extends GetxController {
         log(
           "📅 Booking => ${booking.bikeName} (${booking.bikeModel}) | "
           "From: ${booking.pickupDate} ${booking.pickupTime} "
-          "To: ${booking.dropoffDate} ${booking.dropoffTime} | "
-          "Location: ${booking.pickupLocation}",
+          "To: ${booking.dropoffDate} ${booking.dropoffTime} | ",
         );
       }
     } catch (e) {

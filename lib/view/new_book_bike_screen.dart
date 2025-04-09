@@ -81,29 +81,29 @@ class _NewBookBikeScreenState extends State<NewBookBikeScreen> {
               children: [
                 Expanded(
                   child: CustomText(
-                    "${bike.name} ${bike.model}",
+                    "${bike.brandName} ${bike.model}",
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                if ((bike.tripsDone ?? 0) > 0)
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 8.w,
-                      vertical: 4.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.amber,
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: CustomText(
-                      "${bike.tripsDone} ${StringUtils.trips}",
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+                // if ((bike.tripsDone ?? 0) > 0)
+                //   Container(
+                //     padding: EdgeInsets.symmetric(
+                //       horizontal: 8.w,
+                //       vertical: 4.h,
+                //     ),
+                //     decoration: BoxDecoration(
+                //       color: Colors.amber,
+                //       borderRadius: BorderRadius.circular(8.r),
+                //     ),
+                //     child: CustomText(
+                //       "${bike.tripsDone} ${StringUtils.trips}",
+                //       fontSize: 12.sp,
+                //       fontWeight: FontWeight.w500,
+                //     ),
+                //   ),
               ],
             ),
             SizedBox(height: 14.h),
@@ -146,21 +146,21 @@ class _NewBookBikeScreenState extends State<NewBookBikeScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(
-                      "\$ ${bike.rentPerDay?.toStringAsFixed(0)}${StringUtils.perDay}",
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
-                    ),
-                    SizedBox(height: 4.h),
+                    // CustomText(
+                    //   "\$ ${bike.rentPerDay?.toStringAsFixed(0)}${StringUtils.perDay}",
+                    //   fontSize: 18.sp,
+                    //   fontWeight: FontWeight.bold,
+                    //   color: Colors.green,
+                    // ),
+                    // SizedBox(height: 4.h),
                     _textRow(
-                      "${StringUtils.kmLimit} ",
+                      "${StringUtils.kmLimit}: ",
                       "${bike.kmLimit} ${StringUtils.km}",
                     ),
-                    _textRow(
-                      "${StringUtils.extra} ",
-                      "\$${bike.extraPerKm}/${StringUtils.km}",
-                    ),
+                    // _textRow(
+                    //   "${StringUtils.extra}: ",
+                    //   "\$${bike.extraPerKm}/${StringUtils.km}",
+                    // ),
                     _textRow("", bike.fuelIncluded ?? ""),
                   ],
                 ),
@@ -202,10 +202,10 @@ class _NewBookBikeScreenState extends State<NewBookBikeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _textRow(
-                  "${StringUtils.deposit}: ",
-                  "\$${bike.deposit?.toStringAsFixed(0)}",
-                ),
+                // _textRow(
+                //   "${StringUtils.deposit}: ",
+                //   "\$${bike.deposit?.toStringAsFixed(0)}",
+                // ),
                 _textRow("${StringUtils.makeYear}: ", bike.makeYear.toString()),
               ],
             ),

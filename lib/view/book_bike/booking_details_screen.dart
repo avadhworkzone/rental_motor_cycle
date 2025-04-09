@@ -255,7 +255,7 @@ class BookingDetailsScreen extends StatelessWidget {
               if (booking.discount > 0)
                 _buildPriceRow(StringUtils.discount, booking.discount),
               if (booking.prepayment > 0)
-                _buildPriceRow(StringUtils.deposit, booking.prepayment),
+                _buildPriceRow(StringUtils.securityDeposit, booking.prepayment),
               SizedBox(height: 6.h),
               _buildPriceRow(
                 StringUtils.grandTotal,

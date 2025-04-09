@@ -250,9 +250,9 @@ class _EmployeesState extends State<EmployeesScreen> {
       appBar: commonAppBar(
         titleText: StringUtils.users,
         context: context,
-        isLeading: false,
-        isCenterTitle: false,
-        fontSize: 20.sp,
+        isLeading: true,
+        isCenterTitle: true,
+        fontSize: 17.sp,
         fontWeight: FontWeight.w600,
       ),
       floatingActionButton: FloatingActionButton(

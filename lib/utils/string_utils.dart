@@ -64,8 +64,11 @@ class StringUtils {
   static const addBikeImage = "Add bike image";
   static const addNewBike = "Add New Bike";
   static const bikeName = "Bike Name";
-  static const enterBikeName = "Enter Bike Name";
+  static const selectBikeBrand = "Select bike brand";
   static const bikeModel = "Bike Model";
+  static const bikeBrandHonda = "Honda";
+  static const bikeBrandYamaha = "Yamaha";
+  static const bikeBrandSuzuki = "Suzuki";
   static const enterBikeModel = "Enter Bike Model";
   static const vehicleNumber = "Vehicle Number";
   static const enterVehicleNumber = "Enter Vehicle Number";
@@ -109,6 +112,7 @@ class StringUtils {
   static const String tax = "Tax";
   static const String discount = "Discount";
   static const String grandTotal = "Grand Total";
+  static const String balance = "Balance";
   static const String prepayment = "Prepayment";
   static const String deleteBooking = "Delete Booking";
   static const String deleteConfirmationForBooking =
@@ -127,10 +131,10 @@ class StringUtils {
   static const String trips = "Trips";
   static const String seater = "Seater";
   static const String availableAt = "Available at";
-  static const String kmLimit = "Km limit:";
-  static const String extra = "Extra:";
+  static const String kmLimit = "Km limit";
+  static const String extra = "Extra";
   static const String fuel = "Fuel";
-  static const String deposit = "Deposit";
+  static const String securityDeposit = "Security Deposit";
   static const String makeYear = "Make Year";
   static const String included = "Fuel Included";
   static const String excluded = "Fuel Excluded";
@@ -166,6 +170,7 @@ class StringUtils {
   static const String hours = "hours";
   static const String days = "days";
   static const String bookingSummary = "Booking Summary";
+  static const String typeOfPayment = "Type of Payment";
   static const String bookingDetails = "Booking Details";
   static const String totalRent = "Total Rent";
   static const String depositPrepayment = "Deposit / Prepayment";
@@ -193,8 +198,25 @@ class StringUtils {
   static const String noPickUpToday = "No PickUp for today";
   static const String noDropOffToday = "No Drop off for today";
   static const String noBikesAddedYet = "No Bikes added yet";
+  static const String reservation = "Reservation";
+  static const String thisWeek = "This Week";
+  static const String current = "Current";
+  static const String upcoming = "Upcoming";
+  static const String thisMonth = "This Month";
+  static const String custom = "Custom";
+  static const String history = "History";
+  static const String reservations = "Reservations";
+  static const String noReservationsFound = "No Reservations Found";
+  static const String bikeBrand = "Bike Brand";
+  static const String deleteReservationTitle = "Delete Reservation";
+  static const String deleteReservationMessage =
+      "Are you sure you want to delete this reservation?";
   static const String noBookingAvailableForTheDay =
       "No booking available for the day";
+  static const bikeModelHonda = "HONDA Click 125i";
+  static const bikeModelYamaha = "YAMAHA Mio i 125";
+  static const bikeModelSuzuki = "SUZUKI Skydrive 125 Fi";
+  static const selectBikeModel = "Select Bike Model";
 }
 
 logs(String title) {

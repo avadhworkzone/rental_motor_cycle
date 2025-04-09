@@ -2,13 +2,13 @@ import 'package:rental_motor_cycle/utils/string_utils.dart';
 
 class BikeModel {
   int? id;
-  String? name;
+  String? brandName;
   String? model;
   String? numberPlate;
-  double? rentPerDay;
+  // double? rentPerDay;
   String? location;
   String? fuelType;
-  num? mileage;
+  // num? mileage;
   num? engineCC;
   String? description;
   String? imageUrl;
@@ -16,24 +16,24 @@ class BikeModel {
   DateTime? createdAt;
 
   // NEW FIELDS
-  double? deposit;
-  double? extraPerKm;
+  // double? deposit;
+  // double? extraPerKm;
   double? kmLimit;
   int? makeYear;
-  int? tripsDone;
+  // int? tripsDone;
   String? transmission;
   int? seater;
   String? fuelIncluded;
 
   BikeModel({
     this.id,
-    this.name,
+    this.brandName,
     this.model,
     this.numberPlate,
-    this.rentPerDay,
+    // this.rentPerDay,
     this.location,
     this.fuelType,
-    this.mileage,
+    // this.mileage,
     this.engineCC,
     this.description,
     this.imageUrl = "",
@@ -41,11 +41,11 @@ class BikeModel {
     this.createdAt,
 
     // NEW FIELDS
-    this.deposit,
-    this.extraPerKm,
+    // this.deposit,
+    // this.extraPerKm,
     this.kmLimit,
     this.makeYear,
-    this.tripsDone,
+    // this.tripsDone,
     this.transmission,
     this.seater,
     this.fuelIncluded,
@@ -54,13 +54,13 @@ class BikeModel {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'name': name,
+      'name': brandName,
       'model': model,
       'numberPlate': numberPlate,
-      'rentPerDay': rentPerDay,
+      // 'rentPerDay': rentPerDay,
       'location': location,
       'fuelType': fuelType,
-      'mileage': mileage,
+      // 'mileage': mileage,
       'engineCC': engineCC,
       'description': description,
       'imageUrl': imageUrl,
@@ -68,11 +68,11 @@ class BikeModel {
       'createdAt': createdAt?.toIso8601String(),
 
       // NEW FIELDS
-      'deposit': deposit,
-      'extraPerKm': extraPerKm,
+      // 'deposit': deposit,
+      // 'extraPerKm': extraPerKm,
       'kmLimit': kmLimit,
       'makeYear': makeYear,
-      'tripsDone': tripsDone,
+      // 'tripsDone': tripsDone,
       'transmission': transmission,
       'seater': seater,
       'fuelIncluded': fuelIncluded,
@@ -83,13 +83,13 @@ class BikeModel {
     logs("Loading Bike: ${map['name']}, Image URL: ${map['imageUrl']}");
     return BikeModel(
       id: map['id'],
-      name: map['name'],
+      brandName: map['name'],
       model: map['model'],
       numberPlate: map['numberPlate'],
-      rentPerDay: (map['rentPerDay'] ?? 0).toDouble(),
+      // rentPerDay: (map['rentPerDay'] ?? 0).toDouble(),
       location: map['location'],
       fuelType: map['fuelType'],
-      mileage: (map['mileage'] ?? 0).toDouble(),
+      // mileage: (map['mileage'] ?? 0).toDouble(),
       engineCC: map['engineCC'] ?? 0,
       description: map['description'],
       imageUrl: map['imageUrl'] ?? '',
@@ -99,11 +99,11 @@ class BikeModel {
       ),
 
       // NEW FIELDS
-      deposit: (map['deposit'] ?? 0).toDouble(),
-      extraPerKm: (map['extraPerKm'] ?? 0).toDouble(),
+      // deposit: (map['deposit'] ?? 0).toDouble(),
+      // extraPerKm: (map['extraPerKm'] ?? 0).toDouble(),
       kmLimit: (map['kmLimit'] ?? 0).toDouble(),
       makeYear: map['makeYear'] ?? 0,
-      tripsDone: map['tripsDone'] ?? 0,
+      // tripsDone: map['tripsDone'] ?? 0,
       transmission: map['transmission'] ?? '',
       seater: map['seater'] ?? 1,
       fuelIncluded: map['fuelIncluded'] ?? '',

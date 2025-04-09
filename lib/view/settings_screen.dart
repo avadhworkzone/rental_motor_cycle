@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
+import 'package:rental_motor_cycle/routs/app_page.dart';
+import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/shared_preference_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import 'package:rental_motor_cycle/utils/download_db.dart';
@@ -100,22 +102,38 @@ class SettingsScreen extends StatelessWidget {
               children: [
                 ListTile(
                   leading: Icon(Icons.delete, color: Colors.red),
-                  title: Text("Reset Entire Database"),
+                  title: CustomText(
+                    "Reset Entire Database",
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
                   onTap: () => showResetOptions(),
                 ),
                 ListTile(
                   leading: Icon(Icons.people, color: Colors.blue),
-                  title: Text("Reset Users"),
+                  title: CustomText(
+                    "Reset Users",
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
                   onTap: () => resetDatabase(table: "Users"),
                 ),
                 ListTile(
                   leading: Icon(Icons.meeting_room, color: Colors.green),
-                  title: Text("Reset Rooms"),
+                  title: CustomText(
+                    "Reset Rooms",
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
                   onTap: () => resetDatabase(table: "Rooms"),
                 ),
                 ListTile(
                   leading: Icon(Icons.event, color: Colors.purple),
-                  title: Text("Reset Reservations"),
+                  title: CustomText(
+                    "Reset Reservations",
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
                   onTap: () => resetDatabase(table: "Reservations"),
                 ),
                 ListTile(
@@ -123,14 +141,46 @@ class SettingsScreen extends StatelessWidget {
                     Icons.insert_drive_file_outlined,
                     color: Colors.blue,
                   ),
-                  title: Text("download db"),
+                  title: CustomText(
+                    "download db",
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
                   onTap: () async {
                     await DownloadDBFile.downloadDBFile();
                   },
                 ),
                 ListTile(
+                  leading: Icon(Icons.pedal_bike, color: Colors.orange),
+                  title: CustomText(
+                    StringUtils.myBikes,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  onTap: () async {
+                    Get.toNamed(AppRoutes.myBikesScreen);
+                    // await DownloadDBFile.downloadDBFile();
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.person, color: Colors.brown),
+                  title: CustomText(
+                    StringUtils.users,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  onTap: () async {
+                    Get.toNamed(AppRoutes.employeesScreen);
+                    // await DownloadDBFile.downloadDBFile();
+                  },
+                ),
+                ListTile(
                   leading: Icon(Icons.logout, color: Colors.red),
-                  title: Text("Logout"),
+                  title: CustomText(
+                    "Logout",
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
                   onTap: () async {
                     await SharedPreferenceUtils.clearPreference();
                     Get.off(() => LoginScreen());
@@ -148,7 +198,7 @@ class SettingsScreen extends StatelessWidget {
   void showResetOptions() {
     Get.defaultDialog(
       title: "Reset Database",
-      content: Text("Are you sure you want to delete all data?"),
+      content: CustomText("Are you sure you want to delete all data?"),
       textCancel: "Cancel",
       textConfirm: "Yes, Reset",
       confirmTextColor: Colors.white,

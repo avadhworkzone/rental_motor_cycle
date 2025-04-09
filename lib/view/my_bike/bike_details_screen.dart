@@ -16,7 +16,7 @@ class BikeDetailsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: ColorUtils.white,
       appBar: commonAppBar(
-        titleText: bike.name,
+        titleText: bike.brandName,
         context: context,
         isLeading: true,
         isCenterTitle: true,
@@ -95,7 +95,7 @@ class BikeDetailsScreen extends StatelessWidget {
                   ),
                   _detailCard(
                     StringUtils.vehicleNumber,
-                    bike.vehicleNumber,
+                    bike.numberPlate,
                     Icons.confirmation_number,
                   ),
                   _detailCard(

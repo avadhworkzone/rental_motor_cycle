@@ -13,15 +13,12 @@ import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/shared_preference_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 
-void showAddBikeBottomSheet(
-  BuildContext context,
-  GlobalKey<FormState> key, {
-  BikeModel? bike,
-  required RxBool isProcessing,
-}) {
+void showAddBikeBottomSheet(BuildContext context, {BikeModel? bike}) {
+  final formKey = GlobalKey<FormState>();
+  var isProcessing = false;
   final BikeController bikeController = Get.find<BikeController>();
-  final TextEditingController nameController = TextEditingController(
-    text: bike?.name ?? "",
+  final TextEditingController bikeBrandController = TextEditingController(
+    text: bike?.brandName ?? "",
   );
   final TextEditingController modelController = TextEditingController(
     text: bike?.model ?? "",
@@ -29,41 +26,49 @@ void showAddBikeBottomSheet(
   final TextEditingController numberPlateController = TextEditingController(
     text: bike?.numberPlate ?? "",
   );
-  final TextEditingController rentController = TextEditingController(
-    text: bike?.rentPerDay?.toStringAsFixed(0) ?? "",
+  final TextEditingController transmissionController = TextEditingController(
+    text: bike?.transmission ?? "",
   );
+  // final TextEditingController rentController = TextEditingController(
+  //   text: bike?.rentPerDay?.toStringAsFixed(0) ?? "",
+  // );
   final TextEditingController locationController = TextEditingController(
     text: bike?.location ?? "",
   );
   final TextEditingController fuelTypeController = TextEditingController(
     text: bike?.fuelType ?? "",
   );
-  final TextEditingController mileageController = TextEditingController(
-    text: bike?.mileage?.toStringAsFixed(0) ?? "",
-  );
+  // final TextEditingController mileageController = TextEditingController(
+  //   text: bike?.mileage?.toStringAsFixed(0) ?? "",
+  // );
   final TextEditingController ccController = TextEditingController(
     text: bike?.engineCC?.toStringAsFixed(0) ?? "",
   );
   final TextEditingController descriptionController = TextEditingController(
     text: bike?.description ?? "",
   );
-  final TextEditingController depositController = TextEditingController(
-    text: bike?.deposit?.toStringAsFixed(0) ?? "",
-  );
-  final TextEditingController extraPerKmController = TextEditingController(
-    text: bike?.extraPerKm?.toStringAsFixed(0) ?? "",
-  );
+  // final TextEditingController depositController = TextEditingController(
+  //   text: bike?.deposit?.toStringAsFixed(0) ?? "",
+  // );
+  // final TextEditingController extraPerKmController = TextEditingController(
+  //   text: bike?.extraPerKm?.toStringAsFixed(0) ?? "",
+  // );
   final TextEditingController kmLimitController = TextEditingController(
     text: bike?.kmLimit?.toStringAsFixed(0) ?? "",
   );
-  final TextEditingController tripsDoneController = TextEditingController(
-    text: bike?.tripsDone.toString() ?? "",
-  );
+  // final TextEditingController tripsDoneController = TextEditingController(
+  //   text: bike?.tripsDone.toString() ?? "",
+  // );
   final TextEditingController makeYearController = TextEditingController(
     text: bike?.makeYear.toString() ?? "",
   );
-
-  String? selectedTransmission = bike?.transmission;
+  final RxString selectedBrand =
+      ( /*bike?.brandName ??*/ StringUtils.bikeBrandHonda).obs;
+  final RxString selectedModel =
+      ( /*bike?.model ??*/ StringUtils.bikeModelHonda).obs;
+  final RxString selectedTransmission =
+      (bike?.transmission ?? StringUtils.automatic).obs;
+  // String? selectedTransmission = bike?.transmission;
   String? selectedSeater = bike?.seater.toString();
   String? selectedFuelIncluded = bike?.fuelIncluded;
 
@@ -76,25 +81,71 @@ void showAddBikeBottomSheet(
 
   void validateFields() {
     isValid.value =
-        nameController.text.trim().isNotEmpty &&
-        modelController.text.trim().isNotEmpty &&
+        // bikeBrandController.text.trim().isNotEmpty &&
+        // modelController.text.trim().isNotEmpty &&
         numberPlateController.text.trim().isNotEmpty &&
-        rentController.text.trim().isNotEmpty &&
+        // rentController.text.trim().isNotEmpty &&
         locationController.text.trim().isNotEmpty &&
         fuelTypeController.text.trim().isNotEmpty &&
-        mileageController.text.trim().isNotEmpty &&
+        // mileageController.text.trim().isNotEmpty &&
         ccController.text.trim().isNotEmpty &&
         descriptionController.text.trim().isNotEmpty &&
-        depositController.text.trim().isNotEmpty &&
-        extraPerKmController.text.trim().isNotEmpty &&
+        // depositController.text.trim().isNotEmpty &&
+        // extraPerKmController.text.trim().isNotEmpty &&
         kmLimitController.text.trim().isNotEmpty &&
         makeYearController.text.trim().isNotEmpty &&
-        tripsDoneController.text.trim().isNotEmpty &&
-        selectedTransmission != null &&
+        // tripsDoneController.text.trim().isNotEmpty &&
+        // selectedTransmission != null &&
         selectedSeater != null &&
         selectedFuelIncluded != null &&
+        selectedBrand != null &&
+        selectedModel != null &&
+        selectedTransmission != null &&
         (bikeController.bikeImage.value != null &&
             bikeController.bikeImage.value!.path.isNotEmpty);
+
+    logs(
+      "Validation: brand=${bikeBrandController.text.trim().isNotEmpty}, "
+      "model=${modelController.text.trim().isNotEmpty}, "
+      "numberPlate=${numberPlateController.text.trim().isNotEmpty}, "
+      "location=${locationController.text.trim().isNotEmpty}, "
+      "fuelType=${fuelTypeController.text.trim().isNotEmpty}, "
+      "cc=${ccController.text.trim().isNotEmpty}, "
+      "desc=${descriptionController.text.trim().isNotEmpty}, "
+      "kmLimit=${kmLimitController.text.trim().isNotEmpty}, "
+      "makeYear=${makeYearController.text.trim().isNotEmpty}, "
+      "seater=$selectedSeater, "
+      "fuelIncluded=$selectedFuelIncluded, "
+      "transmission=$selectedTransmission, "
+      "image=${bikeController.bikeImage.value?.path}",
+    );
+  }
+
+  void onBrandChanged(String? brand) {
+    selectedBrand.value = brand ?? "";
+    switch (brand) {
+      case StringUtils.bikeBrandHonda:
+        selectedModel.value = StringUtils.bikeModelHonda;
+        selectedTransmission.value = StringUtils.automatic;
+        break;
+      case StringUtils.bikeBrandYamaha:
+        selectedModel.value = StringUtils.bikeModelYamaha;
+        selectedTransmission.value = StringUtils.automatic;
+        break;
+      case StringUtils.bikeBrandSuzuki:
+        selectedModel.value = StringUtils.bikeModelSuzuki;
+        selectedTransmission.value = StringUtils.automatic;
+        break;
+      default:
+        selectedModel.value = "";
+        selectedTransmission.value = "";
+    }
+
+    // bikeBrandController.text = selectedBrand.value;
+    modelController.text = selectedModel.value;
+    transmissionController.text = selectedTransmission.value;
+
+    validateFields();
   }
 
   Get.bottomSheet(
@@ -106,7 +157,7 @@ void showAddBikeBottomSheet(
       ),
       child: SingleChildScrollView(
         child: Form(
-          key: key,
+          key: formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -191,24 +242,45 @@ void showAddBikeBottomSheet(
               ),
               SizedBox(height: 10.h),
 
-              CommonTextField(
-                textEditController: nameController,
-                labelText: StringUtils.bikeName,
-                keyBoardType: TextInputType.name,
-                validator:
-                    (value) =>
-                        value!.isEmpty ? StringUtils.enterBikeName : null,
-                onChange: (_) => validateFields(),
+              ///bikeBrand
+              Obx(
+                () => CommonDropdown(
+                  items: [
+                    StringUtils.bikeBrandHonda,
+                    StringUtils.bikeBrandYamaha,
+                    StringUtils.bikeBrandSuzuki,
+                  ],
+                  labelText: StringUtils.bikeBrand,
+                  selectedValue: selectedBrand.value,
+                  onChanged: onBrandChanged,
+                  validationMessage: StringUtils.selectBikeBrand,
+                ),
               ),
-              CommonTextField(
-                textEditController: modelController,
-                labelText: StringUtils.bikeModel,
-                keyBoardType: TextInputType.name,
-                validator:
-                    (value) =>
-                        value!.isEmpty ? StringUtils.enterBikeModel : null,
-                onChange: (_) => validateFields(),
+
+              ///bikeModel
+              // CommonTextField(
+              //   textEditController: modelController,
+              //   labelText: StringUtils.bikeModel,
+              //   keyBoardType: TextInputType.name,
+              //   validator:
+              //       (value) =>
+              //           value!.isEmpty ? StringUtils.enterBikeModel : null,
+              //   onChange: (_) => validateFields(),
+              // ),
+              Obx(
+                () => CommonDropdown(
+                  items:
+                      selectedModel.value.isNotEmpty
+                          ? [selectedModel.value]
+                          : [],
+                  labelText: StringUtils.bikeModel,
+                  selectedValue: selectedModel.value,
+                  onChanged: null,
+                  validationMessage: StringUtils.selectBikeModel,
+                ),
               ),
+
+              ///vehicleNumber
               CommonTextField(
                 textEditController: numberPlateController,
                 labelText: StringUtils.vehicleNumber,
@@ -218,15 +290,19 @@ void showAddBikeBottomSheet(
                         value!.isEmpty ? StringUtils.enterVehicleNumber : null,
                 onChange: (_) => validateFields(),
               ),
-              CommonTextField(
-                textEditController: rentController,
-                labelText: StringUtils.rentPerDay,
-                keyBoardType: TextInputType.number,
-                validator:
-                    (value) =>
-                        value!.isEmpty ? StringUtils.enterRentPrice : null,
-                onChange: (_) => validateFields(),
-              ),
+
+              ///rentPerDay
+              // CommonTextField(
+              //   textEditController: rentController,
+              //   labelText: StringUtils.rentPerDay,
+              //   keyBoardType: TextInputType.number,
+              //   validator:
+              //       (value) =>
+              //           value!.isEmpty ? StringUtils.enterRentPrice : null,
+              //   onChange: (_) => validateFields(),
+              // ),
+
+              ///bikeLocation
               CommonTextField(
                 textEditController: locationController,
                 labelText: StringUtils.bikeLocation,
@@ -236,6 +312,8 @@ void showAddBikeBottomSheet(
                         value!.isEmpty ? StringUtils.enterLocation : null,
                 onChange: (_) => validateFields(),
               ),
+
+              ///fuelType
               CommonDropdown(
                 items: [
                   StringUtils.petrol,
@@ -253,14 +331,18 @@ void showAddBikeBottomSheet(
                 },
                 validationMessage: StringUtils.selectFuelType,
               ),
-              CommonTextField(
-                textEditController: mileageController,
-                labelText: StringUtils.mileage,
-                keyBoardType: TextInputType.number,
-                validator:
-                    (value) => value!.isEmpty ? StringUtils.enterMileage : null,
-                onChange: (_) => validateFields(),
-              ),
+
+              /// mileage
+              // CommonTextField(
+              //   textEditController: mileageController,
+              //   labelText: StringUtils.mileage,
+              //   keyBoardType: TextInputType.number,
+              //   validator:
+              //       (value) => value!.isEmpty ? StringUtils.enterMileage : null,
+              //   onChange: (_) => validateFields(),
+              // ),
+
+              ///engineCC
               CommonTextField(
                 textEditController: ccController,
                 labelText: StringUtils.engineCC,
@@ -270,21 +352,36 @@ void showAddBikeBottomSheet(
                         value!.isEmpty ? StringUtils.enterEngineCC : null,
                 onChange: (_) => validateFields(),
               ),
-              // CommonDropdown for Transmission
-              CommonDropdown(
-                items: [
-                  StringUtils.automatic,
-                  StringUtils.manual,
-                  StringUtils.semiAutomatic,
-                ],
-                labelText: StringUtils.transmission,
-                selectedValue: selectedTransmission,
-                onChanged: (value) {
-                  selectedTransmission = value;
-                  validateFields();
-                },
-                validationMessage: StringUtils.selectTransmission,
+
+              ///transmission
+              // CommonDropdown(
+              //   items: [
+              //     StringUtils.automatic,
+              //     StringUtils.manual,
+              //     StringUtils.semiAutomatic,
+              //   ],
+              //   labelText: StringUtils.transmission,
+              //   selectedValue: selectedTransmission,
+              //   onChanged: (value) {
+              //     selectedTransmission = value;
+              //     validateFields();
+              //   },
+              //   validationMessage: StringUtils.selectTransmission,
+              // ),
+              Obx(
+                () => CommonDropdown(
+                  items:
+                      selectedTransmission.value.isNotEmpty
+                          ? [selectedTransmission.value]
+                          : [],
+                  labelText: StringUtils.transmission,
+                  selectedValue: selectedTransmission.value,
+                  onChanged: null,
+                  validationMessage: StringUtils.selectTransmission,
+                ),
               ),
+
+              ///seater
               CommonDropdown(
                 items: ["1", "2", "3", "4", "5", "6"],
                 labelText: StringUtils.seater,
@@ -295,6 +392,8 @@ void showAddBikeBottomSheet(
                 },
                 validationMessage: StringUtils.selectSeater,
               ),
+
+              ///fuel
               CommonDropdown(
                 items: [StringUtils.included, StringUtils.excluded],
                 labelText: StringUtils.fuel,
@@ -305,24 +404,30 @@ void showAddBikeBottomSheet(
                 },
                 validationMessage: StringUtils.selectFuelOption,
               ),
-              CommonTextField(
-                textEditController: depositController,
-                labelText: "${StringUtils.deposit}: (\$)",
-                keyBoardType: TextInputType.number,
-                onChange: (_) => validateFields(),
-                validator:
-                    (value) =>
-                        value!.isEmpty ? StringUtils.enterDepositAmount : null,
-              ),
-              CommonTextField(
-                textEditController: extraPerKmController,
-                labelText: StringUtils.extraPerKm,
-                keyBoardType: TextInputType.number,
-                onChange: (_) => validateFields(),
-                validator:
-                    (value) =>
-                        value!.isEmpty ? StringUtils.enterExtraKmRate : null,
-              ),
+
+              ///deposit
+              // CommonTextField(
+              //   textEditController: depositController,
+              //   labelText: "${StringUtils.deposit}: (\$)",
+              //   keyBoardType: TextInputType.number,
+              //   onChange: (_) => validateFields(),
+              //   validator:
+              //       (value) =>
+              //           value!.isEmpty ? StringUtils.enterDepositAmount : null,
+              // ),
+
+              ///extraPerKm
+              // CommonTextField(
+              //   textEditController: extraPerKmController,
+              //   labelText: StringUtils.extraPerKm,
+              //   keyBoardType: TextInputType.number,
+              //   onChange: (_) => validateFields(),
+              //   validator:
+              //       (value) =>
+              //           value!.isEmpty ? StringUtils.enterExtraKmRate : null,
+              // ),
+
+              ///kmLimit
               CommonTextField(
                 textEditController: kmLimitController,
                 labelText: StringUtils.kmLimit,
@@ -331,6 +436,8 @@ void showAddBikeBottomSheet(
                 validator:
                     (value) => value!.isEmpty ? StringUtils.enterKmLimit : null,
               ),
+
+              ///makeYear
               CommonTextField(
                 textEditController: makeYearController,
                 labelText: StringUtils.makeYear,
@@ -371,15 +478,19 @@ void showAddBikeBottomSheet(
                     (value) =>
                         value!.isEmpty ? StringUtils.enterMakeYear : null,
               ),
-              CommonTextField(
-                textEditController: tripsDoneController,
-                labelText: StringUtils.tripsDone,
-                keyBoardType: TextInputType.number,
-                onChange: (_) => validateFields(),
-                validator:
-                    (value) =>
-                        value!.isEmpty ? StringUtils.enterTripsDone : null,
-              ),
+
+              ///tripsDone
+              // CommonTextField(
+              //   textEditController: tripsDoneController,
+              //   labelText: StringUtils.tripsDone,
+              //   keyBoardType: TextInputType.number,
+              //   onChange: (_) => validateFields(),
+              //   validator:
+              //       (value) =>
+              //           value!.isEmpty ? StringUtils.enterTripsDone : null,
+              // ),
+
+              ///bikeDescription
               CommonTextField(
                 textEditController: descriptionController,
                 labelText: StringUtils.bikeDescription,
@@ -392,6 +503,7 @@ void showAddBikeBottomSheet(
               ),
               SizedBox(height: 20),
 
+              ///Add Update btn
               Obx(
                 () => CustomBtn(
                   title:
@@ -399,12 +511,12 @@ void showAddBikeBottomSheet(
                           ? StringUtils.addBike
                           : StringUtils.updateBike,
                   onTap:
-                      (isProcessing.value || !isValid.value)
+                      (isProcessing || !isValid.value)
                           ? null
                           : () async {
-                            if (key.currentState?.validate() ?? false) {
+                            if (formKey.currentState?.validate() ?? false) {
                               try {
-                                isProcessing.value = true;
+                                isProcessing = true;
                                 var userId =
                                     await SharedPreferenceUtils.getString(
                                       SharedPreferenceUtils.userId,
@@ -414,18 +526,22 @@ void showAddBikeBottomSheet(
 
                                 BikeModel newBike = BikeModel(
                                   id: bike?.id,
-                                  name: nameController.text.trim(),
-                                  model: modelController.text.trim(),
+                                  brandName: selectedBrand.value,
+                                  // brandName: bikeBrandController.text.trim(),
+                                  model: selectedModel.value,
+                                  // model: modelController.text.trim(),
                                   numberPlate:
                                       numberPlateController.text.trim(),
-                                  rentPerDay: double.parse(
+                                  // rentPerDay: 0.0,
+                                  /*rentPerDay: double.parse(
                                     rentController.text.trim(),
-                                  ),
+                                  ),*/
                                   location: locationController.text.trim(),
                                   fuelType: fuelTypeController.text.trim(),
-                                  mileage: num.parse(
+                                  // mileage: 0,
+                                  /* mileage: num.parse(
                                     mileageController.text.trim(),
-                                  ),
+                                  ),*/
                                   engineCC: num.parse(ccController.text.trim()),
                                   description:
                                       descriptionController.text.trim(),
@@ -433,34 +549,37 @@ void showAddBikeBottomSheet(
                                       bikeController.selectedImagePath.value,
                                   createdAt: DateTime.now(),
                                   userId: int.parse(userId),
-                                  deposit: double.parse(
+                                  // deposit: 0.0,
+                                  /*  deposit: double.parse(
                                     depositController.text.trim(),
-                                  ),
-                                  extraPerKm: double.parse(
+                                  ),*/
+                                  // extraPerKm: 0.0,
+                                  /* extraPerKm: double.parse(
                                     extraPerKmController.text.trim(),
-                                  ),
+                                  ),*/
                                   kmLimit: double.parse(
                                     kmLimitController.text.trim(),
                                   ),
                                   makeYear: int.parse(
                                     makeYearController.text.trim(),
                                   ),
-                                  tripsDone: int.parse(
+                                  // tripsDone: 0,
+                                  /* tripsDone: int.parse(
                                     tripsDoneController.text.trim(),
-                                  ),
-                                  transmission: selectedTransmission!,
+                                  ),*/
+                                  transmission: selectedTransmission.value,
                                   seater: int.parse(selectedSeater!),
                                   fuelIncluded: selectedFuelIncluded!,
                                 );
 
                                 if (bike != null &&
-                                    bike.name == newBike.name &&
+                                    bike.brandName == newBike.brandName &&
                                     bike.model == newBike.model &&
                                     bike.numberPlate == newBike.numberPlate &&
-                                    bike.rentPerDay == newBike.rentPerDay &&
+                                    // bike.rentPerDay == newBike.rentPerDay &&
                                     bike.location == newBike.location &&
                                     bike.fuelType == newBike.fuelType &&
-                                    bike.mileage == newBike.mileage &&
+                                    // bike.mileage == newBike.mileage &&
                                     bike.engineCC == newBike.engineCC &&
                                     bike.description == newBike.description &&
                                     bike.imageUrl == newBike.imageUrl) {
@@ -469,7 +588,7 @@ void showAddBikeBottomSheet(
                                         StringUtils
                                             .pleaseChangeTheDataBeforeSaving,
                                   );
-                                  isProcessing.value = false;
+                                  isProcessing = false;
                                   return;
                                 }
 
@@ -479,7 +598,7 @@ void showAddBikeBottomSheet(
                                   await bikeController.updateBike(newBike);
                                 }
                                 await bikeController.fetchBikes();
-                                isProcessing.value = false;
+                                isProcessing = false;
                                 Get.back();
                                 showCustomSnackBar(
                                   message: StringUtils.bikeAddedSuccessfully,
@@ -492,7 +611,7 @@ void showAddBikeBottomSheet(
                             }
                           },
                   bgColor:
-                      (isProcessing.value || !isValid.value)
+                      (isProcessing || !isValid.value)
                           ? ColorUtils.primary.withValues(alpha: 0.4)
                           : ColorUtils.primary,
                 ),
@@ -510,6 +629,7 @@ void showAddBikeBottomSheet(
 
 Future<void> profileScreenDialogBox({
   required BuildContext context,
+
   VoidCallback? onTap,
   VoidCallback? onTap2,
   String? text,
@@ -583,8 +703,9 @@ Future<void> profileScreenDialogBox({
   );
 }
 
-void confirmDelete(int id, RxBool isProcessing) {
+void confirmDelete(int id) {
   final BikeController bikeController = Get.find<BikeController>();
+  var isProcessing = false;
   Get.defaultDialog(
     title: StringUtils.deleteBike,
     middleText: StringUtils.deleteConfirmation,
@@ -593,12 +714,12 @@ void confirmDelete(int id, RxBool isProcessing) {
     cancelTextColor: ColorUtils.black,
     confirmTextColor: ColorUtils.black,
     onConfirm: () async {
-      isProcessing.value = true;
+      isProcessing = true;
       // isProcessing.value = true;
       await Future.delayed(Duration(milliseconds: 300));
       await bikeController.deleteBike(id);
       await bikeController.fetchBikes();
-      isProcessing.value = false;
+      isProcessing = false;
       // isProcessing.value = false;
       Get.back();
     },

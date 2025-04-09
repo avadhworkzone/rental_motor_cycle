@@ -218,6 +218,7 @@ import 'package:rental_motor_cycle/view/calendar_screen.dart';
 import 'package:rental_motor_cycle/view/book_bike/book_bike_screen.dart';
 import 'package:rental_motor_cycle/view/my_bike/my_bike_screen.dart';
 import 'package:rental_motor_cycle/view/new_book_bike_screen.dart';
+import 'package:rental_motor_cycle/view/reservation/reservation_screen.dart';
 import 'package:rental_motor_cycle/view/settings_screen.dart';
 import 'package:rental_motor_cycle/view/today/today_screen.dart';
 import 'package:rental_motor_cycle/view/user_screen.dart';
@@ -234,10 +235,10 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
   RxInt currentIndex = 0.obs;
   final screens = [
     CalendarScreen(),
-    MyBikesScreen(),
-    NewBookBikeScreen(),
+    // MyBikesScreen(),
     TodayScreen(),
-    EmployeesScreen(),
+    NewBookBikeScreen(),
+    ReservationScreen(),
     SettingsScreen(),
   ];
 
@@ -266,22 +267,32 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      /*      extendBody: false, // Removes floating bottom bar
-      appBar: AppBar(
-        leading: Icon(Icons.calendar_month, size: 30),
-
-        // ✅ Replace with your logo
-        title: Text(StringUtils.calendar),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search, color: ColorUtils.white),
-            onPressed: () {
-              // Get.to(()=>SearchReservation());
-              //  showSearch(context: context, delegate: DataSearch());
-            },
-          ),
-        ],
-      ),*/
+      // extendBody: false, // Removes floating bottom bar
+      // appBar: AppBar(
+      //   backgroundColor: ColorUtils.primary,
+      //   leading: Icon(
+      //     Icons.calendar_month,
+      //     size: 30.sp,
+      //     color: ColorUtils.white,
+      //   ),
+      //
+      //   // ✅ Replace with your logo
+      //   title: CustomText(
+      //     StringUtils.calendar,
+      //     color: ColorUtils.white,
+      //     fontWeight: FontWeight.bold,
+      //     fontSize: 22.sp,
+      //   ),
+      //   actions: [
+      //     IconButton(
+      //       icon: Icon(Icons.search, color: ColorUtils.white),
+      //       onPressed: () {
+      //         // Get.to(()=>SearchReservation());
+      //         //  showSearch(context: context, delegate: DataSearch());
+      //       },
+      //     ),
+      //   ],
+      // ),
       body: Obx(() => screens[currentIndex.value]),
       bottomNavigationBar: Obx(
         () => Container(
@@ -302,7 +313,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(6, (index) => _buildNavItem(index)),
+            children: List.generate(5, (index) => _buildNavItem(index)),
           ),
         ),
       ),
@@ -312,18 +323,20 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
   Widget _buildNavItem(int index) {
     List<IconData> icons = [
       Icons.calendar_today_rounded,
-      Icons.pedal_bike,
-      Icons.event_note_outlined,
+      // Icons.pedal_bike,
       Icons.today,
-      Icons.person,
+      Icons.event_note_outlined,
+
+      Icons.book_online_outlined,
       Icons.settings,
     ];
     List<String> labels = [
       StringUtils.calendar,
-      StringUtils.myBikes,
-      StringUtils.bookBike,
+      // StringUtils.myBikes,
       StringUtils.today,
-      StringUtils.users,
+      StringUtils.bookBike,
+
+      StringUtils.reservation,
       StringUtils.settings,
     ];
 
@@ -342,30 +355,28 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
                   : Colors.transparent,
           borderRadius: BorderRadius.circular(16.r),
         ),
-        child: Expanded(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icons[index],
-                size: currentIndex.value == index ? 28.sp : 24.sp,
-                color:
-                    currentIndex.value == index
-                        ? ColorUtils.primary
-                        : ColorUtils.darkBlue35,
-              ),
-              SizedBox(height: 4.h),
-              CustomText(
-                labels[index],
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w500,
-                color:
-                    currentIndex.value == index
-                        ? ColorUtils.primary
-                        : ColorUtils.darkBlue35,
-              ),
-            ],
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icons[index],
+              size: currentIndex.value == index ? 28.sp : 24.sp,
+              color:
+                  currentIndex.value == index
+                      ? ColorUtils.primary
+                      : ColorUtils.darkBlue35,
+            ),
+            SizedBox(height: 4.h),
+            CustomText(
+              labels[index],
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w500,
+              color:
+                  currentIndex.value == index
+                      ? ColorUtils.primary
+                      : ColorUtils.darkBlue35,
+            ),
+          ],
         ),
       ),
     );

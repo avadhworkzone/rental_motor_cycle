@@ -53,6 +53,11 @@ class AppPages {
       transition: Transition.cupertino,
     ),
     GetPage(
+      name: AppRoutes.employeesScreen,
+      page: () => EmployeesScreen(),
+      transition: Transition.cupertino,
+    ),
+    GetPage(
       name: AppRoutes.settingsScreen,
       page: () => SettingsScreen(),
       transition: Transition.cupertino,

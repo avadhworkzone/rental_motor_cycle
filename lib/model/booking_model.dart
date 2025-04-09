@@ -15,8 +15,6 @@ class BookingModel {
   DateTime dropoffDate;
   String pickupTime;
   String dropoffTime;
-  String pickupLocation;
-  String dropoffLocation;
   double rentPerDay;
   double discount;
   double tax;
@@ -27,6 +25,13 @@ class BookingModel {
   double totalRent;
   double finalAmountPayable;
   List<BikeModel> bikes;
+  // New fields
+  String typeOfPayment;
+  num mileage;
+  double extraPerKm;
+  double securityDeposit;
+  double subtotal;
+  double balance;
 
   BookingModel({
     this.id,
@@ -41,8 +46,6 @@ class BookingModel {
     required this.dropoffDate,
     required this.pickupTime,
     required this.dropoffTime,
-    required this.pickupLocation,
-    required this.dropoffLocation,
     required this.rentPerDay,
     this.discount = 0,
     this.tax = 0,
@@ -53,6 +56,13 @@ class BookingModel {
     required this.totalRent,
     required this.finalAmountPayable,
     required this.bikes,
+    // New required fields
+    required this.typeOfPayment,
+    this.mileage = 0,
+    this.extraPerKm = 0,
+    this.securityDeposit = 0,
+    this.subtotal = 0,
+    this.balance = 0,
   });
 
   factory BookingModel.fromMap(Map<String, dynamic> map) {
@@ -69,8 +79,6 @@ class BookingModel {
       dropoffDate: DateTime.parse(map['dropoffDate']),
       pickupTime: map['pickupTime'],
       dropoffTime: map['dropoffTime'],
-      pickupLocation: map['pickupLocation'],
-      dropoffLocation: map['dropoffLocation'],
       rentPerDay: (map['rentPerDay'] ?? 0).toDouble(),
       discount: (map['discount'] ?? 0).toDouble(),
       tax: (map['tax'] ?? 0).toDouble(),
@@ -80,6 +88,12 @@ class BookingModel {
       durationInHours: (map['durationInHours'] ?? 0).toDouble(),
       totalRent: (map['totalRent'] ?? 0).toDouble(),
       finalAmountPayable: (map['finalAmountPayable'] ?? 0).toDouble(),
+      typeOfPayment: map['typeOfPayment'] ?? '',
+      mileage: (map['mileage'] ?? 0).toDouble(),
+      extraPerKm: (map['extraPerKm'] ?? 0).toDouble(),
+      securityDeposit: (map['securityDeposit'] ?? 0).toDouble(),
+      subtotal: (map['subtotal'] ?? 0).toDouble(),
+      balance: (map['balance'] ?? 0).toDouble(),
       bikes:
           map['bikes'] != null && map['bikes'] != "" && map['bikes'] != "null"
               ? (jsonDecode(map['bikes']) as List)
@@ -104,8 +118,6 @@ class BookingModel {
       'dropoffDate': dropoffDate.toIso8601String(),
       'pickupTime': pickupTime,
       'dropoffTime': dropoffTime,
-      'pickupLocation': pickupLocation,
-      'dropoffLocation': dropoffLocation,
       'rentPerDay': rentPerDay,
       'discount': discount,
       'tax': tax,
@@ -115,6 +127,12 @@ class BookingModel {
       'durationInHours': durationInHours,
       'totalRent': totalRent,
       'finalAmountPayable': finalAmountPayable,
+      'typeOfPayment': typeOfPayment,
+      'mileage': mileage,
+      'extraPerKm': extraPerKm,
+      'securityDeposit': securityDeposit,
+      'subtotal': subtotal,
+      'balance': balance,
       'bikes': jsonEncode(bikes.map((e) => e.toMap()).toList()),
     };
   }
