@@ -219,6 +219,7 @@ import 'package:rental_motor_cycle/view/book_bike/book_bike_screen.dart';
 import 'package:rental_motor_cycle/view/my_bike/my_bike_screen.dart';
 import 'package:rental_motor_cycle/view/new_book_bike_screen.dart';
 import 'package:rental_motor_cycle/view/settings_screen.dart';
+import 'package:rental_motor_cycle/view/today/today_screen.dart';
 import 'package:rental_motor_cycle/view/user_screen.dart';
 
 class BottomNavigationBarScreen extends StatefulWidget {
@@ -235,24 +236,10 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
     CalendarScreen(),
     MyBikesScreen(),
     NewBookBikeScreen(),
+    TodayScreen(),
     EmployeesScreen(),
     SettingsScreen(),
   ];
-  void navigateToScreen(int index) {
-    List<String> routes = [
-      AppRoutes.calendarScreen,
-      AppRoutes.myBikesScreen,
-      AppRoutes.bookBikeScreen,
-      AppRoutes.userScreen,
-      AppRoutes.settingsScreen,
-    ];
-
-    if (currentIndex.value != index) {
-      Get.offNamed(routes[index]);
-      currentIndex.value = index;
-      clearBadge(index);
-    }
-  }
 
   final BadgeController badgeController = Get.find<BadgeController>();
 
@@ -280,6 +267,22 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
   Widget build(BuildContext context) {
     bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+      /*      extendBody: false, // Removes floating bottom bar
+      appBar: AppBar(
+        leading: Icon(Icons.calendar_month, size: 30),
+
+        // ✅ Replace with your logo
+        title: Text(StringUtils.calendar),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search, color: ColorUtils.white),
+            onPressed: () {
+              // Get.to(()=>SearchReservation());
+              //  showSearch(context: context, delegate: DataSearch());
+            },
+          ),
+        ],
+      ),*/
       body: Obx(() => screens[currentIndex.value]),
       bottomNavigationBar: Obx(
         () => Container(
@@ -300,7 +303,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(5, (index) => _buildNavItem(index)),
+            children: List.generate(6, (index) => _buildNavItem(index)),
           ),
         ),
       ),
@@ -314,6 +317,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
       Icons.calendar_today_rounded,
       Icons.pedal_bike,
       Icons.event_note_outlined,
+      Icons.today,
       Icons.person,
       Icons.settings,
     ];
@@ -321,6 +325,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
       StringUtils.calendar,
       StringUtils.myBikes,
       StringUtils.bookBike,
+      StringUtils.today,
       StringUtils.users,
       StringUtils.settings,
     ];
@@ -332,7 +337,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
       },
       child: AnimatedContainer(
         duration: Duration(milliseconds: 300),
-        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
+        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 5.w),
         decoration: BoxDecoration(
           color:
               currentIndex.value == index
@@ -340,21 +345,21 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
                   : Colors.transparent,
           borderRadius: BorderRadius.circular(16.r),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icons[index],
-              size: currentIndex.value == index ? 30.sp : 24.sp,
-              color:
-              isDarkTheme? ColorUtils.white:  currentIndex.value == index
-                      ? ColorUtils.primary
-                      : ColorUtils.darkBlue35,
-            ),
-            SizedBox(height: 4.h),
-            Text(
-              labels[index],
-              style: TextStyle(
+        child: Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icons[index],
+                size: currentIndex.value == index ? 28.sp : 24.sp,
+                color:
+                isDarkTheme? ColorUtils.white:  currentIndex.value == index
+                    ? ColorUtils.primary
+                    : ColorUtils.darkBlue35,
+              ),
+              SizedBox(height: 4.h),
+              CustomText(
+                labels[index],
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w500,
                 color:
@@ -363,8 +368,8 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
                         ? ColorUtils.primary
                         : ColorUtils.darkBlue35,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

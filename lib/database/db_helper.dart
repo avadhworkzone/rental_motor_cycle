@@ -129,6 +129,7 @@ class DBHelper {
     tax REAL DEFAULT 0,
     prepayment REAL DEFAULT 0,
     isConfirmed INTEGER NOT NULL DEFAULT 0,
+    bikes TEXT NOT NULL,
     createdAt TEXT NOT NULL
   );
 ''');

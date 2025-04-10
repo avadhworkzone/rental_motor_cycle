@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:rental_motor_cycle/commonWidgets/common_dropdown.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_text_field.dart';
@@ -599,9 +600,9 @@ class _BookBikeScreenState extends State<BookBikeScreen> {
                       if (formKey.currentState!.validate()) {
                         final newBooking = BookingModel(
                           userId: 1,
-                          bikeId: selectedBike.value!.id!,
-                          bikeName: selectedBike.value!.name,
-                          bikeModel: selectedBike.value!.model,
+                          bikeId: selectedBike.value?.id ?? 0,
+                          bikeName: selectedBike.value?.name ?? "",
+                          bikeModel: selectedBike.value?.model ?? "",
                           discount:
                               double.tryParse(discountController.text) ?? 0,
                           tax: tax.value,
@@ -626,10 +627,11 @@ class _BookBikeScreenState extends State<BookBikeScreen> {
                           dropoffTime: '',
                           pickupLocation: '',
                           dropoffLocation: '',
-                          rentPerDay: selectedBike.value!.rentPerDay,
+                          rentPerDay: selectedBike.value?.rentPerDay ?? 0.0,
                           durationInHours: 5.0,
                           totalRent: 500.00,
                           finalAmountPayable: 1000.00,
+                          bikes: [],
                         );
 
                         if (booking == null) {
@@ -708,7 +710,7 @@ class _BookBikeScreenState extends State<BookBikeScreen> {
         children: [
           CustomText(label, fontWeight: isBold ? FontWeight.bold : null),
           CustomText(
-            '₹ ${value.toStringAsFixed(2)}',
+            '\$ ${value.toStringAsFixed(2)}',
 
             fontWeight: isBold ? FontWeight.bold : null,
             color: color,

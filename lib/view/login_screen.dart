@@ -5,7 +5,7 @@ import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_btn.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_snackbar.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_text_field.dart';
-import 'package:rental_motor_cycle/controller/user_controller.dart';
+import 'package:rental_motor_cycle/controller/employee_controller.dart';
 import 'package:get/get.dart';
 import 'package:rental_motor_cycle/routs/app_page.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
@@ -27,21 +27,21 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final UserController userController = Get.find<UserController>();
+  final EmployeeController employeeController = Get.find<EmployeeController>();
   var isProcessing = false.obs;
 
   /// ✅ **Login Logic**
   void _login() async {
     if (_formKey.currentState!.validate()) {
       isProcessing.value = true;
-      await userController.loginFetchUsers();
+      await employeeController.loginFetchUsers();
       String username = usernameController.text.trim();
       String password = passwordController.text.trim();
-      var user = userController.loginUserList.firstWhereOrNull(
+      var user = employeeController.loginUserList.firstWhereOrNull(
         (user) => user.username == username && user.password == password,
       );
 
-      print('user--->> ${user}----> ${userController.loginUserList}');
+      print('user--->> ${user}----> ${employeeController.loginUserList}');
       if (user != null) {
         await SharedPreferenceUtils.setValue(
           SharedPreferenceUtils.isLoggedIn,
@@ -56,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
         await SharedPreferenceUtils.setValue(
           SharedPreferenceUtils.userId,
-          userController.loginUserList.first.id.toString(),
+          employeeController.loginUserList.first.id.toString(),
         );
         await SharedPreferenceUtils.setValue(
           SharedPreferenceUtils.username,

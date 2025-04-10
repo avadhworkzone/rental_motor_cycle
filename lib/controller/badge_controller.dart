@@ -1,10 +1,10 @@
 import 'package:get/get.dart';
 import 'package:rental_motor_cycle/controller/bike_booking_controller.dart';
 import 'package:rental_motor_cycle/controller/bike_controller.dart';
-import 'package:rental_motor_cycle/controller/user_controller.dart';
+import 'package:rental_motor_cycle/controller/employee_controller.dart';
 
 class BadgeController extends GetxController {
-  final UserController userController = Get.find();
+  final EmployeeController employeeController = Get.find();
   final BikeController bikeController = Get.find();
   final BikeBookingController reservationController = Get.find();
 
@@ -21,7 +21,7 @@ class BadgeController extends GetxController {
 
     // ✅ Update badge counts when list updates (without triggering unnecessary fetches)
     ever(reservationController.bookingList, (_) => updateBadgeCounts());
-    ever(userController.userList, (_) => updateBadgeCounts());
+    ever(employeeController.userList, (_) => updateBadgeCounts());
     ever(bikeController.bikeList, (_) => updateBadgeCounts());
   }
 
@@ -31,7 +31,7 @@ class BadgeController extends GetxController {
     calendarBadge.value = reservationController.bookingList.length;
     roomsBadge.value = bikeController.bikeList.length;
     reservationsBadge.value = reservationController.bookingList.length;
-    usersBadge.value = userController.userList.length;
+    usersBadge.value = employeeController.userList.length;
     settingsBadge.value = 0; // Reserved for future updates
   }
 }

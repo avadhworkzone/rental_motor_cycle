@@ -10,6 +10,7 @@ import 'package:rental_motor_cycle/view/new_book_bike_screen.dart';
 import 'package:rental_motor_cycle/view/settings_screen.dart';
 import 'package:rental_motor_cycle/view/signup_screen.dart';
 import 'package:rental_motor_cycle/view/splash_screen.dart';
+import 'package:rental_motor_cycle/view/today/today_screen.dart';
 import 'package:rental_motor_cycle/view/user_screen.dart';
 
 import '../view/on_boarding_screen.dart';
@@ -69,6 +70,11 @@ class AppPages {
     GetPage(
       name: AppRoutes.bikeDetailsScreen,
       page: () => BikeDetailsScreen(),
+      transition: Transition.cupertino,
+    ),
+    GetPage(
+      name: AppRoutes.todayScreen,
+      page: () => TodayScreen(),
       transition: Transition.cupertino,
     ),
     GetPage(

@@ -3,7 +3,7 @@ import '../database/db_helper.dart';
 import '../model/login_user_model.dart';
 import '../model/user_model.dart';
 
-class UserController extends GetxController {
+class EmployeeController extends GetxController {
   var loginUserList = <LoginUserModel>[].obs;
   var userList = <UserModel>[].obs;
   var isProcessing = false.obs; // ✅ Prevents multiple simultaneous operations

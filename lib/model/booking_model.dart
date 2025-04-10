@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:rental_motor_cycle/model/bike_model.dart';
+
 class BookingModel {
   int? id;
   int? userId;
@@ -22,6 +26,7 @@ class BookingModel {
   double durationInHours;
   double totalRent;
   double finalAmountPayable;
+  List<BikeModel> bikes;
 
   BookingModel({
     this.id,
@@ -47,6 +52,7 @@ class BookingModel {
     required this.durationInHours,
     required this.totalRent,
     required this.finalAmountPayable,
+    required this.bikes,
   });
 
   factory BookingModel.fromMap(Map<String, dynamic> map) {
@@ -74,6 +80,13 @@ class BookingModel {
       durationInHours: (map['durationInHours'] ?? 0).toDouble(),
       totalRent: (map['totalRent'] ?? 0).toDouble(),
       finalAmountPayable: (map['finalAmountPayable'] ?? 0).toDouble(),
+      bikes:
+          map['bikes'] != null && map['bikes'] != "" && map['bikes'] != "null"
+              ? (jsonDecode(map['bikes']) as List)
+                  .cast<Map<String, dynamic>>()
+                  .map((e) => BikeModel.fromMap(e))
+                  .toList()
+              : [],
     );
   }
 
@@ -102,6 +115,7 @@ class BookingModel {
       'durationInHours': durationInHours,
       'totalRent': totalRent,
       'finalAmountPayable': finalAmountPayable,
+      'bikes': jsonEncode(bikes.map((e) => e.toMap()).toList()),
     };
   }
 }

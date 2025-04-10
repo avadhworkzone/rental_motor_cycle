@@ -94,8 +94,8 @@ class BikeDetailsScreen extends StatelessWidget {
                     Icons.directions_bike,
                   ),
                   _detailCard(
-                    StringUtils.numberPlate,
-                    bike.numberPlate,
+                    StringUtils.vehicleNumber,
+                    bike.vehicleNumber,
                     Icons.confirmation_number,
                   ),
                   _detailCard(
