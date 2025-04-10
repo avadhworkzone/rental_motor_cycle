@@ -78,7 +78,7 @@ class AppTheme {
     ),
   );
 
-  static final ThemeData darkTheme = ThemeData(
+  static final ThemeData  darkTheme = ThemeData(
     scaffoldBackgroundColor: ColorUtils.darkThemeBg,
     cardColor: ColorUtils.darkThemeBg,
     // cardColor: const Color(0xff474747),

@@ -152,10 +152,11 @@ void showAddBikeBottomSheet(BuildContext context, {BikeModel? bike}) {
     Container(
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: ColorUtils.white,
+        color: Theme.of(context).brightness == Brightness.dark?ColorUtils.darkThemeBg:ColorUtils.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      child: SingleChildScrollView(
+      child: FractionallySizedBox(
+        heightFactor: 0.75.w,
         child: Form(
           key: formKey,
           child: Column(
@@ -169,78 +170,82 @@ void showAddBikeBottomSheet(BuildContext context, {BikeModel? bike}) {
               SizedBox(height: 10.h),
 
               ///Pick bike image
-              Align(
-                alignment: Alignment.center,
-                child: Container(
-                  padding: EdgeInsets.all(2.w),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: ColorUtils.primary, width: 2.w),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Container(
-                    height: 111.h,
-                    width: 111.w,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: ColorUtils.primary, width: 2.w),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Obx(() {
-                          return Center(
-                            child:
-                                (bikeController.bikeImage.value?.path.isEmpty ??
-                                        true)
-                                    ? Icon(
-                                      Icons.supervised_user_circle,
-                                      size: 50.sp,
-                                    )
-                                    : Container(
-                                      height: 111.h,
-                                      width: 111.w,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: DecorationImage(
-                                          image: FileImage(
-                                            bikeController.bikeImage.value ??
-                                                File(''),
-                                          ),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                          );
-                        }),
-                        Positioned(
-                          right: -4.w,
-                          bottom: -10.h,
-                          child: IconButton(
-                            onPressed: () {
-                              profileScreenDialogBox(
-                                context: context,
-                                text: StringUtils.addBikeImage,
-                                onTap: () async {
-                                  await bikeController.selectImageCamera(
-                                    context,
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
+                        child: Container(
+                          padding: EdgeInsets.all(2.w),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: ColorUtils.primary, width: 2.w),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Container(
+                            height: 111.h,
+                            width: 111.w,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: ColorUtils.primary, width: 2.w),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Obx(() {
+                                  return Center(
+                                    child:
+                                        (bikeController.bikeImage.value?.path.isEmpty ??
+                                                true)
+                                            ? Icon(
+                                              Icons.supervised_user_circle,
+                                              size: 50.sp,
+                                            )
+                                            : Container(
+                                              height: 111.h,
+                                              width: 111.w,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                image: DecorationImage(
+                                                  image: FileImage(
+                                                    bikeController.bikeImage.value ??
+                                                        File(''),
+                                                  ),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
                                   );
-                                  validateFields();
-                                },
-                                onTap2: () async {
-                                  await bikeController.selectImage(context);
-                                  validateFields();
-                                },
-                              );
-                            },
-                            icon: Icon(Icons.camera_alt_outlined),
+                                }),
+                                Positioned(
+                                  right: -4.w,
+                                  bottom: -10.h,
+                                  child: IconButton(
+                                    onPressed: () {
+                                      profileScreenDialogBox(
+                                        context: context,
+                                        text: StringUtils.addBikeImage,
+                                        onTap: () async {
+                                          await bikeController.selectImageCamera(
+                                            context,
+                                          );
+                                          validateFields();
+                                        },
+                                        onTap2: () async {
+                                          await bikeController.selectImage(context);
+                                          validateFields();
+                                        },
+                                      );
+                                    },
+                                    icon: Icon(Icons.camera_alt_outlined),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 10.h),
+                      ),
+                      SizedBox(height: 10.h),
 
               ///bikeBrand
               Obx(
@@ -468,11 +473,11 @@ void showAddBikeBottomSheet(BuildContext context, {BikeModel? bike}) {
                     },
                   );
 
-                  if (selectedYear != null) {
-                    makeYearController.text = selectedYear.toString();
-                    validateFields();
-                  }
-                },
+                          if (selectedYear != null) {
+                            makeYearController.text = selectedYear.toString();
+                            validateFields();
+                          }
+                        },
 
                 validator:
                     (value) =>
@@ -620,7 +625,7 @@ void showAddBikeBottomSheet(BuildContext context, {BikeModel? bike}) {
           ),
         ),
       ),
-    ),
+    ]),),),),
     isScrollControlled: true,
   ).then((value) {
     (bikeController.bikeImage.value = File(''));

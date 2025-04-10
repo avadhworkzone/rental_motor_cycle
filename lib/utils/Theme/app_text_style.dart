@@ -158,14 +158,16 @@ class CustomText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
     return Text(
-      isLocalization ? title.tr : title,
+      isLocalization ? title.tr :
+      title,
       textDirection: textDirection,
       textAlign: textAlign,
       maxLines: maxLines,
       style: TextStyle(
         color:
-            color ?? (Get.isDarkMode ? ColorUtils.white : ColorUtils.black21),
+        color ?? (isDarkTheme ? ColorUtils.white : ColorUtils.black21),
         fontFamily: fontFamily ?? FontUtils.cerebriSans,
         fontWeight: fontWeight ?? FontWeight.w400,
         fontSize: fontSize ?? 14.sp,

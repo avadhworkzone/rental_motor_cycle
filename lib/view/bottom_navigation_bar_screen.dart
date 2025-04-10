@@ -266,6 +266,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       // extendBody: false, // Removes floating bottom bar
       // appBar: AppBar(
@@ -298,7 +299,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
         () => Container(
           padding: EdgeInsets.symmetric(vertical: 10.h),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color:isDarkTheme?ColorUtils.darkThemeBg:ColorUtils.white,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(24.r),
               topRight: Radius.circular(24.r),
@@ -321,7 +322,9 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
   }
 
   Widget _buildNavItem(int index) {
-    List<IconData> icons = [
+    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+
+  List<IconData> icons = [
       Icons.calendar_today_rounded,
       // Icons.pedal_bike,
       Icons.today,
@@ -362,9 +365,9 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
               icons[index],
               size: currentIndex.value == index ? 28.sp : 24.sp,
               color:
-                  currentIndex.value == index
-                      ? ColorUtils.primary
-                      : ColorUtils.darkBlue35,
+              isDarkTheme? ColorUtils.white:  currentIndex.value == index
+                  ? ColorUtils.primary
+                  : ColorUtils.darkBlue35,
             ),
             SizedBox(height: 4.h),
             CustomText(
@@ -372,9 +375,10 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
               fontSize: 12.sp,
               fontWeight: FontWeight.w500,
               color:
-                  currentIndex.value == index
-                      ? ColorUtils.primary
-                      : ColorUtils.darkBlue35,
+              isDarkTheme? ColorUtils.white:
+              currentIndex.value == index
+                  ? ColorUtils.primary
+                  : ColorUtils.darkBlue35,
             ),
           ],
         ),

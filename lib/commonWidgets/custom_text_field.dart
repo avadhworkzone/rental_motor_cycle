@@ -80,6 +80,7 @@ class CommonTextField extends StatelessWidget {
   /// PLEASE IMPORT GET X PACKAGE
   @override
   Widget build(BuildContext context) {
+    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: TextFormField(
@@ -92,7 +93,7 @@ class CommonTextField extends StatelessWidget {
         autofocus: autoFocus,
         obscureText: obscureValue ?? false,
         style: TextStyle(
-          color: ColorUtils.black21,
+          color: isDarkTheme?ColorUtils.white:ColorUtils.black21,
           fontSize: 16.sp,
           fontWeight: FontWeight.w500,
           fontFamily: FontUtils.cerebriSans,
@@ -124,7 +125,7 @@ class CommonTextField extends StatelessWidget {
             horizontal: 20.w,
             vertical: 14.h,
           ), // Enhanced padding
-          fillColor: Colors.white, // Light background
+          fillColor: isDarkTheme?ColorUtils.darkThemeBg:Colors.white, // Light background
           filled: true, // Enables background fill
           labelText:
               (labelText?.isNotEmpty ?? false) ? labelText.toString().tr : "",
@@ -150,7 +151,7 @@ class CommonTextField extends StatelessWidget {
           // 🔥 When the text field is focused
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.r),
-            borderSide: BorderSide(color: ColorUtils.primary, width: 2.0),
+            borderSide: BorderSide(color: isDarkTheme?ColorUtils.grey99:ColorUtils.primary, width: 2.0),
           ),
 
           // ❌ When there is an error
