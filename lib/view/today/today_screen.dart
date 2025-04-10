@@ -40,14 +40,17 @@ class _TodayScreenState extends State<TodayScreen>
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(StringUtils.todayBooking),
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: ColorUtils.primary,
-          labelColor: ColorUtils.primary,
-          unselectedLabelColor: Colors.black,
+
+          indicatorColor: isDarkTheme?ColorUtils.white:ColorUtils.primary,
+          labelColor: isDarkTheme?ColorUtils.white:ColorUtils.primary,
+          unselectedLabelColor: isDarkTheme?ColorUtils.white:Colors.black,
           labelStyle: TextStyle(fontWeight: FontWeight.bold),
           // Selected tab bold
           unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),

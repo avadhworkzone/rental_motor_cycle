@@ -506,7 +506,7 @@ void showAddBikeBottomSheet(
           ),
         ),
       ),
-    ),
+    ]),),),),
     isScrollControlled: true,
   ).then((value) {
     (bikeController.bikeImage.value = File(''));

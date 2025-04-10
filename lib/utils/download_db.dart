@@ -7,6 +7,7 @@ class DownloadDBFile {
   /// Requests storage permissions for Android and iOS
   static Future<bool> requestPermissions() async {
     if (Platform.isAndroid) {
+      print('heloooi');
       if (await Permission.storage.request().isGranted) {
         return true;
       }
