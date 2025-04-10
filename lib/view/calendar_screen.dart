@@ -399,8 +399,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   // late ScrollController bookingGridController;
   late List<ScrollController> bookingRowControllers;
   bool _isSyncingScroll = false;
-  final double cellWidth =
-      50.w + 2.5.w * 2; // Cell width + margin on both sides
+  final double cellWidth = 50.w + 1.w * 2; // Cell width + margin on both sides
 
   @override
   void initState() {
@@ -758,7 +757,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               return Container(
                 width: 50.w,
                 height: 50.w,
-                margin: EdgeInsets.symmetric(horizontal: 2.5.w),
+                margin: EdgeInsets.symmetric(horizontal: 1.w),
                 decoration: BoxDecoration(color: ColorUtils.greyD6),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -842,7 +841,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                         width: 50.w,
                                         height: 50.w,
                                         margin: EdgeInsets.symmetric(
-                                          horizontal: 2.5.w,
+                                          horizontal: 1.w,
                                         ),
                                         decoration: BoxDecoration(
                                           color: ColorUtils.greyD6,
@@ -877,7 +876,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                       }
 
                                       return Positioned(
-                                        left: startIndex * cellWidth,
+                                        left: (startIndex * cellWidth) + 1.w,
                                         child: InkWell(
                                           onTap: () {
                                             Get.to(
@@ -887,7 +886,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                             );
                                           },
                                           child: Container(
-                                            width: duration * cellWidth,
+                                            width: (duration * cellWidth) - 2.w,
                                             height: 50.w,
                                             alignment: Alignment.centerRight,
                                             padding: EdgeInsets.symmetric(

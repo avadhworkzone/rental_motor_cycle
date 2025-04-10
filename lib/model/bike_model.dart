@@ -54,7 +54,7 @@ class BikeModel {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'name': brandName,
+      'brandName': brandName,
       'model': model,
       'numberPlate': numberPlate,
       // 'rentPerDay': rentPerDay,
@@ -83,7 +83,7 @@ class BikeModel {
     logs("Loading Bike: ${map['name']}, Image URL: ${map['imageUrl']}");
     return BikeModel(
       id: map['id'],
-      brandName: map['name'],
+      brandName: map['brandName'],
       model: map['model'],
       numberPlate: map['numberPlate'],
       // rentPerDay: (map['rentPerDay'] ?? 0).toDouble(),

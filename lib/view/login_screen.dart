@@ -37,11 +37,19 @@ class _LoginScreenState extends State<LoginScreen> {
       await employeeController.loginFetchUsers();
       String username = usernameController.text.trim();
       String password = passwordController.text.trim();
-      var user = employeeController.loginUserList.firstWhereOrNull(
-        (user) => user.username == username && user.password == password,
-      );
+      var user = employeeController.loginUserList.firstWhereOrNull((user) {
+        logs("----user.username-----${user.username}");
+        logs("----user.username---CON--${user.username == username}");
+        logs("----username-----$username");
+        logs("----user.password-----${user.password}");
+        logs("----user.password--CON---${user.password == password}");
+        logs("----password-----$password");
+        return user.username == username && user.password == password;
+      });
 
-      print('user--->> ${user}----> ${employeeController.loginUserList}');
+      // print(
+      //   'user--->> ${user?.username}${user?.password}${user?.id}----> ${employeeController.loginUserList[1].username}',
+      // );
       if (user != null) {
         await SharedPreferenceUtils.setValue(
           SharedPreferenceUtils.isLoggedIn,

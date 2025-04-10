@@ -53,11 +53,30 @@ class _SelectDateTimeForBookingScreenState
   final RxDouble grandTotal = 0.0.obs;
   final RxDouble balance = 0.0.obs;
   final RxDouble discount = 0.0.obs;
+  final RxDouble depositAmount = 0.0.obs;
+  final RxDouble tax = 0.0.obs;
+  final RxDouble prepayment = 0.0.obs;
 
   @override
   void initState() {
     super.initState();
     locationController.text = bike.location;
+    printBikeDetails();
+    initMethod();
+  }
+
+  void printBikeDetails() {
+    print("🚲 Bike Details from Get.arguments:");
+    print("Bike id: ${bike.id}");
+    print("Brand Name: ${bike.brandName}");
+    print("Model: ${bike.model}");
+    print("Location: ${bike.location}");
+    print("Transmission: ${bike.transmission}");
+    // You can add more fields as needed
+  }
+
+  initMethod() async {
+    await Get.find<BikeBookingController>().fetchBookings();
   }
 
   Future<void> pickDateTime(bool isFrom) async {
@@ -200,7 +219,8 @@ class _SelectDateTimeForBookingScreenState
           ).format(finalDateTime);
         }
 
-        // calculateTotal();
+        checkFormValidity();
+        calculateSummary();
       }
     }
   }
@@ -224,33 +244,74 @@ class _SelectDateTimeForBookingScreenState
   }
 
   void calculateSummary() {
-    final fromDate = DateTime.tryParse(fromDateController.text);
-    final toDate = DateTime.tryParse(toDateController.text);
-    logs("---fromDate---$fromDate");
-    logs("---toDate---$toDate");
+    DateTime? fromDate, toDate;
 
-    if (fromDate == null || toDate == null) return;
+    try {
+      final format = DateFormat('MMMM d, yyyy hh:mm a');
+      fromDate = format.parse(fromDateController.text);
+      toDate = format.parse(toDateController.text);
+    } catch (e) {
+      logs("❌ Error parsing date: $e");
+      return;
+    }
 
-    int numberOfDays = toDate.difference(fromDate).inDays + 1;
-    double rent = double.tryParse(rentController.text) ?? 0;
+    if (fromDate == null || toDate == null || toDate.isBefore(fromDate)) return;
+
+    // Ignore time - use only date
+    final fromDateOnly = DateTime(fromDate.year, fromDate.month, fromDate.day);
+    final toDateOnly = DateTime(toDate.year, toDate.month, toDate.day);
+
+    final numberOfDays = toDateOnly.difference(fromDateOnly).inDays + 1;
+
+    double rentPerDay = double.tryParse(rentController.text) ?? 0;
     double discountVal = double.tryParse(discountController.text) ?? 0;
     double taxPercent = double.tryParse(taxController.text) ?? 0;
     double prepayment = double.tryParse(prePaymentController.text) ?? 0;
+    double deposit = double.tryParse(depositController.text) ?? 0;
 
-    subtotal.value = rent * numberOfDays;
+    final rentWithoutDiscount = rentPerDay * numberOfDays;
+
+    // 🛑 Prevent discount > subtotal
+    if (discountVal > rentWithoutDiscount) {
+      discountVal = rentWithoutDiscount;
+      discountController.text = discountVal.toStringAsFixed(0);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showCustomSnackBar(message: StringUtils.discountCantMoreThanTotal);
+      });
+    }
+
+    subtotal.value = rentWithoutDiscount;
     discount.value = discountVal;
-    taxAmount.value = subtotal.value * (taxPercent / 100);
+
+    taxAmount.value = (subtotal.value - discount.value) * (taxPercent / 100);
     grandTotal.value = subtotal.value + taxAmount.value - discount.value;
+
+    // 🛑 Prevent prepayment > grandTotal
+    if (prepayment > grandTotal.value) {
+      prepayment = grandTotal.value;
+      prePaymentController.text = prepayment.toStringAsFixed(0);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showCustomSnackBar(
+          message: "Prepayment can't be more than total amount",
+        );
+      });
+    }
+
     balance.value = grandTotal.value - prepayment;
-    logs("--rent-----$rent");
-    logs("--discountVal-----$discountVal");
-    logs("--taxPercent-----$taxPercent");
-    logs("--prepayment-----$prepayment");
-    logs("--subtotal-----$subtotal");
-    logs("--discount-----$discount");
-    logs("--taxAmount-----$taxAmount");
-    logs("--grandTotal-----$grandTotal");
-    logs("--balance-----$balance");
+    depositAmount.value = deposit;
+    tax.value = taxPercent;
+    this.prepayment.value = prepayment;
+    // logs("--📅 Days Selected (based on date only): $numberOfDays");
+    // logs("--💰 Rent Per Day: $rentPerDay");
+    // logs("--🧮 Rent Without Discount: $rentWithoutDiscount");
+    // logs("--🎁 Discount: $discountVal");
+    // logs("--💸 Tax Percent: $taxPercent");
+    // logs("--🪙 Prepayment: $prepayment");
+    // logs("--🔐 Deposit: $deposit");
+    // logs("--📊 Subtotal: ${subtotal.value}");
+    // logs("--🧾 Tax Amount: ${taxAmount.value}");
+    // logs("--💳 Grand Total: ${grandTotal.value}");
+    // logs("--🧮 Balance: ${balance.value}");
   }
 
   @override
@@ -306,21 +367,30 @@ class _SelectDateTimeForBookingScreenState
                 _buildTextField(
                   fullNameController,
                   StringUtils.fullName,
-                  onChange: (_) => checkFormValidity(),
+                  onChange: (value) {
+                    checkFormValidity();
+                    calculateSummary();
+                  },
                 ),
 
                 /// Phone
                 _buildTextField(
                   phoneController,
                   StringUtils.phone,
-                  onChange: (_) => checkFormValidity(),
+                  onChange: (value) {
+                    checkFormValidity();
+                    calculateSummary();
+                  },
                 ),
 
                 /// Email
                 _buildTextField(
                   emailController,
                   StringUtils.email,
-                  onChange: (_) => checkFormValidity(),
+                  onChange: (value) {
+                    checkFormValidity();
+                    calculateSummary();
+                  },
                 ),
 
                 /// Mileage
@@ -331,7 +401,10 @@ class _SelectDateTimeForBookingScreenState
                   validator:
                       (value) =>
                           value!.isEmpty ? StringUtils.enterMileage : null,
-                  onChange: (_) => checkFormValidity(),
+                  onChange: (value) {
+                    checkFormValidity();
+                    calculateSummary();
+                  },
                 ),
 
                 ///rentPerDay
@@ -342,7 +415,10 @@ class _SelectDateTimeForBookingScreenState
                   validator:
                       (value) =>
                           value!.isEmpty ? StringUtils.enterRentPrice : null,
-                  onChange: (_) => checkFormValidity(),
+                  onChange: (value) {
+                    checkFormValidity();
+                    calculateSummary();
+                  },
                 ),
 
                 ///extraPerKm
@@ -350,7 +426,10 @@ class _SelectDateTimeForBookingScreenState
                   textEditController: extraPerKmController,
                   labelText: StringUtils.extraPerKm,
                   keyBoardType: TextInputType.number,
-                  onChange: (_) => checkFormValidity(),
+                  onChange: (value) {
+                    checkFormValidity();
+                    calculateSummary();
+                  },
                   validator:
                       (value) =>
                           value!.isEmpty ? StringUtils.enterExtraKmRate : null,
@@ -361,7 +440,10 @@ class _SelectDateTimeForBookingScreenState
                   textEditController: depositController,
                   labelText: "${StringUtils.securityDeposit}: (\$)",
                   keyBoardType: TextInputType.number,
-                  onChange: (_) => checkFormValidity(),
+                  onChange: (value) {
+                    checkFormValidity();
+                    calculateSummary();
+                  },
                   validator:
                       (value) =>
                           value!.isEmpty
@@ -374,7 +456,10 @@ class _SelectDateTimeForBookingScreenState
                   labelText: "${StringUtils.discount} (\$)",
                   textEditController: discountController,
                   keyBoardType: TextInputType.number,
-                  onChange: (_) => checkFormValidity(),
+                  onChange: (value) {
+                    checkFormValidity();
+                    calculateSummary();
+                  },
                 ),
 
                 /// Tax
@@ -382,7 +467,10 @@ class _SelectDateTimeForBookingScreenState
                   labelText: "${StringUtils.tax} (%)",
                   textEditController: taxController,
                   keyBoardType: TextInputType.number,
-                  onChange: (_) => checkFormValidity(),
+                  onChange: (value) {
+                    checkFormValidity();
+                    calculateSummary();
+                  },
                 ),
 
                 /// Pre payment
@@ -390,87 +478,112 @@ class _SelectDateTimeForBookingScreenState
                   labelText: StringUtils.prepayment,
                   textEditController: prePaymentController,
                   keyBoardType: TextInputType.number,
-                  onChange: (_) => checkFormValidity(),
+                  onChange: (value) {
+                    checkFormValidity();
+                    calculateSummary();
+                  },
                 ),
 
-                /// Duration + Payment Info UI Section
-                // final from = fromDate.value;
-                // final to = toDate.value;
-                //
-                // if (from == null || to == null) return SizedBox.shrink();
-                // if (!isValid.value) return SizedBox.shrink();
-                //
-                // final duration = to.difference(from);
-                // final durationInDays = duration.inHours / 24;
-                // // final rentPerDay = bike.rentPerDay ?? 0.0;
-                // // final deposit = bike.deposit ?? 0.0;
-                // final totalRent = durationInDays /* * rentPerDay*/;
-                //
-                // double discount =
-                //     double.tryParse(discountController.text) ?? 0.0;
-
-                // // 🚫 Prevent discount greater than total rent
-                // if (discount > totalRent) {
-                //   discount = totalRent;
-                //   discountController.text = totalRent.toStringAsFixed(0);
-                //
-                //   // Show warning
-                //   WidgetsBinding.instance.addPostFrameCallback((_) {
-                //     showCustomSnackBar(
-                //       message: StringUtils.discountCantMoreThanTotal,
-                //     );
-                //   });
-                // }
-
-                // final payable = (totalRent - discount).clamp(
-                //   0,
-                //   double.infinity,
-                // );
-
-                // final durationText =
-                //     duration.inHours == 24
-                //         ? StringUtils.oneDay
-                //         : "${duration.inHours} ${StringUtils.hours}${durationInDays >= 1 ? " (${durationInDays.toStringAsFixed(1)} ${StringUtils.days})" : ""}";
+                /// Payment Summary
                 Container(
                   padding: EdgeInsets.all(16.w),
                   margin: EdgeInsets.only(top: 24.h),
                   decoration: BoxDecoration(
                     color: ColorUtils.white,
-                    borderRadius: BorderRadius.circular(12.r),
+                    borderRadius: BorderRadius.circular(16.r),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black12,
-                        blurRadius: 6,
-                        offset: Offset(0, 2),
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
                       ),
                     ],
                   ),
-                  child: Obx(
-                    () => Column(
+                  child: Obx(() {
+                    final parsedPrepayment =
+                        double.tryParse(prePaymentController.text) ?? 0.0;
+                    final hasPrepayment =
+                        prePaymentController.text.isNotEmpty &&
+                        parsedPrepayment > 0;
+
+                    return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 20.h),
-                        _buildInfoRow("${StringUtils.typeOfPayment}:", "CASH"),
+                        Row(
+                          children: [
+                            Icon(Icons.payment, color: ColorUtils.primary),
+                            SizedBox(width: 8.w),
+                            CustomText(
+                              StringUtils.paymentDetails,
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.w600,
+                              color: ColorUtils.primary,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 16.h),
+                        _buildInfoRow("${StringUtils.typeOfPayment}:", "Cash"),
+
+                        SizedBox(height: 12.h),
+                        _sectionHeader(StringUtils.costBreakdown),
                         _buildInfoRow(
                           "${StringUtils.subtotal}:",
                           "\$${subtotal.value.toStringAsFixed(2)}",
                         ),
+
+                        if (discount.value > 0)
+                          _buildInfoRow(
+                            "${StringUtils.discount}:",
+                            "-\$${discount.value.toStringAsFixed(2)}",
+                          ),
                         _buildInfoRow(
-                          "${StringUtils.tax}:",
+                          "${StringUtils.tax} (${double.tryParse(taxController.text)?.toStringAsFixed(0) ?? 0}%):",
                           "\$${taxAmount.value.toStringAsFixed(2)}",
                         ),
                         _buildInfoRow(
-                          StringUtils.grandTotal,
+                          "${StringUtils.grandTotal}:",
                           "\$${grandTotal.value.toStringAsFixed(2)}",
                         ),
+
+                        if (hasPrepayment) ...[
+                          SizedBox(height: 12.h),
+                          _sectionHeader(StringUtils.advancePayment),
+                          _buildInfoRow(
+                            "${StringUtils.prepaid}:",
+                            "-\$${parsedPrepayment.toStringAsFixed(2)}",
+                          ),
+                        ],
+
+                        SizedBox(height: 12.h),
+                        _sectionHeader(StringUtils.finalAmount),
                         _buildInfoRow(
-                          StringUtils.balance,
+                          "${StringUtils.balance}:",
                           "\$${balance.value.toStringAsFixed(2)}",
                         ),
+                        _buildInfoRow(
+                          "${StringUtils.securityDepositRefundable}:",
+                          "\$${depositAmount.value.toStringAsFixed(2)}",
+                        ),
+
+                        SizedBox(height: 10.h),
+                        Divider(
+                          height: 30.h,
+                          color: Colors.grey.shade300,
+                          thickness: 1,
+                        ),
+                        Center(
+                          child: CustomText(
+                            "${StringUtils.totalToCollectNow}: \$${(balance.value + depositAmount.value).toStringAsFixed(2)}",
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
                       ],
-                    ),
-                  ),
+                    );
+                  }),
                 ),
+
                 SizedBox(height: 40.h),
 
                 /// Confirm Booking btn
@@ -480,9 +593,73 @@ class _SelectDateTimeForBookingScreenState
                     onTap:
                         isValid.value
                             ? () {
-                              logs("---calculateSummary----");
-                              calculateSummary();
-                            } /*showBookingConfirmationDialog*/
+                              final existingBookings =
+                                  Get.find<BikeBookingController>().bookingList
+                                      .where(
+                                        (booking) => booking.bikeId == bike.id,
+                                      )
+                                      .toList();
+
+                              bool isOverlapping(
+                                DateTime newStart,
+                                DateTime newEnd,
+                                DateTime existingStart,
+                                DateTime existingEnd,
+                              ) {
+                                return newStart.isBefore(existingEnd) &&
+                                    newEnd.isAfter(existingStart);
+                              }
+
+                              final newStart = fromDate.value!;
+                              final newEnd = toDate.value!;
+                              bool isConflict = false;
+
+                              for (var booking in existingBookings) {
+                                final existingStart = DateTime(
+                                  booking.pickupDate.year,
+                                  booking.pickupDate.month,
+                                  booking.pickupDate.day,
+                                  DateFormat(
+                                    'hh:mm a',
+                                  ).parse(booking.pickupTime).hour,
+                                  DateFormat(
+                                    'hh:mm a',
+                                  ).parse(booking.pickupTime).minute,
+                                );
+
+                                final existingEnd = DateTime(
+                                  booking.dropoffDate.year,
+                                  booking.dropoffDate.month,
+                                  booking.dropoffDate.day,
+                                  DateFormat(
+                                    'hh:mm a',
+                                  ).parse(booking.dropoffTime).hour,
+                                  DateFormat(
+                                    'hh:mm a',
+                                  ).parse(booking.dropoffTime).minute,
+                                );
+
+                                if (isOverlapping(
+                                  newStart,
+                                  newEnd,
+                                  existingStart,
+                                  existingEnd,
+                                )) {
+                                  isConflict = true;
+                                  break;
+                                }
+                              }
+
+                              if (isConflict) {
+                                showCustomSnackBar(
+                                  message:
+                                      "This bike is already booked during the selected time.",
+                                );
+                                return;
+                              } else {
+                                showBookingConfirmationDialog();
+                              }
+                            }
                             : null,
                     title: StringUtils.confirmBooking,
                     bgColor:
@@ -499,6 +676,50 @@ class _SelectDateTimeForBookingScreenState
     );
   }
 
+  Widget _sectionHeader(String title) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 4.h),
+      child: CustomText(
+        title,
+        fontWeight: FontWeight.w600,
+        color: Colors.grey.shade600,
+      ),
+    );
+  }
+
+  bool isBookingOverlapping(
+    DateTime newStart,
+    DateTime newEnd,
+    List<BookingModel> existingBookings,
+  ) {
+    for (final booking in existingBookings) {
+      final DateTime start = DateTime(
+        booking.pickupDate.year,
+        booking.pickupDate.month,
+        booking.pickupDate.day,
+        DateFormat('hh:mm a').parse(booking.pickupTime).hour,
+      );
+
+      final DateTime end = DateTime(
+        booking.dropoffDate.year,
+        booking.dropoffDate.month,
+        booking.dropoffDate.day,
+        DateFormat('hh:mm a').parse(booking.dropoffTime).hour,
+      );
+
+      if (newStart.isBefore(end) && newEnd.isAfter(start)) {
+        // Overlap exists
+        showCustomSnackBar(
+          message:
+              "Dates occupied from ${DateFormat('d MMM, hh:mm a').format(start)} "
+              "to ${DateFormat('d MMM, hh:mm a').format(end)}",
+        );
+        return true;
+      }
+    }
+    return false;
+  }
+
   void showBookingConfirmationDialog() {
     if (fromDate.value == null || toDate.value == null) {
       showCustomSnackBar(message: StringUtils.pleaseSelectBothTheDates);
@@ -508,19 +729,13 @@ class _SelectDateTimeForBookingScreenState
     final bikeName = bike.brandName ?? "N/A";
     final bikeModel = bike.model ?? "N/A";
     final location = locationController.text;
-    // final depositAmount = bike.deposit ?? 0.0;
 
     final from = fromDate.value!;
     final to = toDate.value!;
     final duration = to.difference(from);
     final durationInDays = duration.inHours / 24;
-    // final rentPerDay = bike.rentPerDay ?? 0.0;
-    final totalRent = durationInDays /* * rentPerDay*/;
-    double discount = double.tryParse(discountController.text) ?? 0.0;
-    final payableAmount =
-        (totalRent - discount /* + depositAmount*/ ).clamp(0, double.infinity)
-            as double;
 
+    // Format helper
     String formatAmount(double amount) {
       return amount % 1 == 0
           ? amount.toInt().toString()
@@ -536,38 +751,51 @@ class _SelectDateTimeForBookingScreenState
             fontWeight: FontWeight.bold,
             fontSize: 18.sp,
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildInfoRow("${StringUtils.bike}:", "$bikeName ($bikeModel)"),
-              _buildInfoRow("${StringUtils.location}:", location),
-              _buildInfoRow(
-                "${StringUtils.from}:",
-                DateFormat('MMMM d, yyyy hh:mm a').format(from),
-              ),
-              _buildInfoRow(
-                "${StringUtils.to}:",
-                DateFormat('MMMM d, yyyy hh:mm a').format(to),
-              ),
-              _buildInfoRow(
-                "${StringUtils.duration}:",
-                "${duration.inHours} ${StringUtils.hours} (${durationInDays.toStringAsFixed(1)} ${StringUtils.days})",
-              ),
-
-              _buildInfoRow(
-                "${StringUtils.totalRent}:",
-                "\$ ${formatAmount(totalRent)}",
-              ),
-              // _buildInfoRow(
-              //   "${StringUtils.depositAmount}:",
-              //   "\$ ${formatAmount(depositAmount)}",
-              // ),
-              _buildInfoRow(
-                "${StringUtils.totalAmount}: ",
-                "\$ ${formatAmount(payableAmount)}",
-              ),
-            ],
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildInfoRow("${StringUtils.bike}:", "$bikeName ($bikeModel)"),
+                _buildInfoRow("${StringUtils.location}:", location),
+                _buildInfoRow(
+                  "${StringUtils.from}:",
+                  DateFormat('MMMM d, yyyy hh:mm a').format(from),
+                ),
+                _buildInfoRow(
+                  "${StringUtils.to}:",
+                  DateFormat('MMMM d, yyyy hh:mm a').format(to),
+                ),
+                _buildInfoRow(
+                  "${StringUtils.duration}:",
+                  "${duration.inHours} ${StringUtils.hours} (${durationInDays.toStringAsFixed(1)} ${StringUtils.days})",
+                ),
+                _buildInfoRow(
+                  "${StringUtils.totalRent}:",
+                  "\$ ${formatAmount(subtotal.value)}",
+                ),
+                _buildInfoRow(
+                  "${StringUtils.discount}:",
+                  "\$ ${formatAmount(discount.value)}",
+                ),
+                _buildInfoRow(
+                  "${StringUtils.tax}:",
+                  "${formatAmount(tax.value)}%",
+                ),
+                _buildInfoRow(
+                  "${StringUtils.totalAmount}: ",
+                  "\$ ${formatAmount(grandTotal.value)}",
+                ),
+                _buildInfoRow(
+                  "${StringUtils.prepayment}: ",
+                  "\$ ${formatAmount(prepayment.value)}",
+                ),
+                _buildInfoRow(
+                  "${StringUtils.balance}: ",
+                  "\$ ${formatAmount(balance.value)}",
+                ),
+              ],
+            ),
           ),
           actions: [
             Row(
@@ -584,8 +812,6 @@ class _SelectDateTimeForBookingScreenState
                 Expanded(
                   child: CustomBtn(
                     onTap: () async {
-                      final from = fromDate.value!;
-                      final to = toDate.value!;
                       final pickupDate = DateTime(
                         from.year,
                         from.month,
@@ -600,9 +826,6 @@ class _SelectDateTimeForBookingScreenState
                         bikeId: bike.id!,
                         bikeName: bike.brandName,
                         bikeModel: bike.model,
-                        discount: discount,
-                        prepayment: 0,
-                        // prepayment: depositAmount,
                         userFullName: fullNameController.text,
                         userPhone: phoneController.text,
                         userEmail: emailController.text,
@@ -610,33 +833,33 @@ class _SelectDateTimeForBookingScreenState
                         dropoffDate: dropOffDate,
                         pickupTime: pickupTime,
                         dropoffTime: dropOffTime,
-
-                        createdAt: DateTime.now(),
-                        durationInHours: duration.inHours.toDouble(),
-                        totalRent: totalRent,
-                        finalAmountPayable: payableAmount,
-                        bikes: [bike],
-                        tax: double.parse(taxController.text.trim()),
+                        typeOfPayment: 'Cash',
+                        rentPerDay: double.parse(rentController.text.trim()),
+                        mileage: num.parse(mileageController.text.trim()),
                         extraPerKm: double.parse(
                           extraPerKmController.text.trim(),
                         ),
-                        balance: 0,
                         securityDeposit: double.parse(
                           depositController.text.trim(),
                         ),
-                        subtotal: 0,
-                        mileage: num.parse(mileageController.text.trim()),
-                        rentPerDay: double.parse(rentController.text.trim()),
-                        typeOfPayment: 'CASH',
+                        subtotal: subtotal.value,
+                        balance: balance.value,
+                        durationInHours: duration.inHours.toDouble(),
+                        totalRent: subtotal.value,
+                        finalAmountPayable: grandTotal.value,
+                        discount: discount.value,
+                        tax: tax.value,
+                        prepayment: prepayment.value,
+                        bikes: [bike],
+                        createdAt: DateTime.now(),
                       );
 
                       await Get.find<BikeBookingController>().addBooking(
                         newBooking,
                       );
-
                       await Get.find<BikeBookingController>().fetchBookings();
-                      Get.back();
-                      Get.back();
+                      Get.back(); // Close dialog
+                      Get.back(); // Go back to previous screen
                       showCustomSnackBar(
                         message: StringUtils.bikeBookedSuccessfully,
                       );

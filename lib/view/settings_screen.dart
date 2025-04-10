@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
+import 'package:rental_motor_cycle/commonWidgets/custom_snackbar.dart';
 import 'package:rental_motor_cycle/routs/app_page.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
+import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/shared_preference_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import 'package:rental_motor_cycle/utils/download_db.dart';
@@ -16,8 +18,7 @@ import 'login_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   final isDarkMode = false.obs;
-  final isLoading =
-      false.obs; // ✅ Prevents multiple database operations at once
+  final isLoading = false.obs;
 
   final EmployeeController employeeController = Get.find();
   final BikeController bikeController = Get.find();
@@ -37,15 +38,15 @@ class SettingsScreen extends StatelessWidget {
         if (table == "Users") {
           await txn.execute("DELETE FROM Users;");
           await employeeController.fetchUsers();
-        } else if (table == "Rooms") {
-          await txn.execute("DELETE FROM Rooms;");
+        } else if (table == "Bikes") {
+          await txn.execute("DELETE FROM Bikes;");
           await bikeController.fetchBikes();
-        } else if (table == "Reservations") {
-          await txn.execute("DELETE FROM Reservations;");
+        } else if (table == "Bookings") {
+          await txn.execute("DELETE FROM Bookings;");
           await bikeBookingController.fetchBookings();
         } else {
-          await txn.execute("DELETE FROM Reservations;");
-          await txn.execute("DELETE FROM Rooms;");
+          await txn.execute("DELETE FROM Bookings;");
+          await txn.execute("DELETE FROM Bikes;");
           await txn.execute("DELETE FROM Users;");
           await employeeController.fetchUsers();
           await bikeController.fetchBikes();
@@ -54,7 +55,10 @@ class SettingsScreen extends StatelessWidget {
 
         await txn.execute("PRAGMA foreign_keys = ON;");
       } catch (e) {
-        Get.snackbar("Error", "Database reset failed: ${e.toString()}");
+        showCustomSnackBar(
+          message: "ERROR___${StringUtils.databaseResetFailed} ${e.toString()}",
+          isError: true,
+        );
       }
     });
 
@@ -66,7 +70,11 @@ class SettingsScreen extends StatelessWidget {
     });
 
     isLoading.value = false; // ✅ Stop loading
-    Get.snackbar("Success", "${table ?? 'All Data'} reset successfully!");
+    showCustomSnackBar(
+      message:
+          "${table ?? StringUtils.allData} ${StringUtils.resetSuccessfully}",
+      isError: true,
+    );
   }
 
   @override
@@ -84,7 +92,7 @@ class SettingsScreen extends StatelessWidget {
         children: [
           Obx(
             () => SwitchListTile(
-              title: Text("Dark Mode"),
+              title: CustomText(StringUtils.darkMode),
               value: isDarkMode.value,
               onChanged: (value) {
                 isDarkMode.value = value;
@@ -94,16 +102,14 @@ class SettingsScreen extends StatelessWidget {
           ),
           Obx(() {
             if (isLoading.value) {
-              return Center(
-                child: CircularProgressIndicator(),
-              ); // ✅ Show loading indicator
+              return Center(child: CircularProgressIndicator());
             }
             return Column(
               children: [
                 ListTile(
                   leading: Icon(Icons.delete, color: Colors.red),
                   title: CustomText(
-                    "Reset Entire Database",
+                    StringUtils.resetEntireDB,
                     fontSize: 15.sp,
                     fontWeight: FontWeight.w500,
                   ),
@@ -112,29 +118,29 @@ class SettingsScreen extends StatelessWidget {
                 ListTile(
                   leading: Icon(Icons.people, color: Colors.blue),
                   title: CustomText(
-                    "Reset Users",
+                    StringUtils.resetUsers,
                     fontSize: 15.sp,
                     fontWeight: FontWeight.w500,
                   ),
-                  onTap: () => resetDatabase(table: "Users"),
+                  onTap: () => showResetOptions(table: "Users"),
                 ),
                 ListTile(
                   leading: Icon(Icons.meeting_room, color: Colors.green),
                   title: CustomText(
-                    "Reset Rooms",
+                    StringUtils.resetBikes,
                     fontSize: 15.sp,
                     fontWeight: FontWeight.w500,
                   ),
-                  onTap: () => resetDatabase(table: "Rooms"),
+                  onTap: () => resetDatabase(table: "Bikes"),
                 ),
                 ListTile(
                   leading: Icon(Icons.event, color: Colors.purple),
                   title: CustomText(
-                    "Reset Reservations",
+                    StringUtils.resetBookings,
                     fontSize: 15.sp,
                     fontWeight: FontWeight.w500,
                   ),
-                  onTap: () => resetDatabase(table: "Reservations"),
+                  onTap: () => resetDatabase(table: "Bookings"),
                 ),
                 ListTile(
                   leading: Icon(
@@ -142,7 +148,7 @@ class SettingsScreen extends StatelessWidget {
                     color: Colors.blue,
                   ),
                   title: CustomText(
-                    "download db",
+                    StringUtils.downloadDb,
                     fontSize: 15.sp,
                     fontWeight: FontWeight.w500,
                   ),
@@ -177,7 +183,7 @@ class SettingsScreen extends StatelessWidget {
                 ListTile(
                   leading: Icon(Icons.logout, color: Colors.red),
                   title: CustomText(
-                    "Logout",
+                    StringUtils.logout,
                     fontSize: 15.sp,
                     fontWeight: FontWeight.w500,
                   ),
@@ -195,17 +201,89 @@ class SettingsScreen extends StatelessWidget {
   }
 
   /// ✅ Show Confirmation Dialog Before Reset
-  void showResetOptions() {
+  void showResetOptions({String? table}) {
+    final tableName = table ?? StringUtils.allData;
+
     Get.defaultDialog(
-      title: "Reset Database",
-      content: CustomText("Are you sure you want to delete all data?"),
-      textCancel: "Cancel",
-      textConfirm: "Yes, Reset",
+      title: "",
+      backgroundColor: Colors.white,
+      contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.warning_amber_rounded, size: 48.sp, color: Colors.red),
+          SizedBox(height: 12.h),
+          CustomText(
+            StringUtils.resetDatabaseTitle,
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w700,
+            color: Colors.black,
+          ),
+          SizedBox(height: 12.h),
+          CustomText(
+            "${StringUtils.resetDatabaseMsg} $tableName?",
+            textAlign: TextAlign.center,
+            fontSize: 15.sp,
+            color: Colors.black87,
+          ),
+          SizedBox(height: 20.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  backgroundColor: Colors.grey[300],
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 24.w,
+                    vertical: 10.h,
+                  ),
+                ),
+                onPressed: () => Get.back(),
+                child: CustomText(
+                  StringUtils.cancel,
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.red,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 24.w,
+                    vertical: 10.h,
+                  ),
+                ),
+                onPressed: () {
+                  Get.back();
+                  resetDatabase(table: table);
+                },
+                child: CustomText(
+                  StringUtils.yesReset,
+                  color: ColorUtils.white,
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /*void showResetOptions() {
+    Get.defaultDialog(
+      title: StringUtils.resetDatabaseTitle,
+      content: CustomText(StringUtils.resetDatabaseMsg),
+      textCancel: StringUtils.cancel,
+      textConfirm: StringUtils.yesReset,
       confirmTextColor: Colors.white,
       onConfirm: () {
-        Get.back(); // Close dialog
+        Get.back();
         resetDatabase();
       },
     );
-  }
+  }*/
 }

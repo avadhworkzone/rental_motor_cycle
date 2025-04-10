@@ -217,6 +217,25 @@ class StringUtils {
   static const bikeModelYamaha = "YAMAHA Mio i 125";
   static const bikeModelSuzuki = "SUZUKI Skydrive 125 Fi";
   static const selectBikeModel = "Select Bike Model";
+  static const prepaid = "Prepaid";
+  static const advancePayment = "Advance Payment";
+  static const finalAmount = "Final Amount";
+  static const securityDepositRefundable = "Security Deposit (Refundable)";
+  static const totalToCollectNow = "Total to Collect Now";
+  static const costBreakdown = "Cost Breakdown";
+  static const darkMode = "Dark Mode";
+  static const databaseResetFailed = "Database reset failed";
+  static const resetSuccessfully = "reset successfully!";
+  static const allData = "All Data";
+  static const resetEntireDB = "Reset Entire Database";
+  static const resetUsers = "Reset Users";
+  static const resetBikes = "Reset Bikes";
+  static const resetBookings = "Reset Bookings";
+  static const downloadDb = "Download db";
+  static const logout = "Logout";
+  static const resetDatabaseTitle = "Reset Database";
+  static const resetDatabaseMsg = "Are you sure you want to reset";
+  static const yesReset = "Yes, Reset";
 }
 
 logs(String title) {

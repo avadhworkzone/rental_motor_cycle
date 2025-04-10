@@ -143,7 +143,7 @@ class BikeController extends GetxController {
       });
     });
 
-    await fetchBikes(); // ✅ Refresh list after adding a bike
+    // await fetchBikes(); // ✅ Refresh list after adding a bike
     isProcessing.value = false;
   }
 

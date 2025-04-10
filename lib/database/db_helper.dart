@@ -80,14 +80,14 @@ class DBHelper {
     await db.execute('''
       CREATE TABLE Bikes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        brandName TEXT NOT NULL,  -- ✅ Fixed column name (previously 'room_name')
+        brandName TEXT NOT NULL,  
         model TEXT,
         numberPlate TEXT,
         location TEXT,
         fuelType TEXT,
         engineCC INTEGER,
         description TEXT,
-        isAvailable INTEGER DEFAULT 1,  -- ✅ Changed BOOLEAN to INTEGER (0/1)
+        isAvailable INTEGER DEFAULT 1, 
         imageUrl TEXT,
         userId INTEGER NOT NULL,
         createdAt TEXT,
