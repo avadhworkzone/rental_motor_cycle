@@ -79,9 +79,11 @@ class _TodayScreenState extends State<TodayScreen>
               ),
               child: TabBar(
                 controller: _tabController,
-                indicatorColor: isDarkTheme?ColorUtils.white:ColorUtils.primary,
-                labelColor: isDarkTheme?ColorUtils.white:ColorUtils.primary,
-                unselectedLabelColor: isDarkTheme?ColorUtils.white:Colors.black,
+                indicatorColor:
+                    isDarkTheme ? ColorUtils.white : ColorUtils.primary,
+                labelColor: isDarkTheme ? ColorUtils.white : ColorUtils.primary,
+                unselectedLabelColor:
+                    isDarkTheme ? ColorUtils.white : Colors.black,
                 indicatorSize: TabBarIndicatorSize.tab,
                 labelStyle: TextStyle(
                   fontWeight: FontWeight.bold,
