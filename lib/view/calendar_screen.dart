@@ -747,36 +747,39 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return Column(
       children: [
         SizedBox(height: 10.h),
-        // Horizontally scrollable Date Header
+
+        /// Horizontally scrollable Date Header
         SingleChildScrollView(
           controller: dateHeaderController,
           scrollDirection: Axis.horizontal,
           child: Row(
             children: List.generate(calenderDates.length, (index) {
               final date = calenderDates[index];
+              final now = DateTime.now();
+              final isToday =
+                  date.year == now.year &&
+                  date.month == now.month &&
+                  date.day == now.day;
+
               return Container(
                 width: 50.w,
                 height: 50.w,
                 margin: EdgeInsets.symmetric(horizontal: 1.w),
-                decoration: BoxDecoration(color: ColorUtils.greyD6),
+                decoration: BoxDecoration(
+                  color: isToday ? ColorUtils.primary : ColorUtils.greyDF,
+                ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // CustomText(
-                    //   DateFormat('MMM').format(date), // Month (e.g., Apr)
-                    //   fontSize: 12.sp,
-                    // ),
-                    // CustomText(
-                    //   DateFormat('yyyy').format(date), // Year (e.g., 2025)
-                    //   fontSize: 10.sp,
-                    // ),
                     CustomText(
                       DateFormat('E').format(date).substring(0, 2),
+                      color: isToday ? ColorUtils.white : ColorUtils.black21,
                       fontSize: 12.sp,
                     ),
                     CustomText(
-                      DateFormat('dd').format(date), // Day (e.g., 08)
+                      DateFormat('dd').format(date),
                       fontSize: 15.sp,
+                      color: isToday ? ColorUtils.white : ColorUtils.black21,
                       fontWeight: FontWeight.w500,
                     ),
                   ],
@@ -786,7 +789,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ),
         ),
 
-        // Booking rows vertically stacked
+        /// Booking rows vertically stacked
         Expanded(
           child:
               bikeController.bikeList.isEmpty
@@ -844,7 +847,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                           horizontal: 1.w,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: ColorUtils.greyD6,
+                                          color: ColorUtils.greyDF,
                                         ),
                                       );
                                     },
