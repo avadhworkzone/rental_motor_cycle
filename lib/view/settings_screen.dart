@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -28,16 +30,22 @@ class SettingsScreen extends StatelessWidget {
 
   /// Reset Specific Table or Entire Database
   void resetDatabase({String? table}) async {
-    if (isLoading.value) return; // ✅ Prevent multiple clicks
-    isLoading.value = true; // ✅ Start loading
-
+    // if (isLoading.value) return; // ✅ Prevent multiple clicks
+    // isLoading.value = true; // ✅ Start loading
+    log('----users table =-=-=-=-> ${table}');
     final db = await DBHelper.database;
     await db.transaction((txn) async {
+      log('----txn=-=-=-=-> ${txn}');
       try {
         await txn.execute("PRAGMA foreign_keys = OFF;");
+      log('users table =-=-=-=-=-=-=->>> ${table}');
 
         if (table == "Users") {
-          await txn.execute("DELETE FROM Users;");
+          log('delete users');
+          await db.delete('Users');
+          // await txn.execute("DELETE FROM Users;");
+          await db.rawDelete('DELETE FROM Users');
+
           await employeeController.fetchUsers();
         } else if (table == "Bikes") {
           await txn.execute("DELETE FROM Bikes;");
@@ -46,6 +54,7 @@ class SettingsScreen extends StatelessWidget {
           await txn.execute("DELETE FROM Bookings;");
           await bikeBookingController.fetchBookings();
         } else {
+          print('========delete data=======');
           await txn.execute("DELETE FROM Bookings;");
           await txn.execute("DELETE FROM Bikes;");
           await txn.execute("DELETE FROM Users;");
@@ -55,11 +64,14 @@ class SettingsScreen extends StatelessWidget {
         }
 
         await txn.execute("PRAGMA foreign_keys = ON;");
+        isLoading.value =false;
+        Get.back();
       } catch (e) {
         showCustomSnackBar(
           message: "ERROR___${StringUtils.databaseResetFailed} ${e.toString()}",
           isError: true,
         );
+        isLoading.value =false;
       }
     });
 
@@ -203,6 +215,7 @@ class SettingsScreen extends StatelessWidget {
 
   /// ✅ Show Confirmation Dialog Before Reset
   void showResetOptions({String? table}) {
+    print('table==>> ${table}');
     final tableName = table ?? StringUtils.allData;
 
     Get.defaultDialog(
@@ -256,8 +269,9 @@ class SettingsScreen extends StatelessWidget {
                     vertical: 10.h,
                   ),
                 ),
-                onPressed: () {
-                  Get.back();
+                onPressed: () async {
+
+
                   resetDatabase(table: table);
                 },
                 child: CustomText(
