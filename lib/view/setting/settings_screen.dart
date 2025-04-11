@@ -10,12 +10,12 @@ import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/shared_preference_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import 'package:rental_motor_cycle/utils/download_db.dart';
-import '../controller/employee_controller.dart';
-import '../controller/bike_controller.dart';
-import '../controller/bike_booking_controller.dart';
-import '../database/db_helper.dart';
-import '../controller/badge_controller.dart';
-import 'login_screen.dart';
+import '../../controller/employee_controller.dart';
+import '../../controller/bike_controller.dart';
+import '../../controller/bike_booking_controller.dart';
+import '../../database/db_helper.dart';
+import '../../controller/badge_controller.dart';
+import '../auth/login_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   final isDarkMode = false.obs;
@@ -182,6 +182,29 @@ class SettingsScreen extends StatelessWidget {
                   },
                 ),
                 ListTile(
+                  leading: Icon(Icons.history, color: Colors.deepPurple),
+                  title: CustomText(
+                    StringUtils.salesReport,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  onTap: () async {
+                    Get.toNamed(AppRoutes.reportScreen);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.payment, color: Colors.teal),
+                  title: CustomText(
+                    StringUtils.transactionReport,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  onTap: () async {
+                    Get.toNamed(AppRoutes.transactionScreen);
+                  },
+                ),
+
+                ListTile(
                   leading: Icon(Icons.logout, color: Colors.red),
                   title: CustomText(
                     StringUtils.logout,
@@ -190,7 +213,7 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   onTap: () async {
                     await SharedPreferenceUtils.clearPreference();
-                    Get.off(() => LoginScreen());
+                    Get.offNamed(AppRoutes.loginScreen);
                   },
                 ),
               ],

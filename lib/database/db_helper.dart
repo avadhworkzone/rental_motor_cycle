@@ -8,23 +8,14 @@ import 'package:path/path.dart';
 
 class DBHelper {
   static Database? _database;
-  static const String dbName = "app_database.db";
+  // static const String dbName = "app_database.db";
+  static const String dbName = "rental_bikes.db";
 
   static Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDB();
     return _database!;
   }
-
-  // static Future<Database> _initDB() async {
-  //   final path = join(await getDatabasesPath(), dbName);
-  //   return await openDatabase(
-  //     path,
-  //     version: 1,
-  //     onCreate: _createDB,
-  //     singleInstance: true, // ✅ Ensure only one instance of the DB is used
-  //   );
-  // }
 
   static Future<Database> _initDB() async {
     final path = join(await getDatabasesPath(), dbName);
@@ -159,32 +150,6 @@ class DBHelper {
     });
   }
 
-  /*  // CRUD Operations for Rooms
-    static Future<int> insertRoom(Map<String, dynamic> room) async {
-      final db = await database;
-      return await db.transaction((txn) async {
-        return await txn.insert('Rooms', room);
-      });
-    }
-
-    static Future<List<Map<String, dynamic>>> getRooms() async {
-      final db = await database;
-      return await db.query('Rooms');
-    }
-
-    static Future<int> updateRoom(Map<String, dynamic> room, int id) async {
-      final db = await database;
-      return await db.transaction((txn) async {
-        return await txn.update('Rooms', room, where: 'id = ?', whereArgs: [id]);
-      });
-    }
-
-    static Future<int> deleteRoom(int id) async {
-      final db = await database;
-      return await db.transaction((txn) async {
-        return await txn.rawDelete("DELETE FROM Rooms WHERE id = ?", [id]);
-      });
-    }*/
   // CRUD Operations for Bikes
   static Future<int> insertBike(Map<String, dynamic> bike) async {
     final db = await database;
@@ -218,40 +183,6 @@ class DBHelper {
     });
   }
 
-  /*// CRUD Operations for Reservations
-  static Future<int> insertReservation(Map<String, dynamic> reservation) async {
-    final db = await database;
-    return await db.transaction((txn) async {
-      return await txn.insert('Reservations', reservation);
-    });
-  }
-
-  static Future<List<Map<String, dynamic>>> getReservations() async {
-    final db = await database;
-    return await db.query('Reservations');
-  }
-
-  static Future<int> updateReservation(
-    Map<String, dynamic> reservation,
-    int id,
-  ) async {
-    final db = await database;
-    return await db.transaction((txn) async {
-      return await txn.update(
-        'Reservations',
-        reservation,
-        where: 'id = ?',
-        whereArgs: [id],
-      );
-    });
-  }
-
-  static Future<int> deleteReservation(int id) async {
-    final db = await database;
-    return await db.transaction((txn) async {
-      return await txn.rawDelete("DELETE FROM Reservations WHERE id = ?", [id]);
-    });
-  }*/
   // CRUD Operations for Bike Bookings
   static Future<int> insertBooking(Map<String, dynamic> booking) async {
     final db = await database;

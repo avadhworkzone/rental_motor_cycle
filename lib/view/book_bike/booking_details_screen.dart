@@ -186,6 +186,8 @@ class BookingDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double taxAmount =
+        (booking.subtotal - booking.discount) * (booking.tax / 100);
     return Scaffold(
       appBar: commonAppBar(
         titleText: StringUtils.bookingDetails,
@@ -239,37 +241,104 @@ class BookingDetailsScreen extends StatelessWidget {
                 Icons.calendar_today_outlined,
                 "${StringUtils.drop}: ${formatDateTime(booking.dropoffDate, booking.dropoffTime)}",
               ),
-
-              SizedBox(height: 30.h),
-              Divider(thickness: 1),
               SizedBox(height: 10.h),
-              CustomText(
-                StringUtils.paymentDetails,
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w600,
-              ),
-              SizedBox(height: 6.h),
-              _buildPriceRow(StringUtils.rentPerDay, booking.rentPerDay),
-              _buildPriceRow(StringUtils.duration, booking.durationInHours),
-              _buildPriceRow(StringUtils.totalRent, booking.totalRent),
-              if (booking.discount > 0)
-                _buildPriceRow(StringUtils.discount, booking.discount),
-              if (booking.prepayment > 0)
-                _buildPriceRow(StringUtils.securityDeposit, booking.prepayment),
-              SizedBox(height: 6.h),
-              _buildPriceRow(
-                StringUtils.grandTotal,
-                booking.finalAmountPayable,
-                isBold: true,
+
+              ///Payment details container
+              Container(
+                padding: EdgeInsets.all(16.w),
+                margin: EdgeInsets.only(top: 24.h),
+                decoration: BoxDecoration(
+                  color: ColorUtils.white,
+                  borderRadius: BorderRadius.circular(16.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.payment, color: ColorUtils.primary),
+                        SizedBox(width: 8.w),
+                        CustomText(
+                          StringUtils.paymentDetails,
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w600,
+                          color: ColorUtils.primary,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16.h),
+                    _buildInfoRowForPayment(
+                      "${StringUtils.typeOfPayment}:",
+                      "Cash",
+                    ),
+
+                    SizedBox(height: 12.h),
+                    _sectionHeader(StringUtils.costBreakdown),
+                    _buildInfoRowForPayment(
+                      "${StringUtils.subtotal}:",
+                      "\$${booking.subtotal.toStringAsFixed(2)}",
+                    ),
+
+                    _buildInfoRowForPayment(
+                      "${StringUtils.discount}:",
+                      "-\$${booking.discount.toStringAsFixed(2)}",
+                    ),
+                    _buildInfoRowForPayment(
+                      "${StringUtils.tax} (${booking.tax}%):",
+                      "\$${taxAmount.toStringAsFixed(2)}",
+                    ),
+
+                    _buildInfoRowForPayment(
+                      "${StringUtils.grandTotal}:",
+                      "\$${(booking.subtotal + taxAmount - booking.discount).toStringAsFixed(2)}",
+                    ),
+
+                    SizedBox(height: 12.h),
+                    _sectionHeader(StringUtils.advancePayment),
+                    _buildInfoRowForPayment(
+                      "${StringUtils.prepaid}:",
+                      "-\$${booking.prepayment.toStringAsFixed(2)}",
+                    ),
+
+                    SizedBox(height: 12.h),
+                    _sectionHeader(StringUtils.finalAmount),
+                    _buildInfoRowForPayment(
+                      "${StringUtils.balance}:",
+                      "\$${booking.balance.toStringAsFixed(2)}",
+                    ),
+                    _buildInfoRowForPayment(
+                      "${StringUtils.securityDepositRefundable}:",
+                      "\$${booking.securityDeposit.toStringAsFixed(2)}",
+                    ),
+
+                    SizedBox(height: 10.h),
+                    Divider(
+                      height: 30.h,
+                      color: Colors.grey.shade300,
+                      thickness: 1,
+                    ),
+                    CustomText(
+                      "${StringUtils.totalToCollectNow}: \$${(booking.balance + booking.securityDeposit).toStringAsFixed(2)}",
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ],
+                ),
               ),
 
-              Divider(thickness: 1, height: 24.h),
-
-              _buildInfoRow(
-                Icons.access_time,
-                "${StringUtils.bookedOn}: ${formatSimpleDate(booking.createdAt)}",
-              ),
-
+              // Divider(thickness: 1, height: 24.h),
+              // _buildInfoRow(
+              //   Icons.access_time,
+              //   "${StringUtils.bookedOn}: ${formatSimpleDate(booking.createdAt)}",
+              // ),
               SizedBox(height: 40.h),
               Center(
                 child: Container(
@@ -300,6 +369,17 @@ class BookingDetailsScreen extends StatelessWidget {
     );
   }
 
+  Widget _sectionHeader(String title) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 4.h),
+      child: CustomText(
+        title,
+        fontWeight: FontWeight.w600,
+        color: Colors.grey.shade600,
+      ),
+    );
+  }
+
   Widget _buildInfoRow(IconData icon, String text) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 4.h),
@@ -313,22 +393,24 @@ class BookingDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPriceRow(String label, double amount, {bool isBold = false}) {
+  Widget _buildInfoRowForPayment(
+    String title,
+    String value, {
+    Color? valueColor,
+    bool isBold = false,
+  }) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 2.h),
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CustomText(
-            label,
-            fontSize: 16.sp,
-            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-          ),
-          CustomText(
-            formatCurrency(amount),
-            fontSize: 16.sp,
-            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-            color: isBold ? ColorUtils.primary : null,
+          Expanded(child: CustomText(title, fontWeight: FontWeight.w600)),
+          Expanded(
+            child: CustomText(
+              value,
+              color: valueColor,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+            ),
           ),
         ],
       ),
