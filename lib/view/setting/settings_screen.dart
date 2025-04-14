@@ -88,6 +88,8 @@ class SettingsScreen extends StatelessWidget {
         isCenterTitle: false,
         fontSize: 20.sp,
         fontWeight: FontWeight.w600,
+        backgroundColor: ColorUtils.primary,
+        fontColor: ColorUtils.white,
       ),
       body: Column(
         children: [

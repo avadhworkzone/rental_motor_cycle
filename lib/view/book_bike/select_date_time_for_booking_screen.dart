@@ -77,13 +77,29 @@ class _SelectDateTimeForBookingScreenState
       fullNameController.text = booking?.userFullName ?? '';
       phoneController.text = booking?.userPhone ?? '';
       emailController.text = booking?.userEmail ?? '';
-      mileageController.text = booking?.mileage.toString() ?? '';
-      rentController.text = booking?.rentPerDay.toString() ?? '';
-      extraPerKmController.text = booking?.extraPerKm.toString() ?? '';
-      depositController.text = booking?.securityDeposit.toString() ?? '';
-      discountController.text = booking?.discount.toString() ?? '';
-      taxController.text = booking?.tax.toString() ?? '';
-      prePaymentController.text = booking?.prepayment.toString() ?? '';
+      mileageController.text = formatNum(booking?.mileage);
+
+      rentController.text =
+          booking?.rentPerDay != null
+              ? formatDoubleOrInt(booking?.rentPerDay)
+              : '';
+      extraPerKmController.text =
+          booking?.extraPerKm != null
+              ? formatDoubleOrInt(booking?.extraPerKm)
+              : '';
+      depositController.text =
+          booking?.securityDeposit != null
+              ? formatDoubleOrInt(booking?.securityDeposit)
+              : '';
+      discountController.text =
+          booking?.discount != null ? formatDoubleOrInt(booking?.discount) : '';
+      taxController.text =
+          booking?.tax != null ? formatDoubleOrInt(booking?.tax) : '';
+      prePaymentController.text =
+          booking?.prepayment != null
+              ? formatDoubleOrInt(booking?.prepayment)
+              : '';
+
       fromDate.value = booking?.pickupDate;
       toDate.value = booking?.dropoffDate;
 
@@ -102,6 +118,24 @@ class _SelectDateTimeForBookingScreenState
       }
     }
     calculateSummary();
+  }
+
+  String formatDoubleOrInt(double? value) {
+    if (value == null) return '';
+    if (value == value.toInt()) {
+      return value.toInt().toString();
+    } else {
+      return value.toStringAsFixed(2); // Or .toString() if you want raw decimal
+    }
+  }
+
+  String formatNum(num? value) {
+    if (value == null) return '';
+    if (value is int || value == value.toInt()) {
+      return value.toInt().toString();
+    } else {
+      return value.toStringAsFixed(2);
+    }
   }
 
   void printBikeDetails() {

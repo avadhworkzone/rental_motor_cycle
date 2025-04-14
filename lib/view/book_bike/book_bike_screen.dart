@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
+import 'package:rental_motor_cycle/model/booking_model.dart';
 import 'package:rental_motor_cycle/routs/app_page.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/model/bike_model.dart';
+import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import '../../controller/bike_controller.dart';
 
@@ -43,6 +45,8 @@ class _BookBikeScreenState extends State<BookBikeScreen> {
         isLeading: false,
         isCenterTitle: false,
         fontSize: 20.sp,
+        fontColor: ColorUtils.white,
+        backgroundColor: ColorUtils.primary,
         fontWeight: FontWeight.w600,
       ),
       body: Obx(
@@ -134,7 +138,8 @@ class _BookBikeScreenState extends State<BookBikeScreen> {
                   onPressed: () {
                     Get.toNamed(
                       AppRoutes.selectDateTimeForBookingScreen,
-                      arguments: bike,
+                      arguments: {'bike': bike, 'booking': null},
+                      // arguments: bike,
                     );
                   },
 

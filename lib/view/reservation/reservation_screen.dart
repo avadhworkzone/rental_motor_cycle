@@ -116,12 +116,14 @@ class _ReservationScreenState extends State<ReservationScreen>
           unselectedLabelColor: Colors.white70,
           labelStyle: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 15.sp,
+            fontSize: 16.sp,
             fontFamily: FontUtils.cerebriSans,
           ), // Selected tab bold
           unselectedLabelStyle: TextStyle(
-            fontWeight: FontWeight.normal,
-          ), // Unselected tab normal
+            fontWeight: FontWeight.w500,
+            fontFamily: FontUtils.cerebriSans,
+            fontSize: 16.sp,
+          ),
           tabs: tabLabels.map((label) => Tab(text: label)).toList(),
         ),
       ),
@@ -145,7 +147,10 @@ class _ReservationScreenState extends State<ReservationScreen>
 
               if (filteredList.isEmpty) {
                 return Center(
-                  child: CustomText(StringUtils.noReservationsFound),
+                  child: CustomText(
+                    StringUtils.noReservationsFound,
+                    fontWeight: FontWeight.w600,
+                  ),
                 );
               }
 

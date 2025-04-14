@@ -269,8 +269,11 @@ class _EmployeesState extends State<EmployeesScreen> {
         context: context,
         isLeading: true,
         isCenterTitle: true,
-        fontSize: 17.sp,
+        fontSize: 20.sp,
         fontWeight: FontWeight.w600,
+        backgroundColor: ColorUtils.primary,
+        fontColor: ColorUtils.white,
+        iconColor: ColorUtils.white,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => showUserDialog(),
@@ -279,7 +282,12 @@ class _EmployeesState extends State<EmployeesScreen> {
       body: Obx(
         () =>
             employeeController.userList.isEmpty
-                ? Center(child: CustomText(StringUtils.noUsersFound))
+                ? Center(
+                  child: CustomText(
+                    StringUtils.noUsersFound,
+                    fontWeight: FontWeight.bold,
+                  ),
+                )
                 : Column(
                   children: [
                     Expanded(

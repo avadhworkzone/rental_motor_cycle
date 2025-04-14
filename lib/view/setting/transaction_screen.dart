@@ -92,7 +92,10 @@ class _TransactionScreenState extends State<TransactionScreen> {
 
                 if (groupedTransactions.isEmpty) {
                   return const Center(
-                    child: CustomText(StringUtils.noTransactionsFound),
+                    child: CustomText(
+                      StringUtils.noTransactionsFound,
+                      fontWeight: FontWeight.bold,
+                    ),
                   );
                 }
 

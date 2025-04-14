@@ -87,7 +87,10 @@ class _ReportScreenState extends State<ReportScreen> {
 
                 if (groupedTransactions.isEmpty) {
                   return const Center(
-                    child: CustomText(StringUtils.noTransactionsFound),
+                    child: CustomText(
+                      StringUtils.noTransactionsFound,
+                      fontWeight: FontWeight.bold,
+                    ),
                   );
                 }
 
