@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:rental_motor_cycle/blocs/bikes/bike_crud_bloc/bike_bloc.dart';
+import 'package:rental_motor_cycle/blocs/bikes/bike_form_bloc/bike_form_bloc.dart';
 import 'package:rental_motor_cycle/controller/badge_controller.dart';
 import 'package:rental_motor_cycle/controller/bike_booking_controller.dart';
 import 'package:rental_motor_cycle/controller/bike_controller.dart';
@@ -36,15 +39,39 @@ class MyApp extends StatelessWidget {
       designSize: const Size(393, 852),
       minTextAdapt: true,
       splitScreenMode: true,
+      // builder: (context, child) {
+      //   return GetMaterialApp(
+      //     title: 'Flutter Demo',
+      //     debugShowCheckedModeBanner: false,
+      //     theme: AppTheme.lightTheme, // Light theme
+      //     // darkTheme: AppTheme.darkTheme, // Dark theme
+      //     // themeMode: ThemeMode.system,
+      //     getPages: AppPages.route,
+      //     initialRoute: AppPages.initialRoute,
+      //   );
+      // },
+      //   );
+      // }
       builder: (context, child) {
-        return GetMaterialApp(
-          title: 'Flutter Demo',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.lightTheme, // Light theme
-          // darkTheme: AppTheme.darkTheme, // Dark theme
-          // themeMode: ThemeMode.system,
-          getPages: AppPages.route,
-          initialRoute: AppPages.initialRoute,
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider<BikeBloc>(
+              create: (_) => BikeBloc(),
+            ), // Providing BikeBloc
+            BlocProvider<BikeFormBloc>(
+              create:
+                  (context) => BikeFormBloc(bikeBloc: context.read<BikeBloc>()),
+            ), // Providing BikeFormBloc
+          ],
+          child: GetMaterialApp(
+            title: 'Flutter Demo',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme, // Light theme
+            // darkTheme: AppTheme.darkTheme, // Dark theme
+            // themeMode: ThemeMode.system,
+            getPages: AppPages.route,
+            initialRoute: AppPages.initialRoute,
+          ),
         );
       },
     );

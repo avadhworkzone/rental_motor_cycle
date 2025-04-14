@@ -98,11 +98,11 @@ class BikeDetailsScreen extends StatelessWidget {
                     bike.numberPlate,
                     Icons.confirmation_number,
                   ),
-                  _detailCard(
-                    StringUtils.rentPerDay,
-                    "\$${bike.rentPerDay.toStringAsFixed(2)}",
-                    Icons.attach_money,
-                  ),
+                  // _detailCard(
+                  //   StringUtils.rentPerDay,
+                  //   "\$${bike.rentPerDay.toStringAsFixed(2)}",
+                  //   Icons.attach_money,
+                  // ),
                   _detailCard(
                     StringUtils.location,
                     bike.location,
