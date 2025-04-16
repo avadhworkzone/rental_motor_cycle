@@ -8,7 +8,12 @@ plugins {
 android {
     namespace = "com.example.rental_motor_cycle"
     compileSdk = flutter.compileSdkVersion
+
+    /// krina system
     ndkVersion = "27.0.12077973"
+
+    /// bhavesh system
+//    ndkVersion = "23.1.7779620"
 
 //    ndkVersion = flutter.ndkVersion
 
