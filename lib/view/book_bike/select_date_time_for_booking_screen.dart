@@ -30,7 +30,8 @@ class SelectDateTimeForBookingScreen extends StatefulWidget {
 
 class _SelectDateTimeForBookingScreenState
     extends State<SelectDateTimeForBookingScreen> {
-  TextEditingController locationController = TextEditingController();
+  late final BikeModel bike;
+  BookingModel? booking;
   TextEditingController fromDateController = TextEditingController();
   TextEditingController discountController = TextEditingController();
   TextEditingController taxController = TextEditingController();
@@ -43,7 +44,7 @@ class _SelectDateTimeForBookingScreenState
   final TextEditingController depositController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
-  final bike = Get.arguments;
+  // final bike = Get.arguments;
   final Rxn<DateTime> fromDate = Rxn<DateTime>();
   final Rxn<DateTime> toDate = Rxn<DateTime>();
   final isValid = false.obs;
@@ -56,13 +57,85 @@ class _SelectDateTimeForBookingScreenState
   final RxDouble depositAmount = 0.0.obs;
   final RxDouble tax = 0.0.obs;
   final RxDouble prepayment = 0.0.obs;
+  // bool isEditing = false;
+  // int? existingBookingId;
 
   @override
   void initState() {
     super.initState();
-    locationController.text = bike.location;
+    final args = Get.arguments as Map<String, dynamic>;
+    bike = args['bike'];
+    booking = args['booking'];
     printBikeDetails();
     initMethod();
+
+    // If this screen is used to update an existing booking
+    if (booking != null) {
+      // isEditing = true;
+      // existingBookingId = booking?.id ?? 0;
+      // final BookingModel booking = booking;
+      fullNameController.text = booking?.userFullName ?? '';
+      phoneController.text = booking?.userPhone ?? '';
+      emailController.text = booking?.userEmail ?? '';
+      mileageController.text = formatNum(booking?.mileage);
+
+      rentController.text =
+          booking?.rentPerDay != null
+              ? formatDoubleOrInt(booking?.rentPerDay)
+              : '';
+      extraPerKmController.text =
+          booking?.extraPerKm != null
+              ? formatDoubleOrInt(booking?.extraPerKm)
+              : '';
+      depositController.text =
+          booking?.securityDeposit != null
+              ? formatDoubleOrInt(booking?.securityDeposit)
+              : '';
+      discountController.text =
+          booking?.discount != null ? formatDoubleOrInt(booking?.discount) : '';
+      taxController.text =
+          booking?.tax != null ? formatDoubleOrInt(booking?.tax) : '';
+      prePaymentController.text =
+          booking?.prepayment != null
+              ? formatDoubleOrInt(booking?.prepayment)
+              : '';
+
+      fromDate.value = booking?.pickupDate;
+      toDate.value = booking?.dropoffDate;
+
+      final pickup = booking?.pickupDate;
+      if (pickup != null) {
+        fromDateController.text = DateFormat(
+          'MMMM d, yyyy hh:mm a',
+        ).format(pickup);
+      }
+
+      final dropOff = booking?.dropoffDate;
+      if (dropOff != null) {
+        toDateController.text = DateFormat(
+          'MMMM d, yyyy hh:mm a',
+        ).format(dropOff);
+      }
+    }
+    calculateSummary();
+  }
+
+  String formatDoubleOrInt(double? value) {
+    if (value == null) return '';
+    if (value == value.toInt()) {
+      return value.toInt().toString();
+    } else {
+      return value.toStringAsFixed(2); // Or .toString() if you want raw decimal
+    }
+  }
+
+  String formatNum(num? value) {
+    if (value == null) return '';
+    if (value is int || value == value.toInt()) {
+      return value.toInt().toString();
+    } else {
+      return value.toStringAsFixed(2);
+    }
   }
 
   void printBikeDetails() {
@@ -72,7 +145,6 @@ class _SelectDateTimeForBookingScreenState
     print("Model: ${bike.model}");
     print("Location: ${bike.location}");
     print("Transmission: ${bike.transmission}");
-    // You can add more fields as needed
   }
 
   initMethod() async {
@@ -81,14 +153,23 @@ class _SelectDateTimeForBookingScreenState
 
   Future<void> pickDateTime(bool isFrom) async {
     DateTime now = DateTime.now();
+    final initial =
+        isFrom
+            ? fromDate.value ?? now
+            : toDate.value ?? (fromDate.value ?? now).add(Duration(days: 1));
+    final first = isFrom ? now : (fromDate.value ?? now);
 
+    // 👇 Ensure initialDate is not before firstDate
+    final validInitial = initial.isBefore(first) ? first : initial;
     final pickedDate = await showDatePicker(
       context: context,
-      initialDate:
-          isFrom
-              ? fromDate.value ?? now
-              : toDate.value ?? (fromDate.value ?? now).add(Duration(days: 1)),
-      firstDate: isFrom ? now : (fromDate.value ?? now),
+      // initialDate:
+      //     isFrom
+      //         ? fromDate.value ?? now
+      //         : toDate.value ?? (fromDate.value ?? now).add(Duration(days: 1)),
+      // firstDate: isFrom ? now : (fromDate.value ?? now),
+      initialDate: validInitial,
+      firstDate: first,
       lastDate: DateTime(2100),
       initialEntryMode: DatePickerEntryMode.calendarOnly,
       builder: (context, child) {
@@ -329,6 +410,13 @@ class _SelectDateTimeForBookingScreenState
         child: Padding(
           padding: EdgeInsets.all(16.w),
           child: Obx(() {
+            bool isEditing = booking != null;
+
+            bool hasDateChanged =
+                !isEditing ||
+                booking!.pickupDate != fromDate.value ||
+                booking!.dropoffDate != toDate.value;
+
             return Column(
               children: [
                 ///location
@@ -593,74 +681,97 @@ class _SelectDateTimeForBookingScreenState
                     onTap:
                         isValid.value
                             ? () {
-                              final existingBookings =
-                                  Get.find<BikeBookingController>().bookingList
-                                      .where(
-                                        (booking) => booking.bikeId == bike.id,
-                                      )
-                                      .toList();
+                              bool isEditing = booking != null;
 
-                              bool isOverlapping(
-                                DateTime newStart,
-                                DateTime newEnd,
-                                DateTime existingStart,
-                                DateTime existingEnd,
-                              ) {
-                                return newStart.isBefore(existingEnd) &&
-                                    newEnd.isAfter(existingStart);
-                              }
+                              bool hasDateChanged =
+                                  !isEditing ||
+                                  booking!.pickupDate != fromDate.value ||
+                                  booking!.dropoffDate != toDate.value ||
+                                  booking!.pickupTime !=
+                                      DateFormat(
+                                        'hh:mm a',
+                                      ).format(fromDate.value!) ||
+                                  booking!.dropoffTime !=
+                                      DateFormat(
+                                        'hh:mm a',
+                                      ).format(toDate.value!);
 
-                              final newStart = fromDate.value!;
-                              final newEnd = toDate.value!;
-                              bool isConflict = false;
+                              if (hasDateChanged) {
+                                final existingBookings =
+                                    Get.find<BikeBookingController>()
+                                        .bookingList
+                                        .where(
+                                          (b) =>
+                                              b.bikeId == bike.id &&
+                                              (!isEditing ||
+                                                  b.id != booking!.id),
+                                        )
+                                        .toList();
 
-                              for (var booking in existingBookings) {
-                                final existingStart = DateTime(
-                                  booking.pickupDate.year,
-                                  booking.pickupDate.month,
-                                  booking.pickupDate.day,
-                                  DateFormat(
-                                    'hh:mm a',
-                                  ).parse(booking.pickupTime).hour,
-                                  DateFormat(
-                                    'hh:mm a',
-                                  ).parse(booking.pickupTime).minute,
-                                );
+                                bool isOverlapping(
+                                  DateTime newStart,
+                                  DateTime newEnd,
+                                  DateTime existingStart,
+                                  DateTime existingEnd,
+                                ) {
+                                  return newStart.isBefore(existingEnd) &&
+                                      newEnd.isAfter(existingStart);
+                                }
 
-                                final existingEnd = DateTime(
-                                  booking.dropoffDate.year,
-                                  booking.dropoffDate.month,
-                                  booking.dropoffDate.day,
-                                  DateFormat(
-                                    'hh:mm a',
-                                  ).parse(booking.dropoffTime).hour,
-                                  DateFormat(
-                                    'hh:mm a',
-                                  ).parse(booking.dropoffTime).minute,
-                                );
+                                final newStart = fromDate.value!;
+                                final newEnd = toDate.value!;
+                                bool isConflict = false;
 
-                                if (isOverlapping(
-                                  newStart,
-                                  newEnd,
-                                  existingStart,
-                                  existingEnd,
-                                )) {
-                                  isConflict = true;
-                                  break;
+                                for (var b in existingBookings) {
+                                  final existingStart = DateTime(
+                                    b.pickupDate.year,
+                                    b.pickupDate.month,
+                                    b.pickupDate.day,
+                                    DateFormat(
+                                      'hh:mm a',
+                                    ).parse(b.pickupTime).hour,
+                                    DateFormat(
+                                      'hh:mm a',
+                                    ).parse(b.pickupTime).minute,
+                                  );
+
+                                  final existingEnd = DateTime(
+                                    b.dropoffDate.year,
+                                    b.dropoffDate.month,
+                                    b.dropoffDate.day,
+                                    DateFormat(
+                                      'hh:mm a',
+                                    ).parse(b.dropoffTime).hour,
+                                    DateFormat(
+                                      'hh:mm a',
+                                    ).parse(b.dropoffTime).minute,
+                                  );
+
+                                  if (isOverlapping(
+                                    newStart,
+                                    newEnd,
+                                    existingStart,
+                                    existingEnd,
+                                  )) {
+                                    isConflict = true;
+                                    break;
+                                  }
+                                }
+
+                                if (isConflict) {
+                                  showCustomSnackBar(
+                                    message:
+                                        "This bike is already booked during the selected time.",
+                                  );
+                                  return;
                                 }
                               }
 
-                              if (isConflict) {
-                                showCustomSnackBar(
-                                  message:
-                                      "This bike is already booked during the selected time.",
-                                );
-                                return;
-                              } else {
-                                showBookingConfirmationDialog();
-                              }
+                              // If not conflict or not date-changed, show confirm dialog
+                              showBookingConfirmationDialog();
                             }
                             : null,
+
                     title: StringUtils.confirmBooking,
                     bgColor:
                         isValid.value
@@ -728,7 +839,6 @@ class _SelectDateTimeForBookingScreenState
 
     final bikeName = bike.brandName ?? "N/A";
     final bikeModel = bike.model ?? "N/A";
-    final location = locationController.text;
 
     final from = fromDate.value!;
     final to = toDate.value!;
@@ -757,7 +867,6 @@ class _SelectDateTimeForBookingScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildInfoRow("${StringUtils.bike}:", "$bikeName ($bikeModel)"),
-                _buildInfoRow("${StringUtils.location}:", location),
                 _buildInfoRow(
                   "${StringUtils.from}:",
                   DateFormat('MMMM d, yyyy hh:mm a').format(from),
@@ -822,10 +931,11 @@ class _SelectDateTimeForBookingScreenState
                       final dropOffTime = DateFormat('hh:mm a').format(to);
 
                       final newBooking = BookingModel(
+                        // id: isEditing ? existingBookingId : null,
                         userId: 1,
-                        bikeId: bike.id!,
-                        bikeName: bike.brandName,
-                        bikeModel: bike.model,
+                        bikeId: bike.id ?? 0,
+                        bikeName: bike.brandName ?? "",
+                        bikeModel: bike.model ?? "",
                         userFullName: fullNameController.text,
                         userPhone: phoneController.text,
                         userEmail: emailController.text,
@@ -853,15 +963,67 @@ class _SelectDateTimeForBookingScreenState
                         bikes: [bike],
                         createdAt: DateTime.now(),
                       );
+                      if (booking == null) {
+                        logs("----Adding");
+                        await Get.find<BikeBookingController>().addBooking(
+                          newBooking,
+                        );
+                      } else {
+                        logs("----Updating");
+                        final today = DateTime.now();
+                        final nowDateOnly = DateTime(
+                          today.year,
+                          today.month,
+                          today.day,
+                        );
 
-                      await Get.find<BikeBookingController>().addBooking(
-                        newBooking,
-                      );
+                        final isPickupPastOrToday =
+                            DateTime(
+                              from.year,
+                              from.month,
+                              from.day,
+                            ).isBefore(nowDateOnly) ||
+                            DateTime(
+                              from.year,
+                              from.month,
+                              from.day,
+                            ).isAtSameMomentAs(nowDateOnly);
+
+                        final isDropoffPastOrToday =
+                            DateTime(
+                              to.year,
+                              to.month,
+                              to.day,
+                            ).isBefore(nowDateOnly) ||
+                            DateTime(
+                              to.year,
+                              to.month,
+                              to.day,
+                            ).isAtSameMomentAs(nowDateOnly);
+
+                        if (booking != null &&
+                            (isPickupPastOrToday || isDropoffPastOrToday)) {
+                          showCustomSnackBar(
+                            message: StringUtils.youCannotUpdateCurrentBooking,
+                            isError: true,
+                          );
+                          return;
+                        }
+
+                        newBooking.id = booking?.id ?? 0;
+                        await Get.find<BikeBookingController>().updateBooking(
+                          newBooking,
+                        );
+                      }
+
                       await Get.find<BikeBookingController>().fetchBookings();
                       Get.back(); // Close dialog
                       Get.back(); // Go back to previous screen
                       showCustomSnackBar(
-                        message: StringUtils.bikeBookedSuccessfully,
+                        message:
+                            booking != null
+                                ? StringUtils.bookingUpdatedSuccessfully
+                                : StringUtils.bikeBookedSuccessfully,
                       );
                     },
                     title: StringUtils.confirm,

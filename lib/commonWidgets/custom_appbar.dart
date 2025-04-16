@@ -10,8 +10,11 @@ AppBar commonAppBar({
   required BuildContext context,
   VoidCallback? backPress,
   bool? isLeading,
+  Color? backgroundColor,
   bool? isCenterTitle,
   double? fontSize,
+  Color? fontColor,
+  Color? iconColor,
   FontWeight? fontWeight,
   required String titleText,
   // bool isBackButton = true,
@@ -21,10 +24,11 @@ AppBar commonAppBar({
 
   return AppBar(
     centerTitle: isCenterTitle ?? true,
-    // backgroundColor: isDarkTheme?ColorUtils.darkThemeBg:ColorUtils.white,
 
+    // backgroundColor: isDarkTheme?ColorUtils.darkThemeBg:ColorUtils.white,
     // toolbarHeight: 7.5.h,
     // leading: SizedBox(),
+    backgroundColor: backgroundColor,
     leading:
         (isLeading ?? false)
             ? Padding(
@@ -33,30 +37,19 @@ AppBar commonAppBar({
                 onTap: () {
                   Get.back();
                 },
-                child: Icon(Icons.arrow_back_outlined),
+                child: Icon(
+                  Icons.arrow_back_outlined,
+                  color: iconColor ?? ColorUtils.black,
+                ),
               ),
             )
             : SizedBox(),
     leadingWidth: (isLeading ?? false) ? 56.w : 0,
     title: CustomText(
       titleText,
+      color: fontColor ?? ColorUtils.black21,
       fontSize: fontSize ?? 17.sp,
       fontWeight: fontWeight ?? FontWeight.w500,
     ),
-    /* Row(
-      children: [
-        // if (isBackButton)
-        //   InkWell(
-        //     onTap: backPress ?? () => Get.back(),
-        //     child: Icon(
-        //       Icons.arrow_back_outlined,
-        //       size: 24.sp,
-        //       // size: Get.width >= 500 ? 4.w : 6.w,
-        //     ),
-        //   ),
-        CustomText(titleText, fontSize: 17.sp, fontWeight: FontWeight.w500),
-      ],
-    )*/
-    actions: [],
   );
 }

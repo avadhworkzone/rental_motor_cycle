@@ -136,4 +136,31 @@ class BookingModel {
       'bikes': jsonEncode(bikes.map((e) => e.toMap()).toList()),
     };
   }
+
+  factory BookingModel.empty() {
+    return BookingModel(
+      bikeId: 0,
+      bikeName: '',
+      bikeModel: '',
+      userFullName: '',
+      userPhone: '',
+      userEmail: '',
+      pickupDate: DateTime.now(),
+      dropoffDate: DateTime.now(),
+      pickupTime: '',
+      dropoffTime: '',
+      rentPerDay: 0,
+      createdAt: DateTime.now(),
+      durationInHours: 0,
+      totalRent: 0,
+      finalAmountPayable: 0,
+      bikes: [],
+      typeOfPayment: '',
+      mileage: 0,
+      extraPerKm: 0,
+      securityDeposit: 0,
+      subtotal: 0,
+      balance: 0,
+    );
+  }
 }

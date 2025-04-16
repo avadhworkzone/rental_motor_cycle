@@ -31,20 +31,22 @@ class _MyBikesScreenState extends State<MyBikesScreen> {
         context: context,
         isLeading: true,
         isCenterTitle: true,
-        fontSize: 17.sp,
+        fontSize: 20.sp,
         fontWeight: FontWeight.w600,
+        backgroundColor: ColorUtils.primary,
+        fontColor: ColorUtils.white,
+        iconColor: ColorUtils.white,
       ),
 
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () => showAddBikeBottomSheet(context),
-      //   child: Icon(Icons.add),
-      // ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => showAddBikeBottomSheet(context),
+        child: Icon(Icons.add),
+      ),
       body: Obx(() {
         if (bikeController.bikeList.isEmpty) {
           return Center(
             child: CustomText(
               StringUtils.noBikesFound,
-              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           );

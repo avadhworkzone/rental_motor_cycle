@@ -9,8 +9,8 @@ import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/shared_preference_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
-import '../controller/employee_controller.dart';
-import '../model/user_model.dart';
+import '../../controller/employee_controller.dart';
+import '../../model/user_model.dart';
 
 class EmployeesScreen extends StatefulWidget {
   const EmployeesScreen({super.key});
@@ -53,7 +53,10 @@ class _EmployeesState extends State<EmployeesScreen> {
       Container(
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark?ColorUtils.darkThemeBg:Colors.white,
+          color:
+              Theme.of(context).brightness == Brightness.dark
+                  ? ColorUtils.darkThemeBg
+                  : Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: SingleChildScrollView(
@@ -266,8 +269,11 @@ class _EmployeesState extends State<EmployeesScreen> {
         context: context,
         isLeading: true,
         isCenterTitle: true,
-        fontSize: 17.sp,
+        fontSize: 20.sp,
         fontWeight: FontWeight.w600,
+        backgroundColor: ColorUtils.primary,
+        fontColor: ColorUtils.white,
+        iconColor: ColorUtils.white,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => showUserDialog(),
@@ -276,7 +282,12 @@ class _EmployeesState extends State<EmployeesScreen> {
       body: Obx(
         () =>
             employeeController.userList.isEmpty
-                ? Center(child: CustomText(StringUtils.noUsersFound))
+                ? Center(
+                  child: CustomText(
+                    StringUtils.noUsersFound,
+                    fontWeight: FontWeight.bold,
+                  ),
+                )
                 : Column(
                   children: [
                     Expanded(

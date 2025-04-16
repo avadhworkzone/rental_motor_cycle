@@ -3,12 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:rental_motor_cycle/controller/bike_booking_controller.dart';
 import 'package:rental_motor_cycle/controller/bike_controller.dart';
+import 'package:rental_motor_cycle/model/bike_model.dart';
 import 'package:rental_motor_cycle/model/booking_model.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/iamge_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
-import 'package:rental_motor_cycle/view/book_bike/book_bike_screen.dart';
 import 'package:rental_motor_cycle/view/reservation/reservation_card_view.dart';
 
 class ReservationScreen extends StatefulWidget {
@@ -39,11 +39,11 @@ class _ReservationScreenState extends State<ReservationScreen>
     });
 
     initMethod();
-    bikeController.fetchBikes();
   }
 
   initMethod() async {
     await bikeBookingController.fetchBookings();
+    await bikeController.fetchBikes();
   }
 
   List<BookingModel> getFilteredReservations(String type) {
@@ -116,21 +116,16 @@ class _ReservationScreenState extends State<ReservationScreen>
           unselectedLabelColor: Colors.white70,
           labelStyle: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 15.sp,
+            fontSize: 16.sp,
             fontFamily: FontUtils.cerebriSans,
           ), // Selected tab bold
           unselectedLabelStyle: TextStyle(
-            fontWeight: FontWeight.normal,
-          ), // Unselected tab normal
+            fontWeight: FontWeight.w500,
+            fontFamily: FontUtils.cerebriSans,
+            fontSize: 16.sp,
+          ),
           tabs: tabLabels.map((label) => Tab(text: label)).toList(),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // await showBikeBookingDialog();
-          // await Get.find<BikeBookingController>().fetchBookings();
-        },
-        child: Icon(Icons.add),
       ),
       body: Column(
         children: [
@@ -152,7 +147,10 @@ class _ReservationScreenState extends State<ReservationScreen>
 
               if (filteredList.isEmpty) {
                 return Center(
-                  child: CustomText(StringUtils.noReservationsFound),
+                  child: CustomText(
+                    StringUtils.noReservationsFound,
+                    fontWeight: FontWeight.w600,
+                  ),
                 );
               }
 
@@ -160,9 +158,39 @@ class _ReservationScreenState extends State<ReservationScreen>
                 itemCount: filteredList.length,
                 itemBuilder: (context, index) {
                   final reservation = filteredList[index];
+                  // Match the bike by bikeId
+                  BikeModel? matchingBike;
+                  try {
+                    matchingBike = bikeController.bikeList.firstWhere(
+                      (bike) => bike.id == reservation.bikeId,
+                    );
+                  } catch (e) {
+                    matchingBike = null;
+                  }
+
                   return ReservationCardView(
                     booking: reservation,
                     canEditDelete: currentTab != StringUtils.history,
+                    bike:
+                        matchingBike ??
+                        BikeModel(
+                          id: -1,
+                          brandName: "Unknown",
+                          model: "N/A",
+                          numberPlate: "N/A",
+                          location: "N/A",
+                          fuelType: "N/A",
+                          engineCC: 0,
+                          description: "Bike not found",
+                          imageUrl: "",
+                          userId: -1,
+                          createdAt: DateTime.now(),
+                          kmLimit: 0,
+                          makeYear: 0,
+                          transmission: "N/A",
+                          seater: 1,
+                          fuelIncluded: "N/A",
+                        ),
 
                     isFromToday: false,
                   );

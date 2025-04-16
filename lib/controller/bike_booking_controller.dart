@@ -120,21 +120,6 @@ class BikeBookingController extends GetxController {
   }
 
   /// ✅ **Fetch Bike Bookings (Optimized)**
-  // Future<void> fetchBookings() async {
-  //   if (isProcessing.value) return; // ✅ Prevent multiple fetches at once
-  //   isProcessing.value = true;
-  //
-  //   try {
-  //     final bookings = await DBHelper.getBookings();
-  //     bookingList.assignAll(
-  //       bookings.map((e) => BookingModel.fromMap(e)).toList(),
-  //     );
-  //   } catch (e) {
-  //     log("Error fetching bookings: $e");
-  //   } finally {
-  //     isProcessing.value = false;
-  //   }
-  // }
   Future<void> fetchBookings() async {
     if (isProcessing.value) return; // ✅ Prevent multiple fetches at once
     isProcessing.value = true;
@@ -150,6 +135,7 @@ class BikeBookingController extends GetxController {
       for (var booking in bookingModels) {
         log(
           "📅 Booking => ${booking.bikeName} (${booking.bikeModel}) | "
+          "balance: ${booking.balance} ${booking.finalAmountPayable} ||||||||||----"
           "From: ${booking.pickupDate} ${booking.pickupTime} "
           "To: ${booking.dropoffDate} ${booking.dropoffTime} | ",
         );

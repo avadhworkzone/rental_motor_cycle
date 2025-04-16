@@ -13,7 +13,7 @@ import 'package:rental_motor_cycle/utils/iamge_utils.dart';
 import 'package:rental_motor_cycle/utils/shared_preference_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import 'package:rental_motor_cycle/view/bottom_navigation_bar_screen.dart';
-import 'package:rental_motor_cycle/view/signup_screen.dart';
+import 'package:rental_motor_cycle/view/auth/signup_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LoginScreen extends StatefulWidget {

@@ -184,6 +184,9 @@ class StringUtils {
   static const String km = "km";
   static const String rent = "Rent";
   static const String bikeBookedSuccessfully = "Bike Booked Successfully!";
+  static const String bookingUpdatedSuccessfully =
+      "Booking updated successfully!";
+
   static const String pickUp = "Pick Up";
   static const String drop = "Drop";
   static const String back = "Back";
@@ -236,6 +239,18 @@ class StringUtils {
   static const resetDatabaseTitle = "Reset Database";
   static const resetDatabaseMsg = "Are you sure you want to reset";
   static const yesReset = "Yes, Reset";
+  static const salesReport = "Sales Report";
+  static const transactionReport = "Transaction Report";
+  static const daily = "Daily";
+  static const monthly = "Monthly";
+  static const yearly = "Yearly";
+  static const noTransactionsFound = "No transactions found.";
+  static const selectFilter = "Select Filter";
+  static const bookingDeletedSuccessfully = "Booking deleted successfully";
+  static const youCannotUpdateCurrentBooking =
+      "You cannot update pickup or drop-off dates of current bookings.";
+  static const theBikeAlreadyBooked =
+      "This bike is already booked during the selected time.";
 }
 
 logs(String title) {
