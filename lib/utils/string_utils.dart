@@ -247,6 +247,7 @@ class StringUtils {
   static const noTransactionsFound = "No transactions found.";
   static const selectFilter = "Select Filter";
   static const bookingDeletedSuccessfully = "Booking deleted successfully";
+  static const cash = "Cash";
   static const youCannotUpdateCurrentBooking =
       "You cannot update pickup or drop-off dates of current bookings.";
   static const theBikeAlreadyBooked =

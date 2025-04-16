@@ -1,7 +1,8 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
+import 'package:rental_motor_cycle/blocs/users/employee_bloc.dart';
+import 'package:rental_motor_cycle/blocs/users/employee_state.dart';
 import 'package:rental_motor_cycle/commonWidgets/common_dropdown.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_text_field.dart';
@@ -9,10 +10,10 @@ import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/shared_preference_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
-import '../../controller/employee_controller.dart';
+import '../../blocs/users/employee_event.dart';
 import '../../model/user_model.dart';
 
-class EmployeesScreen extends StatefulWidget {
+/*class EmployeesScreen extends StatefulWidget {
   const EmployeesScreen({super.key});
 
   @override
@@ -350,6 +351,310 @@ class _EmployeesState extends State<EmployeesScreen> {
                     ),
                   ],
                 ),
+      ),
+    );
+  }
+}*/
+class EmployeesScreen extends StatefulWidget {
+  const EmployeesScreen({super.key});
+
+  @override
+  State<EmployeesScreen> createState() => _EmployeesState();
+}
+
+class _EmployeesState extends State<EmployeesScreen> {
+  final _formKey = GlobalKey<FormState>();
+
+  final mobileController = TextEditingController();
+  final emailController = TextEditingController();
+  final fullNameController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  String selectedRole = StringUtils.admin;
+  List<String> employRoleList = [StringUtils.admin, StringUtils.manager];
+
+  UserModel? editingUser;
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<EmployeeBloc>().add(FetchUsers());
+  }
+
+  void _showUserDialog(BuildContext context, {UserModel? user}) {
+    if (user != null) {
+      editingUser = user;
+      mobileController.text = user.mobileNumber;
+      fullNameController.text = user.fullname;
+      emailController.text = user.emailId;
+      passwordController.text = user.password ?? '';
+      selectedRole = user.role ?? StringUtils.admin;
+    } else {
+      editingUser = null;
+      mobileController.clear();
+      fullNameController.clear();
+      emailController.clear();
+      passwordController.clear();
+      selectedRole = StringUtils.admin;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) {
+        return Padding(
+          padding: MediaQuery.of(context).viewInsets,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Form(
+              key: _formKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    CustomText(
+                      editingUser == null
+                          ? StringUtils.addEmployee
+                          : StringUtils.editEmployee,
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    SizedBox(height: 10.h),
+                    CommonTextField(
+                      textEditController: fullNameController,
+                      validator:
+                          (value) =>
+                              value!.isEmpty ? StringUtils.enterName : null,
+                      keyBoardType: TextInputType.name,
+                      pIcon: Icon(Icons.person, color: ColorUtils.grey99),
+                      labelText: StringUtils.fullName,
+                    ),
+                    SizedBox(height: 10.h),
+                    CommonTextField(
+                      textEditController: mobileController,
+                      validator:
+                          (value) =>
+                              value!.isEmpty
+                                  ? StringUtils.enterMobileNumber
+                                  : null,
+                      pIcon: Icon(Icons.phone, color: ColorUtils.grey99),
+                      keyBoardType: TextInputType.phone,
+                      labelText: StringUtils.mobileNumber,
+                    ),
+                    SizedBox(height: 10.h),
+                    CommonTextField(
+                      textEditController: emailController,
+                      validator:
+                          (value) =>
+                              value!.isEmpty
+                                  ? StringUtils.enterEmailAddress
+                                  : null,
+                      pIcon: Icon(Icons.email, color: ColorUtils.grey99),
+                      keyBoardType: TextInputType.emailAddress,
+                      labelText: StringUtils.emailId,
+                    ),
+                    SizedBox(height: 10.h),
+                    CommonTextField(
+                      textEditController: passwordController,
+                      validator: (value) {
+                        if (value!.isEmpty) return StringUtils.enterPassword;
+                        if (value.length < 6) {
+                          return StringUtils.passwordValidation;
+                        }
+                        return null;
+                      },
+                      pIcon: Icon(Icons.lock, color: ColorUtils.grey99),
+                      labelText: StringUtils.password,
+                    ),
+                    SizedBox(height: 10.h),
+                    CommonDropdown(
+                      items: employRoleList,
+                      labelText: StringUtils.seater,
+                      selectedValue: selectedRole,
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => selectedRole = value);
+                        }
+                      },
+                      validationMessage: StringUtils.selectSeater,
+                    ),
+                    SizedBox(height: 16),
+                    BlocBuilder<EmployeeBloc, EmployeeState>(
+                      builder: (context, state) {
+                        final isLoading = state is EmployeeProcessing;
+                        return ElevatedButton(
+                          onPressed:
+                              isLoading
+                                  ? null
+                                  : () async {
+                                    if (_formKey.currentState!.validate()) {
+                                      final userId =
+                                          SharedPreferenceUtils.getString(
+                                            SharedPreferenceUtils.userId,
+                                          );
+
+                                      final newUser = UserModel(
+                                        id: editingUser?.id,
+                                        mobileNumber:
+                                            mobileController.text.trim(),
+                                        userId: await userId,
+                                        fullname:
+                                            fullNameController.text.trim(),
+                                        emailId: emailController.text.trim(),
+                                        password:
+                                            passwordController.text.trim(),
+                                        role: selectedRole,
+                                      );
+
+                                      if (editingUser == null) {
+                                        context.read<EmployeeBloc>().add(
+                                          AddUser(newUser),
+                                        );
+                                      } else {
+                                        context.read<EmployeeBloc>().add(
+                                          UpdateUser(newUser),
+                                        );
+                                      }
+
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                          child: CustomText(
+                            editingUser == null
+                                ? StringUtils.addEmployee
+                                : StringUtils.updateEmployee,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _confirmDelete(BuildContext context, int id) {
+    showDialog(
+      context: context,
+      builder:
+          (_) => AlertDialog(
+            title: CustomText(StringUtils.deleteUser),
+            content: CustomText(StringUtils.confirmDeleteUser),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: CustomText(StringUtils.cancel),
+              ),
+              TextButton(
+                onPressed: () {
+                  context.read<EmployeeBloc>().add(DeleteUser(id));
+                  Navigator.pop(context);
+                },
+                child: CustomText(StringUtils.delete),
+              ),
+            ],
+          ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: commonAppBar(
+        titleText: StringUtils.users,
+        context: context,
+        isLeading: true,
+        isCenterTitle: true,
+        fontSize: 20.sp,
+        fontWeight: FontWeight.w600,
+        backgroundColor: ColorUtils.primary,
+        fontColor: ColorUtils.white,
+        iconColor: ColorUtils.white,
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showUserDialog(context),
+        child: Icon(Icons.add),
+      ),
+      body: BlocBuilder<EmployeeBloc, EmployeeState>(
+        builder: (context, state) {
+          if (state is EmployeeLoading) {
+            return Center(child: CircularProgressIndicator());
+          } else if (state is EmployeeLoaded) {
+            if (state.userList.isEmpty) {
+              return Center(child: CustomText(StringUtils.noUsersFound));
+            }
+            return Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: state.userList.length,
+                    itemBuilder: (context, index) {
+                      final user = state.userList[index];
+                      return Card(
+                        elevation: 4,
+                        margin: EdgeInsets.symmetric(
+                          vertical: 8.h,
+                          horizontal: 10.w,
+                        ),
+                        child: ListTile(
+                          title: CustomText(
+                            user.fullname,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomText(
+                                "${StringUtils.mobileNumberPrefix} ${user.mobileNumber}",
+                              ),
+                              CustomText(
+                                "${StringUtils.emailIdPrefix} ${user.emailId}",
+                              ),
+                              CustomText(
+                                "${StringUtils.userRolePrefix} ${user.role}",
+                              ),
+                            ],
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.edit, color: Colors.blue),
+                                onPressed:
+                                    () => _showUserDialog(context, user: user),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.delete, color: Colors.red),
+                                onPressed:
+                                    () => _confirmDelete(context, user.id!),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // exportUsersAsPDF
+                    },
+                    child: CustomText(StringUtils.exportUsersAsPdf),
+                  ),
+                ),
+              ],
+            );
+          }
+          return SizedBox();
+        },
       ),
     );
   }

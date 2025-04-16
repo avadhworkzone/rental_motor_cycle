@@ -1,7 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:rental_motor_cycle/blocs/bikes/bike_crud_bloc/bike_bloc.dart';
+import 'package:rental_motor_cycle/blocs/bikes/bike_form_bloc/bike_form_bloc.dart';
+import 'package:rental_motor_cycle/blocs/bikes/bike_form_bloc/bike_form_event.dart';
+import 'package:rental_motor_cycle/blocs/bikes/bike_form_bloc/bike_form_state.dart';
 import 'package:rental_motor_cycle/commonWidgets/common_dropdown.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_btn.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_snackbar.dart';
@@ -14,8 +20,8 @@ import 'package:rental_motor_cycle/utils/shared_preference_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 
 void showAddBikeBottomSheet(BuildContext context, {BikeModel? bike}) {
-  final formKey = GlobalKey<FormState>();
-  var isProcessing = false;
+  // final formKey = GlobalKey<FormState>();
+  /* var isProcessing = false;
   final BikeController bikeController = Get.find<BikeController>();
   final TextEditingController numberPlateController = TextEditingController(
     text: bike?.numberPlate ?? "",
@@ -89,6 +95,21 @@ void showAddBikeBottomSheet(BuildContext context, {BikeModel? bike}) {
         selectedTransmission.value = "";
     }
     validateFields();
+  }*/
+  final formKey = GlobalKey<FormState>();
+  // final bikeFormBloc = BikeFormBloc(bikeBloc: null)..add(InitializeBikeFormEvent(bike: bike));
+  Future<File?> pickImageFromCamera(BuildContext context) async {
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.camera,
+    );
+    return pickedFile != null ? File(pickedFile.path) : null;
+  }
+
+  Future<File?> pickImageFromGallery(BuildContext context) async {
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+    );
+    return pickedFile != null ? File(pickedFile.path) : null;
   }
 
   Get.bottomSheet(
@@ -101,432 +122,547 @@ void showAddBikeBottomSheet(BuildContext context, {BikeModel? bike}) {
                 : ColorUtils.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      child: FractionallySizedBox(
-        heightFactor: 0.75.w,
-        child: Form(
-          key: formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomText(
-                bike == null ? StringUtils.addNewBike : StringUtils.updateBike,
-                fontSize: 20.sp,
-                fontWeight: FontWeight.bold,
-              ),
-              SizedBox(height: 10.h),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider.value(value: context.read<BikeBloc>()),
+          BlocProvider(
+            create:
+                (_) => BikeFormBloc(
+                  bikeBloc: context.read<BikeBloc>(),
+                  bike: bike,
+                ),
+          ),
+        ],
 
-              ///Pick bike image
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Align(
-                        alignment: Alignment.center,
-                        child: Container(
-                          padding: EdgeInsets.all(2.w),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: ColorUtils.primary,
-                              width: 2.w,
-                            ),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Container(
-                            height: 111.h,
-                            width: 111.w,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: ColorUtils.primary,
-                                width: 2.w,
-                              ),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                Obx(() {
-                                  return Center(
-                                    child:
-                                        (bikeController
-                                                    .bikeImage
-                                                    .value
-                                                    ?.path
-                                                    .isEmpty ??
-                                                true)
-                                            ? Icon(
-                                              Icons.supervised_user_circle,
-                                              size: 50.sp,
-                                            )
-                                            : Container(
-                                              height: 111.h,
-                                              width: 111.w,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                image: DecorationImage(
-                                                  image: FileImage(
-                                                    bikeController
-                                                            .bikeImage
-                                                            .value ??
-                                                        File(''),
-                                                  ),
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                            ),
-                                  );
-                                }),
-                                Positioned(
-                                  right: -4.w,
-                                  bottom: -10.h,
-                                  child: IconButton(
-                                    onPressed: () {
-                                      profileScreenDialogBox(
-                                        context: context,
-                                        text: StringUtils.addBikeImage,
-                                        onTap: () async {
-                                          await bikeController
-                                              .selectImageCamera(context);
-                                          validateFields();
-                                        },
-                                        onTap2: () async {
-                                          await bikeController.selectImage(
-                                            context,
+        child: FractionallySizedBox(
+          heightFactor: 0.75.w,
+          child: Form(
+            key: formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomText(
+                  bike == null
+                      ? StringUtils.addNewBike
+                      : StringUtils.updateBike,
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+                SizedBox(height: 10.h),
+
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        ///Pick bike image
+                        BlocBuilder<BikeFormBloc, BikeFormState>(
+                          buildWhen:
+                              (previous, current) =>
+                                  previous.imageFile != current.imageFile,
+                          builder: (context, state) {
+                            return Align(
+                              alignment: Alignment.center,
+                              child: Container(
+                                padding: EdgeInsets.all(2.w),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: ColorUtils.primary,
+                                    width: 2.w,
+                                  ),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Container(
+                                  height: 111.h,
+                                  width: 111.w,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: ColorUtils.primary,
+                                      width: 2.w,
+                                    ),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      BlocBuilder<BikeFormBloc, BikeFormState>(
+                                        builder: (context, state) {
+                                          return Center(
+                                            child:
+                                                (state.imageFile == null ||
+                                                        state
+                                                            .imageFile!
+                                                            .path
+                                                            .isEmpty)
+                                                    ? Icon(
+                                                      Icons
+                                                          .supervised_user_circle,
+                                                      size: 50.sp,
+                                                    )
+                                                    : Container(
+                                                      height: 111.h,
+                                                      width: 111.w,
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        image: DecorationImage(
+                                                          image: FileImage(
+                                                            state.imageFile!,
+                                                          ),
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      ),
+                                                    ),
                                           );
-                                          validateFields();
                                         },
-                                      );
-                                    },
-                                    icon: Icon(Icons.camera_alt_outlined),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 10.h),
-
-                      ///bikeBrand
-                      Obx(
-                        () => CommonDropdown(
-                          items: [
-                            StringUtils.bikeBrandHonda,
-                            StringUtils.bikeBrandYamaha,
-                            StringUtils.bikeBrandSuzuki,
-                          ],
-                          labelText: StringUtils.bikeBrand,
-                          selectedValue: selectedBrand.value,
-                          onChanged: onBrandChanged,
-                          validationMessage: StringUtils.selectBikeBrand,
-                        ),
-                      ),
-
-                      ///bikeModel
-                      Obx(
-                        () => CommonDropdown(
-                          items:
-                              selectedModel.value.isNotEmpty
-                                  ? [selectedModel.value]
-                                  : [],
-                          labelText: StringUtils.bikeModel,
-                          selectedValue: selectedModel.value,
-                          onChanged: null,
-                          validationMessage: StringUtils.selectBikeModel,
-                        ),
-                      ),
-
-                      ///vehicleNumber
-                      CommonTextField(
-                        textEditController: numberPlateController,
-                        labelText: StringUtils.vehicleNumber,
-                        keyBoardType: TextInputType.name,
-                        validator:
-                            (value) =>
-                                value!.isEmpty
-                                    ? StringUtils.enterVehicleNumber
-                                    : null,
-                        onChange: (_) => validateFields(),
-                      ),
-
-                      ///bikeLocation
-                      CommonTextField(
-                        textEditController: locationController,
-                        labelText: StringUtils.bikeLocation,
-                        keyBoardType: TextInputType.name,
-                        validator:
-                            (value) =>
-                                value!.isEmpty
-                                    ? StringUtils.enterLocation
-                                    : null,
-                        onChange: (_) => validateFields(),
-                      ),
-
-                      ///fuelType
-                      CommonDropdown(
-                        items: [
-                          StringUtils.petrol,
-                          StringUtils.diesel,
-                          StringUtils.electric,
-                        ],
-                        labelText: StringUtils.fuelType,
-                        selectedValue:
-                            fuelTypeController.text.isNotEmpty
-                                ? fuelTypeController.text
-                                : null,
-                        onChanged: (value) {
-                          fuelTypeController.text = value ?? "";
-                          validateFields();
-                        },
-                        validationMessage: StringUtils.selectFuelType,
-                      ),
-
-                      ///engineCC
-                      CommonTextField(
-                        textEditController: ccController,
-                        labelText: StringUtils.engineCC,
-                        keyBoardType: TextInputType.number,
-                        validator:
-                            (value) =>
-                                value!.isEmpty
-                                    ? StringUtils.enterEngineCC
-                                    : null,
-                        onChange: (_) => validateFields(),
-                      ),
-
-                      ///transmission
-                      Obx(
-                        () => CommonDropdown(
-                          items:
-                              selectedTransmission.value.isNotEmpty
-                                  ? [selectedTransmission.value]
-                                  : [],
-                          labelText: StringUtils.transmission,
-                          selectedValue: selectedTransmission.value,
-                          onChanged: null,
-                          validationMessage: StringUtils.selectTransmission,
-                        ),
-                      ),
-
-                      ///seater
-                      CommonDropdown(
-                        items: ["1", "2", "3", "4", "5", "6"],
-                        labelText: StringUtils.seater,
-                        selectedValue: selectedSeater,
-                        onChanged: (value) {
-                          selectedSeater = value;
-                          validateFields();
-                        },
-                        validationMessage: StringUtils.selectSeater,
-                      ),
-
-                      ///fuel
-                      CommonDropdown(
-                        items: [StringUtils.included, StringUtils.excluded],
-                        labelText: StringUtils.fuel,
-                        selectedValue: selectedFuelIncluded,
-                        onChanged: (value) {
-                          selectedFuelIncluded = value;
-                          validateFields();
-                        },
-                        validationMessage: StringUtils.selectFuelOption,
-                      ),
-
-                      ///kmLimit
-                      CommonTextField(
-                        textEditController: kmLimitController,
-                        labelText: StringUtils.kmLimit,
-                        keyBoardType: TextInputType.number,
-                        onChange: (_) => validateFields(),
-                        validator:
-                            (value) =>
-                                value!.isEmpty
-                                    ? StringUtils.enterKmLimit
-                                    : null,
-                      ),
-
-                      ///makeYear
-                      CommonTextField(
-                        textEditController: makeYearController,
-                        labelText: StringUtils.makeYear,
-                        readOnly: false,
-                        onTap: () async {
-                          final currentYear = DateTime.now().year;
-                          int? selectedYear = await showDialog<int>(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: CustomText(StringUtils.selectYear),
-                                content: SizedBox(
-                                  height: 300,
-                                  width: 300,
-                                  child: YearPicker(
-                                    firstDate: DateTime(1980),
-                                    lastDate: DateTime(currentYear),
-                                    initialDate: DateTime(currentYear),
-                                    selectedDate:
-                                        DateTime.tryParse(
-                                          makeYearController.text,
-                                        ) ??
-                                        DateTime(currentYear),
-                                    onChanged: (DateTime dateTime) {
-                                      Navigator.of(context).pop(dateTime.year);
-                                    },
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-
-                          if (selectedYear != null) {
-                            makeYearController.text = selectedYear.toString();
-                            validateFields();
-                          }
-                        },
-
-                        validator:
-                            (value) =>
-                                value!.isEmpty
-                                    ? StringUtils.enterMakeYear
-                                    : null,
-                      ),
-
-                      ///bikeDescription
-                      CommonTextField(
-                        textEditController: descriptionController,
-                        labelText: StringUtils.bikeDescription,
-                        keyBoardType: TextInputType.name,
-                        onChange: (_) => validateFields(),
-                        validator:
-                            (value) =>
-                                value!.isEmpty
-                                    ? StringUtils.enterDescription
-                                    : null,
-                        maxLine: 3,
-                      ),
-                      SizedBox(height: 20),
-
-                      ///Add Update btn
-                      Obx(
-                        () => CustomBtn(
-                          title:
-                              bike == null
-                                  ? StringUtils.addBike
-                                  : StringUtils.updateBike,
-                          onTap:
-                              (isProcessing || !isValid.value)
-                                  ? null
-                                  : () async {
-                                    if (formKey.currentState?.validate() ??
-                                        false) {
-                                      try {
-                                        isProcessing = true;
-                                        var userId =
-                                            await SharedPreferenceUtils.getString(
-                                              SharedPreferenceUtils.userId,
+                                      ),
+                                      Positioned(
+                                        right: -4.w,
+                                        bottom: -10.h,
+                                        child: IconButton(
+                                          onPressed: () {
+                                            profileScreenDialogBox(
+                                              context: context,
+                                              text: StringUtils.addBikeImage,
+                                              onTap: () async {
+                                                final image =
+                                                    await pickImageFromCamera(
+                                                      context,
+                                                    );
+                                                if (image != null) {
+                                                  context
+                                                      .read<BikeFormBloc>()
+                                                      .add(
+                                                        PickedImageUpdatedEvent(
+                                                          image,
+                                                        ),
+                                                      );
+                                                }
+                                              },
+                                              onTap2: () async {
+                                                final image =
+                                                    await pickImageFromGallery(
+                                                      context,
+                                                    );
+                                                if (image != null) {
+                                                  context
+                                                      .read<BikeFormBloc>()
+                                                      .add(
+                                                        PickedImageUpdatedEvent(
+                                                          image,
+                                                        ),
+                                                      );
+                                                }
+                                              },
                                             );
-                                        logs('User ID ---> $userId');
-                                        if (!isValid.value) return;
-
-                                        BikeModel newBike = BikeModel(
-                                          id: bike?.id,
-                                          brandName: selectedBrand.value,
-                                          model: selectedModel.value,
-                                          numberPlate:
-                                              numberPlateController.text.trim(),
-                                          location:
-                                              locationController.text.trim(),
-                                          fuelType:
-                                              fuelTypeController.text.trim(),
-                                          engineCC: num.parse(
-                                            ccController.text.trim(),
-                                          ),
-                                          description:
-                                              descriptionController.text.trim(),
-                                          imageUrl:
-                                              bikeController
-                                                  .selectedImagePath
-                                                  .value,
-                                          createdAt: DateTime.now(),
-                                          userId: int.parse(userId),
-                                          kmLimit: double.parse(
-                                            kmLimitController.text.trim(),
-                                          ),
-                                          makeYear: int.parse(
-                                            makeYearController.text.trim(),
-                                          ),
-                                          transmission:
-                                              selectedTransmission.value,
-                                          seater: int.parse(selectedSeater!),
-                                          fuelIncluded: selectedFuelIncluded!,
-                                        );
-
-                                        if (bike != null &&
-                                            bike.brandName ==
-                                                newBike.brandName &&
-                                            bike.model == newBike.model &&
-                                            bike.numberPlate ==
-                                                newBike.numberPlate &&
-                                            bike.fuelIncluded ==
-                                                newBike.fuelIncluded &&
-                                            bike.location == newBike.location &&
-                                            bike.fuelType == newBike.fuelType &&
-                                            bike.kmLimit == newBike.kmLimit &&
-                                            bike.engineCC == newBike.engineCC &&
-                                            bike.description ==
-                                                newBike.description &&
-                                            bike.seater == newBike.seater &&
-                                            bike.transmission ==
-                                                newBike.transmission &&
-                                            bike.makeYear == newBike.makeYear &&
-                                            bike.imageUrl == newBike.imageUrl) {
-                                          showCustomSnackBar(
-                                            message:
-                                                StringUtils
-                                                    .pleaseChangeTheDataBeforeSaving,
-                                          );
-                                          isProcessing = false;
-                                          return;
-                                        }
-
-                                        if (bike == null) {
-                                          await bikeController.addBike(newBike);
-                                        } else {
-                                          await bikeController.updateBike(
-                                            newBike,
-                                          );
-                                        }
-                                        await bikeController.fetchBikes();
-                                        isProcessing = false;
-                                        Get.back();
-                                        showCustomSnackBar(
-                                          message:
-                                              StringUtils.bikeAddedSuccessfully,
-                                        );
-                                      } catch (e) {
-                                        logs("----e---${e.toString()}");
-                                      }
-                                    } else {
-                                      logs("---NOT VALIDATE");
-                                    }
-                                  },
-                          bgColor:
-                              (isProcessing || !isValid.value)
-                                  ? ColorUtils.primary.withValues(alpha: 0.4)
-                                  : ColorUtils.primary,
+                                          },
+                                          icon: Icon(Icons.camera_alt_outlined),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                      ),
-                    ],
+                        SizedBox(height: 10.h),
+
+                        /// Brand Dropdown
+                        BlocBuilder<BikeFormBloc, BikeFormState>(
+                          buildWhen:
+                              (previous, current) =>
+                                  previous.selectedBrand !=
+                                  current.selectedBrand,
+                          builder: (context, state) {
+                            return CommonDropdown(
+                              items: [
+                                StringUtils.bikeBrandHonda,
+                                StringUtils.bikeBrandYamaha,
+                                StringUtils.bikeBrandSuzuki,
+                              ],
+                              labelText: StringUtils.bikeBrand,
+                              selectedValue: state.selectedBrand,
+                              onChanged: (value) {
+                                context.read<BikeFormBloc>().add(
+                                  UpdateBrand(value ?? ''),
+                                );
+                                context.read<BikeFormBloc>().add(
+                                  BikeFormValidateFields(),
+                                );
+                              },
+                              validationMessage: StringUtils.selectBikeBrand,
+                            );
+                          },
+                        ),
+
+                        /// Model Dropdown (non-editable, based on brand)
+                        BlocBuilder<BikeFormBloc, BikeFormState>(
+                          buildWhen:
+                              (previous, current) =>
+                                  previous.selectedModel !=
+                                  current.selectedModel,
+                          builder: (context, state) {
+                            return CommonDropdown(
+                              items:
+                                  state.selectedModel.isNotEmpty
+                                      ? [state.selectedModel]
+                                      : [],
+                              labelText: StringUtils.bikeModel,
+                              selectedValue: state.selectedModel,
+                              onChanged: null,
+                              validationMessage: StringUtils.selectBikeModel,
+                            );
+                          },
+                        ),
+
+                        /// Vehicle Number
+                        BlocBuilder<BikeFormBloc, BikeFormState>(
+                          buildWhen:
+                              (previous, current) =>
+                                  previous.numberPlate != current.numberPlate,
+                          builder: (context, state) {
+                            return CommonTextField(
+                              textEditController:
+                                  context
+                                      .read<BikeFormBloc>()
+                                      .numberPlateController,
+                              labelText: StringUtils.vehicleNumber,
+                              keyBoardType: TextInputType.name,
+                              validator:
+                                  (value) =>
+                                      value!.isEmpty
+                                          ? StringUtils.enterVehicleNumber
+                                          : null,
+                              onChange:
+                                  (_) => context.read<BikeFormBloc>().add(
+                                    BikeFormValidateFields(),
+                                  ),
+                            );
+                          },
+                        ),
+
+                        /// Bike Location
+                        BlocBuilder<BikeFormBloc, BikeFormState>(
+                          buildWhen:
+                              (previous, current) =>
+                                  previous.locationController !=
+                                  current.locationController,
+                          builder: (context, state) {
+                            return CommonTextField(
+                              textEditController:
+                                  context
+                                      .read<BikeFormBloc>()
+                                      .locationController,
+                              labelText: StringUtils.bikeLocation,
+                              keyBoardType: TextInputType.name,
+                              validator:
+                                  (value) =>
+                                      value!.isEmpty
+                                          ? StringUtils.enterLocation
+                                          : null,
+                              onChange:
+                                  (_) => context.read<BikeFormBloc>().add(
+                                    BikeFormValidateFields(),
+                                  ),
+                            );
+                          },
+                        ),
+
+                        /// Fuel Type
+                        BlocBuilder<BikeFormBloc, BikeFormState>(
+                          buildWhen:
+                              (previous, current) =>
+                                  previous.fuelType != current.fuelType,
+                          builder: (context, state) {
+                            return CommonDropdown(
+                              items: [
+                                StringUtils.petrol,
+                                StringUtils.diesel,
+                                StringUtils.electric,
+                              ],
+                              labelText: StringUtils.fuelType,
+                              selectedValue:
+                                  context
+                                          .read<BikeFormBloc>()
+                                          .fuelTypeController
+                                          .text
+                                          .isNotEmpty
+                                      ? context
+                                          .read<BikeFormBloc>()
+                                          .fuelTypeController
+                                          .text
+                                      : null,
+                              onChanged: (value) {
+                                context
+                                    .read<BikeFormBloc>()
+                                    .fuelTypeController
+                                    .text = value ?? "";
+                                context.read<BikeFormBloc>().add(
+                                  BikeFormValidateFields(),
+                                );
+                              },
+                              validationMessage: StringUtils.selectFuelType,
+                            );
+                          },
+                        ),
+
+                        /// Engine CC
+                        BlocBuilder<BikeFormBloc, BikeFormState>(
+                          buildWhen:
+                              (previous, current) =>
+                                  previous.ccController != current.ccController,
+                          builder: (context, state) {
+                            return CommonTextField(
+                              textEditController:
+                                  context.read<BikeFormBloc>().ccController,
+                              labelText: StringUtils.engineCC,
+                              keyBoardType: TextInputType.number,
+                              validator:
+                                  (value) =>
+                                      value!.isEmpty
+                                          ? StringUtils.enterEngineCC
+                                          : null,
+                              onChange:
+                                  (_) => context.read<BikeFormBloc>().add(
+                                    BikeFormValidateFields(),
+                                  ),
+                            );
+                          },
+                        ),
+
+                        /// Transmission Dropdown (non-editable, based on brand)
+                        BlocBuilder<BikeFormBloc, BikeFormState>(
+                          buildWhen:
+                              (previous, current) =>
+                                  previous.selectedTransmission !=
+                                  current.selectedTransmission,
+                          builder: (context, state) {
+                            return CommonDropdown(
+                              items:
+                                  state.selectedTransmission.isNotEmpty
+                                      ? [state.selectedTransmission]
+                                      : [],
+                              labelText: StringUtils.transmission,
+                              selectedValue: state.selectedTransmission,
+                              onChanged: null,
+                              validationMessage: StringUtils.selectTransmission,
+                            );
+                          },
+                        ),
+
+                        /// Seater
+                        BlocBuilder<BikeFormBloc, BikeFormState>(
+                          buildWhen:
+                              (previous, current) =>
+                                  previous.selectedSeater !=
+                                  current.selectedSeater,
+                          builder: (context, state) {
+                            return CommonDropdown(
+                              items: ["1", "2", "3", "4", "5", "6"],
+                              labelText: StringUtils.seater,
+                              selectedValue: state.selectedSeater,
+                              onChanged: (value) {
+                                context.read<BikeFormBloc>().add(
+                                  UpdateSeater(value),
+                                );
+                                context.read<BikeFormBloc>().add(
+                                  BikeFormValidateFields(),
+                                );
+                              },
+                              validationMessage: StringUtils.selectSeater,
+                            );
+                          },
+                        ),
+
+                        /// Fuel Included / Excluded
+                        BlocBuilder<BikeFormBloc, BikeFormState>(
+                          buildWhen:
+                              (previous, current) =>
+                                  previous.selectedFuelIncluded !=
+                                  current.selectedFuelIncluded,
+                          builder: (context, state) {
+                            return CommonDropdown(
+                              items: [
+                                StringUtils.included,
+                                StringUtils.excluded,
+                              ],
+                              labelText: StringUtils.fuel,
+                              selectedValue: state.selectedFuelIncluded,
+                              onChanged: (value) {
+                                context.read<BikeFormBloc>().add(
+                                  UpdateFuelIncluded(value),
+                                );
+                                context.read<BikeFormBloc>().add(
+                                  BikeFormValidateFields(),
+                                );
+                              },
+                              validationMessage: StringUtils.selectFuelOption,
+                            );
+                          },
+                        ),
+
+                        /// KM Limit
+                        BlocBuilder<BikeFormBloc, BikeFormState>(
+                          buildWhen:
+                              (previous, current) =>
+                                  previous.kmLimit != current.kmLimit,
+                          builder: (context, state) {
+                            return CommonTextField(
+                              textEditController:
+                                  context
+                                      .read<BikeFormBloc>()
+                                      .kmLimitController,
+                              labelText: StringUtils.kmLimit,
+                              keyBoardType: TextInputType.number,
+                              onChange:
+                                  (_) => context.read<BikeFormBloc>().add(
+                                    BikeFormValidateFields(),
+                                  ),
+                              validator:
+                                  (value) =>
+                                      value!.isEmpty
+                                          ? StringUtils.enterKmLimit
+                                          : null,
+                            );
+                          },
+                        ),
+
+                        ///makeYear
+                        BlocBuilder<BikeFormBloc, BikeFormState>(
+                          buildWhen:
+                              (previous, current) =>
+                                  previous.makeYear != current.makeYear,
+                          builder: (context, state) {
+                            return CommonTextField(
+                              textEditController:
+                                  context
+                                      .read<BikeFormBloc>()
+                                      .makeYearController,
+                              labelText: StringUtils.makeYear,
+                              readOnly: false,
+                              onTap: () async {
+                                final currentYear = DateTime.now().year;
+                                int? selectedYear = await showDialog<int>(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: CustomText(StringUtils.selectYear),
+                                      content: SizedBox(
+                                        height: 300,
+                                        width: 300,
+                                        child: YearPicker(
+                                          firstDate: DateTime(1980),
+                                          lastDate: DateTime(currentYear),
+                                          initialDate: DateTime(currentYear),
+                                          selectedDate:
+                                              DateTime.tryParse(
+                                                context
+                                                    .read<BikeFormBloc>()
+                                                    .makeYearController
+                                                    .text,
+                                              ) ??
+                                              DateTime(currentYear),
+                                          onChanged: (DateTime dateTime) {
+                                            Navigator.of(
+                                              context,
+                                            ).pop(dateTime.year);
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+
+                                if (selectedYear != null) {
+                                  context
+                                      .read<BikeFormBloc>()
+                                      .makeYearController
+                                      .text = selectedYear.toString();
+                                  context.read<BikeFormBloc>().add(
+                                    BikeFormValidateFields(),
+                                  );
+                                }
+                              },
+                              validator:
+                                  (value) =>
+                                      value!.isEmpty
+                                          ? StringUtils.enterMakeYear
+                                          : null,
+                            );
+                          },
+                        ),
+
+                        ///bikeDescription
+                        BlocBuilder<BikeFormBloc, BikeFormState>(
+                          buildWhen:
+                              (previous, current) =>
+                                  previous.description != current.description,
+                          builder: (context, state) {
+                            return CommonTextField(
+                              textEditController:
+                                  context
+                                      .read<BikeFormBloc>()
+                                      .descriptionController,
+                              labelText: StringUtils.bikeDescription,
+                              keyBoardType: TextInputType.name,
+                              onChange:
+                                  (_) => context.read<BikeFormBloc>().add(
+                                    BikeFormValidateFields(),
+                                  ),
+                              validator:
+                                  (value) =>
+                                      value!.isEmpty
+                                          ? StringUtils.enterDescription
+                                          : null,
+                              maxLine: 3,
+                            );
+                          },
+                        ),
+                        SizedBox(height: 20.h),
+
+                        ///Add Update btn
+                        BlocBuilder<BikeFormBloc, BikeFormState>(
+                          builder: (context, state) {
+                            return CustomBtn(
+                              title:
+                                  bike == null
+                                      ? StringUtils.addBike
+                                      : StringUtils.updateBike,
+                              onTap:
+                                  (state.isProcessing || !state.isValid)
+                                      ? null
+                                      : () {
+                                        if (formKey.currentState?.validate() ??
+                                            false) {
+                                          logs("---bike----${bike?.imageUrl}");
+                                          context.read<BikeFormBloc>().add(
+                                            BikeFormSubmitted(
+                                              existingBike: bike,
+                                            ),
+                                          );
+                                        } else {
+                                          logs("---NOT VALIDATED");
+                                        }
+                                      },
+                              bgColor:
+                                  (state.isProcessing || !state.isValid)
+                                      ? ColorUtils.primary.withOpacity(0.4)
+                                      : ColorUtils.primary,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     ),
     isScrollControlled: true,
   ).then((value) {
-    (bikeController.bikeImage.value = File(''));
+    // (bikeController.bikeImage.value = File(''));
   });
 }
 

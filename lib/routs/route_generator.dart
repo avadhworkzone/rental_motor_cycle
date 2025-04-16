@@ -1,4 +1,7 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+import 'package:rental_motor_cycle/blocs/bikes/bike_crud_bloc/bike_bloc.dart';
+import 'package:rental_motor_cycle/blocs/bikes/bike_crud_bloc/bike_event.dart';
 import 'package:rental_motor_cycle/view/book_bike/select_date_time_for_booking_screen.dart';
 import 'package:rental_motor_cycle/view/bottom_navigation_bar_screen.dart';
 import 'package:rental_motor_cycle/view/calender/calendar_screen.dart';
@@ -24,78 +27,83 @@ class AppPages {
     GetPage(
       name: AppRoutes.onBoardingScreen,
       page: () => OnBoardingScreen(),
-      transition: Transition.cupertino,
+      // transition: Transition.cupertino,
     ),
     GetPage(
       name: AppRoutes.bottomNavigationBarScreen,
       page: () => BottomNavigationBarScreen(),
-      transition: Transition.cupertino,
+      // transition: Transition.cupertino,
     ),
     GetPage(
       name: AppRoutes.bookBikeScreen,
       page: () => BookBikeScreen(),
       // page: () => BookBikeScreen(),
-      transition: Transition.cupertino,
+      // transition: Transition.cupertino,
     ),
     GetPage(
       name: AppRoutes.calendarScreen,
       page: () => CalendarScreen(),
-      transition: Transition.cupertino,
+      // transition: Transition.cupertino,
     ),
     GetPage(
       name: AppRoutes.loginScreen,
       page: () => LoginScreen(),
-      transition: Transition.cupertino,
+      // transition: Transition.cupertino,
     ),
     GetPage(
       name: AppRoutes.myBikesScreen,
-      page: () => MyBikesScreen(),
-      transition: Transition.cupertino,
+      page:
+          () => BlocProvider(
+            create: (_) => BikeBloc()..add(FetchBikesEvent()),
+            child: MyBikesScreen(),
+          ),
+      // page: () => MyBikesScreen(),
+      // transition: Transition.cupertino,
     ),
     GetPage(
       name: AppRoutes.employeesScreen,
       page: () => EmployeesScreen(),
-      transition: Transition.cupertino,
+      // transition: Transition.cupertino,
     ),
     GetPage(
       name: AppRoutes.settingsScreen,
       page: () => SettingsScreen(),
-      transition: Transition.cupertino,
+      // transition: Transition.cupertino,
     ),
     GetPage(
       name: AppRoutes.signupScreen,
       page: () => SignupScreen(),
-      transition: Transition.cupertino,
+      // transition: Transition.cupertino,
     ),
     GetPage(
       name: AppRoutes.userScreen,
       page: () => EmployeesScreen(),
-      transition: Transition.cupertino,
+      // transition: Transition.cupertino,
     ),
     GetPage(
       name: AppRoutes.bikeDetailsScreen,
       page: () => BikeDetailsScreen(),
-      transition: Transition.cupertino,
+      // transition: Transition.cupertino,
     ),
     GetPage(
       name: AppRoutes.todayScreen,
       page: () => TodayScreen(),
-      transition: Transition.cupertino,
+      // transition: Transition.cupertino,
     ),
     GetPage(
       name: AppRoutes.reportScreen,
       page: () => ReportScreen(),
-      transition: Transition.cupertino,
+      // transition: Transition.cupertino,
     ),
     GetPage(
       name: AppRoutes.transactionScreen,
       page: () => TransactionScreen(),
-      transition: Transition.cupertino,
+      // transition: Transition.cupertino,
     ),
-    GetPage(
-      name: AppRoutes.selectDateTimeForBookingScreen,
-      page: () => SelectDateTimeForBookingScreen(),
-      transition: Transition.cupertino,
-    ),
+    // GetPage(
+    //   name: AppRoutes.selectDateTimeForBookingScreen,
+    //   page: () => SelectDateTimeForBookingScreen(bike: null,),
+    //   // transition: Transition.cupertino,
+    // ),
   ];
 }
