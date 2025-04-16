@@ -19,61 +19,146 @@ import '../../database/db_helper.dart';
 import '../../controller/badge_controller.dart';
 import '../auth/login_screen.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
   final isDarkMode = false.obs;
+
   final isLoading = false.obs;
 
   final EmployeeController employeeController = Get.find();
+
   final BikeController bikeController = Get.find();
+
   final BikeBookingController bikeBookingController = Get.find();
+
   final BadgeController badgeController = Get.find();
 
   /// Reset Specific Table or Entire Database
-  void resetDatabase({String? table}) async {
-    // if (isLoading.value) return; // ✅ Prevent multiple clicks
-    // isLoading.value = true; // ✅ Start loading
-    log('----users table =-=-=-=-> ${table}');
-    final db = await DBHelper.database;
-    await db.transaction((txn) async {
-      log('----txn=-=-=-=-> ${txn}');
-      try {
-        await txn.execute("PRAGMA foreign_keys = OFF;");
-      log('users table =-=-=-=-=-=-=->>> ${table}');
+  //  resetDatabase({String? table}) async {
+  //   if (isLoading.value) return; // ✅ Prevent multiple clicks
+  //   setState(() {
+  //     isLoading.value = true; // ✅ Start loading
+  //   });
+  //   log('----users table =-=-=-=-> ${table}');
+  //   final db = await DBHelper.database;
+  //   // await db.transaction((txn) async {
+  //     try {
+  //       await db.execute("PRAGMA foreign_keys = OFF;");
+  //
+  //       if (table == "Users") {
+  //         log('delete users');
+  //         await db.delete('Users');
+  //         log('after delete users');
+  //         // await txn.execute("DELETE FROM Users;");
+  //         // await db.rawDelete('DELETE FROM Users');
+  //
+  //         await employeeController.fetchUsers();
+  //       }
+  //       else if (table == "Bikes") {
+  //         await txn.execute("DELETE FROM Bikes;");
+  //         await bikeController.fetchBikes();
+  //       } else if (table == "Bookings") {
+  //         await txn.execute("DELETE FROM Bookings;");
+  //         await bikeBookingController.fetchBookings();
+  //       } else {
+  //         print('========delete data=======');
+  //         await txn.execute("DELETE FROM Bookings;");
+  //         await txn.execute("DELETE FROM Bikes;");
+  //         await txn.execute("DELETE FROM Users;");
+  //         await employeeController.fetchUsers();
+  //         await bikeController.fetchBikes();
+  //         await bikeBookingController.fetchBookings();
+  //       }
+  //
+  //       await db.execute("PRAGMA foreign_keys = ON;");
+  //       setState(() {
+  //         isLoading.value =false;
+  //         print('isLoading=====>>>${isLoading.value}');
+  //       });
+  //
+  //     } catch (e) {
+  //       showCustomSnackBar(
+  //         message: "ERROR___${StringUtils.databaseResetFailed} ${e.toString()}",
+  //         isError: true,
+  //       );
+  //       setState(() {
+  //         isLoading.value =false;
+  //       });
+  //     }
+  //   // });
+  //
+  //   // ✅ Update badge counts **AFTER** database operations are complete
+  //   Future.delayed(Duration(milliseconds: 500), () {
+  //     if (Get.isRegistered<BadgeController>()) {
+  //       badgeController.updateBadgeCounts();
+  //     }
+  //   });
+  //
+  //   setState(() {
+  //     isLoading.value =false;
+  //   });
+  //   showCustomSnackBar(
+  //     message:
+  //         "${table ?? StringUtils.allData} ${StringUtils.resetSuccessfully}",
+  //     isError: true,
+  //   );
+  // }
 
-        if (table == "Users") {
-          log('delete users');
-          await db.delete('Users');
-          // await txn.execute("DELETE FROM Users;");
-          await db.rawDelete('DELETE FROM Users');
-
-          await employeeController.fetchUsers();
-        } else if (table == "Bikes") {
-          await txn.execute("DELETE FROM Bikes;");
-          await bikeController.fetchBikes();
-        } else if (table == "Bookings") {
-          await txn.execute("DELETE FROM Bookings;");
-          await bikeBookingController.fetchBookings();
-        } else {
-          print('========delete data=======');
-          await txn.execute("DELETE FROM Bookings;");
-          await txn.execute("DELETE FROM Bikes;");
-          await txn.execute("DELETE FROM Users;");
-          await employeeController.fetchUsers();
-          await bikeController.fetchBikes();
-          await bikeBookingController.fetchBookings();
-        }
-
-        await txn.execute("PRAGMA foreign_keys = ON;");
-        isLoading.value =false;
-        Get.back();
-      } catch (e) {
-        showCustomSnackBar(
-          message: "ERROR___${StringUtils.databaseResetFailed} ${e.toString()}",
-          isError: true,
-        );
-        isLoading.value =false;
-      }
+  resetDatabase({String? table}) async {
+    if (isLoading.value) return; // ✅ Prevent multiple clicks
+    setState(() {
+      isLoading.value = true; // ✅ Start loading
     });
+
+    final db = await DBHelper.database;
+    // await db.transaction((txn) async {
+    try {
+      await db.execute("PRAGMA foreign_keys = OFF;");
+
+      if (table == "Users") {
+        await db.delete('Users');
+
+        // await txn.execute("DELETE FROM Users;");
+        // await db.rawDelete('DELETE FROM Users');
+        await employeeController.fetchUsers();
+      }
+      else if (table == "Bikes") {
+
+        await db.execute("DELETE FROM Bikes;");
+        await bikeController.fetchBikes();
+      } else if (table == "Bookings") {
+
+        await db.execute("DELETE FROM Bookings;");
+        await bikeBookingController.fetchBookings();
+      } else {
+
+        await db.execute("DELETE FROM Bookings;");
+        await db.execute("DELETE FROM Bikes;");
+        await db.execute("DELETE FROM Users;");
+        await employeeController.fetchUsers();
+        await bikeController.fetchBikes();
+        await bikeBookingController.fetchBookings();
+      }
+
+      await db.execute("PRAGMA foreign_keys = ON;");
+      setState(() {
+        isLoading.value =false;
+      });
+
+    } catch (e) {
+      showCustomSnackBar(
+        message: "ERROR___${StringUtils.databaseResetFailed} ${e.toString()}",
+        isError: true,
+      );
+      setState(() {
+        isLoading.value =false;
+      });
+    }
+    // });
 
     // ✅ Update badge counts **AFTER** database operations are complete
     Future.delayed(Duration(milliseconds: 500), () {
@@ -82,10 +167,12 @@ class SettingsScreen extends StatelessWidget {
       }
     });
 
-    isLoading.value = false; // ✅ Stop loading
+    setState(() {
+      isLoading.value =false;
+    });
     showCustomSnackBar(
       message:
-          "${table ?? StringUtils.allData} ${StringUtils.resetSuccessfully}",
+      "${table ?? StringUtils.allData} ${StringUtils.resetSuccessfully}",
       isError: true,
     );
   }
@@ -146,7 +233,7 @@ class SettingsScreen extends StatelessWidget {
                     fontSize: 15.sp,
                     fontWeight: FontWeight.w500,
                   ),
-                  onTap: () => resetDatabase(table: "Bikes"),
+                  onTap: () =>  showResetOptions(table: "Bikes")///resetDatabase(table: "Bikes"),
                 ),
                 ListTile(
                   leading: Icon(Icons.event, color: Colors.purple),
@@ -155,7 +242,7 @@ class SettingsScreen extends StatelessWidget {
                     fontSize: 15.sp,
                     fontWeight: FontWeight.w500,
                   ),
-                  onTap: () => resetDatabase(table: "Bookings"),
+                  onTap: () => showResetOptions(table: "Bookings"),///resetDatabase(table: "Bookings"),
                 ),
                 ListTile(
                   leading: Icon(
@@ -240,7 +327,7 @@ class SettingsScreen extends StatelessWidget {
 
   /// ✅ Show Confirmation Dialog Before Reset
   void showResetOptions({String? table}) {
-    print('table==>> ${table}');
+
     final tableName = table ?? StringUtils.allData;
 
     Get.defaultDialog(
@@ -296,8 +383,9 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 onPressed: () async {
 
+                   Get.back();
+                  await resetDatabase(table: table);
 
-                  resetDatabase(table: table);
                 },
                 child: CustomText(
                   StringUtils.yesReset,
@@ -312,18 +400,4 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
   }
-
-  /*void showResetOptions() {
-    Get.defaultDialog(
-      title: StringUtils.resetDatabaseTitle,
-      content: CustomText(StringUtils.resetDatabaseMsg),
-      textCancel: StringUtils.cancel,
-      textConfirm: StringUtils.yesReset,
-      confirmTextColor: Colors.white,
-      onConfirm: () {
-        Get.back();
-        resetDatabase();
-      },
-    );
-  }*/
 }
