@@ -6,10 +6,16 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:rental_motor_cycle/blocs/bikes/bike_crud_bloc/bike_bloc.dart';
 import 'package:rental_motor_cycle/blocs/bikes/bike_form_bloc/bike_form_bloc.dart';
+import 'package:rental_motor_cycle/blocs/book_bike/book_bike_home_bloc/book_bike_bloc.dart';
+import 'package:rental_motor_cycle/blocs/book_bike/booking_form_bloc/booking_form_bloc.dart';
+import 'package:rental_motor_cycle/blocs/report/report_bloc.dart';
+import 'package:rental_motor_cycle/blocs/users/employee_bloc.dart';
+import 'package:rental_motor_cycle/blocs/users/employee_event.dart';
 import 'package:rental_motor_cycle/controller/badge_controller.dart';
 import 'package:rental_motor_cycle/controller/bike_booking_controller.dart';
 import 'package:rental_motor_cycle/controller/bike_controller.dart';
 import 'package:rental_motor_cycle/controller/employee_controller.dart';
+import 'package:rental_motor_cycle/view/setting/report_screen.dart';
 import 'routs/route_generator.dart';
 import 'utils/Theme/app_theme.dart';
 
@@ -61,10 +67,21 @@ class MyApp extends StatelessWidget {
             BlocProvider<BikeFormBloc>(
               create:
                   (context) => BikeFormBloc(bikeBloc: context.read<BikeBloc>()),
-            ), // Providing BikeFormBloc
+            ),
+            BlocProvider<EmployeeBloc>(
+              create: (_) => EmployeeBloc()..add(FetchUsers()),
+            ),
+            BlocProvider<ReportBloc>(
+              create: (_) => ReportBloc(),
+              // child: ReportScreen(),
+            ),
+            BlocProvider<ReportBloc>(create: (_) => ReportBloc()),
+            BlocProvider<BookBikeBloc>(create: (_) => BookBikeBloc()),
+            BlocProvider<BooingFormBloc>(
+              create: (_) => BooingFormBloc(bikeBloc: null),
+            ),
           ],
           child: GetMaterialApp(
-            title: 'Flutter Demo',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.lightTheme, // Light theme
             // darkTheme: AppTheme.darkTheme, // Dark theme

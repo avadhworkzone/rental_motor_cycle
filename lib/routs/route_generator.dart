@@ -100,10 +100,10 @@ class AppPages {
       page: () => TransactionScreen(),
       // transition: Transition.cupertino,
     ),
-    GetPage(
-      name: AppRoutes.selectDateTimeForBookingScreen,
-      page: () => SelectDateTimeForBookingScreen(),
-      // transition: Transition.cupertino,
-    ),
+    // GetPage(
+    //   name: AppRoutes.selectDateTimeForBookingScreen,
+    //   page: () => SelectDateTimeForBookingScreen(bike: null,),
+    //   // transition: Transition.cupertino,
+    // ),
   ];
 }

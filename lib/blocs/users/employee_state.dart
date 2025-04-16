@@ -1,4 +1,4 @@
-import 'package:rental_motor_cycle/model/user_model.dart';
+import '../../model/user_model.dart';
 
 abstract class EmployeeState {}
 
@@ -8,8 +8,10 @@ class EmployeeLoading extends EmployeeState {}
 
 class EmployeeLoaded extends EmployeeState {
   final List<UserModel> userList;
-  EmployeeLoaded({required this.userList});
+  EmployeeLoaded(this.userList);
 }
+
+class EmployeeProcessing extends EmployeeState {}
 
 class EmployeeError extends EmployeeState {
   final String message;

@@ -124,15 +124,13 @@ void showAddBikeBottomSheet(BuildContext context, {BikeModel? bike}) {
       ),
       child: MultiBlocProvider(
         providers: [
-          BlocProvider.value(
-            value: context.read<BikeBloc>(), // Reuse existing BikeBloc
-          ),
+          BlocProvider.value(value: context.read<BikeBloc>()),
           BlocProvider(
             create:
                 (_) => BikeFormBloc(
                   bikeBloc: context.read<BikeBloc>(),
                   bike: bike,
-                ), // New form BLoC instance
+                ),
           ),
         ],
 

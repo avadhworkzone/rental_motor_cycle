@@ -1,28 +1,20 @@
-import 'package:rental_motor_cycle/model/login_user_model.dart';
-import 'package:rental_motor_cycle/model/user_model.dart';
+import '../../model/user_model.dart';
 
 abstract class EmployeeEvent {}
 
-class FetchUsersEvent extends EmployeeEvent {}
+class FetchUsers extends EmployeeEvent {}
 
-class AddUserEvent extends EmployeeEvent {
+class AddUser extends EmployeeEvent {
   final UserModel user;
-  AddUserEvent(this.user);
+  AddUser(this.user);
 }
 
-class AddLoginUserEvent extends EmployeeEvent {
-  final LoginUserModel user;
-  AddLoginUserEvent(this.user);
-}
-
-class UpdateUserEvent extends EmployeeEvent {
+class UpdateUser extends EmployeeEvent {
   final UserModel user;
-  UpdateUserEvent(this.user);
+  UpdateUser(this.user);
 }
 
-class DeleteUserEvent extends EmployeeEvent {
+class DeleteUser extends EmployeeEvent {
   final int id;
-  DeleteUserEvent(this.id);
+  DeleteUser(this.id);
 }
-
-class FetchLoginUsersEvent extends EmployeeEvent {}
