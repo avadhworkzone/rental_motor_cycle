@@ -10,10 +10,10 @@ android {
     compileSdk = flutter.compileSdkVersion
 
     /// krina system
-    ndkVersion = "27.0.12077973"
+//    ndkVersion = "27.0.12077973"
 
     /// bhavesh system
-//    ndkVersion = "23.1.7779620"
+    ndkVersion = "23.1.7779620"
 
 //    ndkVersion = flutter.ndkVersion
 
