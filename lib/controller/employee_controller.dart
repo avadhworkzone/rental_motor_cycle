@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:get/get.dart';
 import '../database/db_helper.dart';
 import '../model/login_user_model.dart';
@@ -16,12 +18,13 @@ class EmployeeController extends GetxController {
 
   /// ✅ **Optimized Fetch Method**
   fetchUsers() async {
-    if (isProcessing.value) return; // ✅ Prevents multiple fetches at once
-    isProcessing.value = true;
+    log('--------userList---$userList');
+    // if (isProcessing.value) return; // ✅ Prevents multiple fetches at once
+    // isProcessing.value = true;
 
     final users = await DBHelper.getUsers();
     userList.assignAll(users.map((e) => UserModel.fromMap(e)).toList());
-    // print('userList---$userList');
+    log('userList---$userList');
     isProcessing.value = false;
   }
 
