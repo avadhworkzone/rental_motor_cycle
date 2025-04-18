@@ -364,7 +364,6 @@ class EmployeesScreen extends StatefulWidget {
 
 class _EmployeesState extends State<EmployeesScreen> {
   final _formKey = GlobalKey<FormState>();
-
   final mobileController = TextEditingController();
   final emailController = TextEditingController();
   final fullNameController = TextEditingController();

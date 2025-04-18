@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 import 'package:rental_motor_cycle/blocs/users/employee_event.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_snackbar.dart';
@@ -16,121 +15,41 @@ import '../../blocs/bikes/bike_crud_bloc/bike_event.dart';
 import '../../blocs/book_bike/book_bike_home_bloc/book_bike_bloc.dart';
 import '../../blocs/book_bike/book_bike_home_bloc/book_bike_event.dart';
 import '../../blocs/users/employee_bloc.dart';
-import '../../controller/employee_controller.dart';
 import '../../database/db_helper.dart';
 
 class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
+
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final isDarkMode = false.obs;
-
-  final isLoading = false.obs;
-
-  // final EmployeeController employeeController = Get.find();
-
-  // final BikeController bikeController = Get.find();
-
-  // final BikeBookingController bikeBookingController = Get.find();
-
-  // final BadgeController badgeController = Get.find();
-
-  /// Reset Specific Table or Entire Database
-  //  resetDatabase({String? table}) async {
-  //   if (isLoading.value) return; // ✅ Prevent multiple clicks
-  //   setState(() {
-  //     isLoading.value = true; // ✅ Start loading
-  //   });
-  //   log('----users table =-=-=-=-> ${table}');
-  //   final db = await DBHelper.database;
-  //   // await db.transaction((txn) async {
-  //     try {
-  //       await db.execute("PRAGMA foreign_keys = OFF;");
-  //
-  //       if (table == "Users") {
-  //         log('delete users');
-  //         await db.delete('Users');
-  //         log('after delete users');
-  //         // await txn.execute("DELETE FROM Users;");
-  //         // await db.rawDelete('DELETE FROM Users');
-  //
-  //         await employeeController.fetchUsers();
-  //       }
-  //       else if (table == "Bikes") {
-  //         await txn.execute("DELETE FROM Bikes;");
-  //         await bikeController.fetchBikes();
-  //       } else if (table == "Bookings") {
-  //         await txn.execute("DELETE FROM Bookings;");
-  //         await bikeBookingController.fetchBookings();
-  //       } else {
-  //         print('========delete data=======');
-  //         await txn.execute("DELETE FROM Bookings;");
-  //         await txn.execute("DELETE FROM Bikes;");
-  //         await txn.execute("DELETE FROM Users;");
-  //         await employeeController.fetchUsers();
-  //         await bikeController.fetchBikes();
-  //         await bikeBookingController.fetchBookings();
-  //       }
-  //
-  //       await db.execute("PRAGMA foreign_keys = ON;");
-  //       setState(() {
-  //         isLoading.value =false;
-  //         print('isLoading=====>>>${isLoading.value}');
-  //       });
-  //
-  //     } catch (e) {
-  //       showCustomSnackBar(
-  //         message: "ERROR___${StringUtils.databaseResetFailed} ${e.toString()}",
-  //         isError: true,
-  //       );
-  //       setState(() {
-  //         isLoading.value =false;
-  //       });
-  //     }
-  //   // });
-  //
-  //   // ✅ Update badge counts **AFTER** database operations are complete
-  //   Future.delayed(Duration(milliseconds: 500), () {
-  //     if (Get.isRegistered<BadgeController>()) {
-  //       badgeController.updateBadgeCounts();
-  //     }
-  //   });
-  //
-  //   setState(() {
-  //     isLoading.value =false;
-  //   });
-  //   showCustomSnackBar(
-  //     message:
-  //         "${table ?? StringUtils.allData} ${StringUtils.resetSuccessfully}",
-  //     isError: true,
-  //   );
-  // }
+  bool isDarkMode = false;
+  bool isLoading = false;
 
   resetDatabase({String? table}) async {
-    if (isLoading.value) return; // ✅ Prevent multiple clicks
+    if (isLoading) return;
     setState(() {
-      isLoading.value = true; // ✅ Start loading
+      isLoading = true;
     });
 
     final db = await DBHelper.database;
-    // await db.transaction((txn) async {
     try {
       await db.execute("PRAGMA foreign_keys = OFF;");
-
       if (table == "Users") {
         await db.delete('Users');
-
-        // await txn.execute("DELETE FROM Users;");
-        // await db.rawDelete('DELETE FROM Users');
-
         context.read<EmployeeBloc>().add(FetchUsers());
       } else if (table == "Bikes") {
         await db.execute("DELETE FROM Bikes;");
         context.read<BikeBloc>().add(FetchBikesEvent());
       } else if (table == "Bookings") {
         await db.execute("DELETE FROM Bookings;");
+        context.read<BookBikeBloc>().add(FetchBookingsEvent());
+      } else if (table == "BikeAndBookings") {
+        await db.execute("DELETE FROM Bikes;");
+        await db.execute("DELETE FROM Bookings;");
+        context.read<BikeBloc>().add(FetchBikesEvent());
         context.read<BookBikeBloc>().add(FetchBookingsEvent());
       } else {
         await db.execute("DELETE FROM Bookings;");
@@ -143,7 +62,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
       await db.execute("PRAGMA foreign_keys = ON;");
       setState(() {
-        isLoading.value = false;
+        isLoading = false;
       });
     } catch (e) {
       showCustomSnackBar(
@@ -151,7 +70,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         isError: true,
       );
       setState(() {
-        isLoading.value = false;
+        isLoading = false;
       });
     }
     // });
@@ -164,7 +83,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // });
 
     setState(() {
-      isLoading.value = false;
+      isLoading = false;
     });
     showCustomSnackBar(
       message:
@@ -186,219 +105,302 @@ class _SettingsScreenState extends State<SettingsScreen> {
         backgroundColor: ColorUtils.primary,
         fontColor: ColorUtils.white,
       ),
-      body: Column(
-        children: [
-          Obx(
-            () => SwitchListTile(
-              title: CustomText(StringUtils.darkMode),
-              value: isDarkMode.value,
-              onChanged: (value) {
-                isDarkMode.value = value;
-                Get.changeTheme(value ? ThemeData.dark() : ThemeData.light());
-              },
-            ),
-          ),
-          Obx(() {
-            if (isLoading.value) {
-              return Center(child: CircularProgressIndicator());
-            }
-            return Column(
-              children: [
-                ListTile(
-                  leading: Icon(Icons.delete, color: Colors.red),
-                  title: CustomText(
-                    StringUtils.resetEntireDB,
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w500,
+      body:
+          isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Column(
+                children: [
+                  // SwitchListTile(
+                  //   title: CustomText(StringUtils.darkMode),
+                  //   value: isDarkMode,
+                  //   onChanged: (value) {
+                  //     isDarkMode = value;
+                  //     setState(() {});
+                  //     // Get.changeTheme(value ? ThemeData.dark() : ThemeData.light());
+                  //   },
+                  // ),
+                  ListTile(
+                    leading: Icon(Icons.delete, color: Colors.red),
+                    title: CustomText(
+                      StringUtils.resetEntireDB,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    onTap: () => showResetOptions(context: context),
                   ),
-                  onTap: () => showResetOptions(),
-                ),
-                ListTile(
-                  leading: Icon(Icons.people, color: Colors.blue),
-                  title: CustomText(
-                    StringUtils.resetUsers,
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w500,
+                  ListTile(
+                    leading: Icon(Icons.people, color: Colors.blue),
+                    title: CustomText(
+                      StringUtils.resetUsers,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    onTap:
+                        () =>
+                            showResetOptions(context: context, table: "Users"),
                   ),
-                  onTap: () => showResetOptions(table: "Users"),
-                ),
-                ListTile(
-                  leading: Icon(Icons.meeting_room, color: Colors.green),
-                  title: CustomText(
-                    StringUtils.resetBikes,
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w500,
+                  ListTile(
+                    leading: Icon(Icons.meeting_room, color: Colors.green),
+                    title: CustomText(
+                      StringUtils.resetBikes,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    onTap:
+                        () => showResetOptions(
+                          context: context,
+                          table: "BikeAndBookings",
+                        ),
                   ),
-                  onTap: () => showResetOptions(table: "Bikes"),
+                  ListTile(
+                    leading: Icon(Icons.event, color: Colors.purple),
+                    title: CustomText(
+                      StringUtils.resetBookings,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    onTap:
+                        () => showResetOptions(
+                          context: context,
+                          table: "Bookings",
+                        ),
+                  ),
+                  ListTile(
+                    leading: Icon(
+                      Icons.insert_drive_file_outlined,
+                      color: Colors.blue,
+                    ),
+                    title: CustomText(
+                      StringUtils.downloadDb,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    onTap: () async {
+                      await DownloadDBFile.downloadDBFile();
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.pedal_bike, color: Colors.orange),
+                    title: CustomText(
+                      StringUtils.myBikes,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    onTap: () async {
+                      Navigator.pushNamed(context, AppRoutes.myBikesScreen);
+                      // await DownloadDBFile.downloadDBFile();
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.person, color: Colors.brown),
+                    title: CustomText(
+                      StringUtils.users,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    onTap: () async {
+                      Navigator.pushNamed(context, AppRoutes.employeesScreen);
 
-                  ///resetDatabase(table: "Bikes"),
-                ),
-                ListTile(
-                  leading: Icon(Icons.event, color: Colors.purple),
-                  title: CustomText(
-                    StringUtils.resetBookings,
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w500,
+                      // await DownloadDBFile.downloadDBFile();
+                    },
                   ),
-                  onTap: () => showResetOptions(table: "Bookings"),
+                  ListTile(
+                    leading: Icon(Icons.history, color: Colors.deepPurple),
+                    title: CustomText(
+                      StringUtils.salesReport,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    onTap: () async {
+                      Navigator.pushNamed(context, AppRoutes.reportScreen);
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.payment, color: Colors.teal),
+                    title: CustomText(
+                      StringUtils.transactionReport,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    onTap: () async {
+                      Navigator.pushNamed(context, AppRoutes.transactionScreen);
+                    },
+                  ),
 
-                  ///resetDatabase(table: "Bookings"),
-                ),
-                ListTile(
-                  leading: Icon(
-                    Icons.insert_drive_file_outlined,
-                    color: Colors.blue,
+                  ListTile(
+                    leading: Icon(Icons.logout, color: Colors.red),
+                    title: CustomText(
+                      StringUtils.logout,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    onTap: () async {
+                      await SharedPreferenceUtils.clearPreference();
+                      Navigator.pushReplacementNamed(
+                        context,
+                        AppRoutes.loginScreen,
+                      );
+                    },
                   ),
-                  title: CustomText(
-                    StringUtils.downloadDb,
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  onTap: () async {
-                    await DownloadDBFile.downloadDBFile();
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.pedal_bike, color: Colors.orange),
-                  title: CustomText(
-                    StringUtils.myBikes,
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  onTap: () async {
-                    Navigator.pushNamed(context, AppRoutes.myBikesScreen);
-                    // await DownloadDBFile.downloadDBFile();
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.person, color: Colors.brown),
-                  title: CustomText(
-                    StringUtils.users,
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  onTap: () async {
-                    Navigator.pushNamed(context, AppRoutes.employeesScreen);
-
-                    // await DownloadDBFile.downloadDBFile();
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.history, color: Colors.deepPurple),
-                  title: CustomText(
-                    StringUtils.salesReport,
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  onTap: () async {
-                    Navigator.pushNamed(context, AppRoutes.reportScreen);
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.payment, color: Colors.teal),
-                  title: CustomText(
-                    StringUtils.transactionReport,
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  onTap: () async {
-                    Navigator.pushNamed(context, AppRoutes.transactionScreen);
-                  },
-                ),
-
-                ListTile(
-                  leading: Icon(Icons.logout, color: Colors.red),
-                  title: CustomText(
-                    StringUtils.logout,
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  onTap: () async {
-                    await SharedPreferenceUtils.clearPreference();
-                    Navigator.pushReplacementNamed(
-                      context,
-                      AppRoutes.loginScreen,
-                    );
-                  },
-                ),
-              ],
-            );
-          }),
-        ],
-      ),
+                ],
+              ),
     );
   }
 
   /// ✅ Show Confirmation Dialog Before Reset
-  void showResetOptions({String? table}) {
+  void showResetOptions({required BuildContext context, String? table}) {
     final tableName = table ?? StringUtils.allData;
 
-    Get.defaultDialog(
-      title: "",
-      backgroundColor: Colors.white,
-      contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.warning_amber_rounded, size: 48.sp, color: Colors.red),
-          SizedBox(height: 12.h),
-          CustomText(
-            StringUtils.resetDatabaseTitle,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w700,
-            color: Colors.black,
+    showDialog(
+      context: context,
+      barrierDismissible:
+          false, // This will make the dialog non-dismissable by tapping outside
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: CustomText(""),
+          backgroundColor: Colors.white,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 20.w,
+            vertical: 20.h,
           ),
-          SizedBox(height: 12.h),
-          CustomText(
-            "${StringUtils.resetDatabaseMsg} $tableName?",
-            textAlign: TextAlign.center,
-            fontSize: 15.sp,
-            color: Colors.black87,
-          ),
-          SizedBox(height: 20.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  backgroundColor: Colors.grey[300],
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 24.w,
-                    vertical: 10.h,
-                  ),
-                ),
-                onPressed: () => Get.back(),
-                child: CustomText(
-                  StringUtils.cancel,
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w700,
-                ),
+              Icon(Icons.warning_amber_rounded, size: 48.sp, color: Colors.red),
+              SizedBox(height: 12.h),
+              CustomText(
+                StringUtils.resetDatabaseTitle,
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.red,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 24.w,
-                    vertical: 10.h,
+              SizedBox(height: 12.h),
+              CustomText(
+                "${StringUtils.resetDatabaseMsg} $tableName?",
+                textAlign: TextAlign.center,
+                fontSize: 15.sp,
+                color: Colors.black87,
+              ),
+              SizedBox(height: 20.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.black,
+                      backgroundColor: Colors.grey[300],
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 24.w,
+                        vertical: 10.h,
+                      ),
+                    ),
+                    onPressed:
+                        () => Navigator.of(context).pop(), // Close the dialog
+                    child: CustomText(
+                      StringUtils.cancel,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
-                onPressed: () async {
-                  Get.back();
-                  await resetDatabase(table: table);
-                },
-                child: CustomText(
-                  StringUtils.yesReset,
-                  color: ColorUtils.white,
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w700,
-                ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.red,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 24.w,
+                        vertical: 10.h,
+                      ),
+                    ),
+                    onPressed: () async {
+                      Navigator.of(context).pop(); // Close the dialog
+                      await resetDatabase(table: table);
+                      setState(() {});
+                    },
+                    child: CustomText(
+                      StringUtils.yesReset,
+                      color: ColorUtils.white,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
+
+  // void showResetOptions({String? table}) {
+  //   final tableName = table ?? StringUtils.allData;
+  //
+  //   Get.defaultDialog(
+  //     title: "",
+  //     backgroundColor: Colors.white,
+  //     contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+  //     content: Column(
+  //       mainAxisSize: MainAxisSize.min,
+  //       children: [
+  //         Icon(Icons.warning_amber_rounded, size: 48.sp, color: Colors.red),
+  //         SizedBox(height: 12.h),
+  //         CustomText(
+  //           StringUtils.resetDatabaseTitle,
+  //           fontSize: 18.sp,
+  //           fontWeight: FontWeight.w700,
+  //           color: Colors.black,
+  //         ),
+  //         SizedBox(height: 12.h),
+  //         CustomText(
+  //           "${StringUtils.resetDatabaseMsg} $tableName?",
+  //           textAlign: TextAlign.center,
+  //           fontSize: 15.sp,
+  //           color: Colors.black87,
+  //         ),
+  //         SizedBox(height: 20.h),
+  //         Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //           children: [
+  //             ElevatedButton(
+  //               style: ElevatedButton.styleFrom(
+  //                 foregroundColor: Colors.black,
+  //                 backgroundColor: Colors.grey[300],
+  //                 padding: EdgeInsets.symmetric(
+  //                   horizontal: 24.w,
+  //                   vertical: 10.h,
+  //                 ),
+  //               ),
+  //               onPressed: () => Get.back(),
+  //               child: CustomText(
+  //                 StringUtils.cancel,
+  //                 fontSize: 15.sp,
+  //                 fontWeight: FontWeight.w700,
+  //               ),
+  //             ),
+  //             ElevatedButton(
+  //               style: ElevatedButton.styleFrom(
+  //                 foregroundColor: Colors.white,
+  //                 backgroundColor: Colors.red,
+  //                 padding: EdgeInsets.symmetric(
+  //                   horizontal: 24.w,
+  //                   vertical: 10.h,
+  //                 ),
+  //               ),
+  //               onPressed: () async {
+  //                 Get.back();
+  //                 await resetDatabase(table: table);
+  //               },
+  //               child: CustomText(
+  //                 StringUtils.yesReset,
+  //                 color: ColorUtils.white,
+  //                 fontSize: 15.sp,
+  //                 fontWeight: FontWeight.w700,
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }

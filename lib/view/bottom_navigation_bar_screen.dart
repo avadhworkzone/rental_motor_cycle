@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
@@ -19,7 +18,8 @@ class BottomNavigationBarScreen extends StatefulWidget {
 }
 
 class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
-  RxInt currentIndex = 0.obs;
+  int currentIndex = 0;
+  // RxInt currentIndex = 0.obs;
   final screens = [
     CalendarScreen(),
     // MyBikesScreen(),
@@ -34,29 +34,27 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
     bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       extendBody: true,
-      body: Obx(() => screens[currentIndex.value]),
-      bottomNavigationBar: Obx(
-        () => SafeArea(
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 10.h),
-            decoration: BoxDecoration(
-              color: isDarkTheme ? ColorUtils.darkThemeBg : ColorUtils.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(24.r),
-                topRight: Radius.circular(24.r),
+      body: screens[currentIndex],
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 10.h),
+          decoration: BoxDecoration(
+            color: isDarkTheme ? ColorUtils.darkThemeBg : ColorUtils.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24.r),
+              topRight: Radius.circular(24.r),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 8,
+                offset: Offset(0, -3),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 8,
-                  offset: Offset(0, -3),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: List.generate(5, (index) => _buildNavItem(index)),
-            ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: List.generate(5, (index) => _buildNavItem(index)),
           ),
         ),
       ),
@@ -87,7 +85,10 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
 
     return GestureDetector(
       onTap: () {
-        currentIndex.value = index;
+        currentIndex = index;
+        setState(() {
+
+        });
         // clearBadge(index);
       },
       child: AnimatedContainer(
@@ -95,7 +96,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
         padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 5.w),
         decoration: BoxDecoration(
           color:
-              currentIndex.value == index
+              currentIndex == index
                   ? ColorUtils.primary.withOpacity(0.2)
                   : Colors.transparent,
           borderRadius: BorderRadius.circular(16.r),
@@ -105,11 +106,11 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
           children: [
             Icon(
               icons[index],
-              size: currentIndex.value == index ? 28.sp : 24.sp,
+              size: currentIndex == index ? 28.sp : 24.sp,
               color:
                   isDarkTheme
                       ? ColorUtils.white
-                      : currentIndex.value == index
+                      : currentIndex == index
                       ? ColorUtils.primary
                       : ColorUtils.darkBlue35,
             ),
@@ -121,7 +122,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
               color:
                   isDarkTheme
                       ? ColorUtils.white
-                      : currentIndex.value == index
+                      : currentIndex == index
                       ? ColorUtils.primary
                       : ColorUtils.darkBlue35,
             ),

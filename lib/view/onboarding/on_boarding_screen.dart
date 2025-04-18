@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 import 'package:rental_motor_cycle/commonWidgets/common_assets.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_btn.dart';
 import 'package:rental_motor_cycle/routs/app_page.dart';
@@ -9,7 +8,6 @@ import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/iamge_utils.dart';
 import 'package:rental_motor_cycle/utils/shared_preference_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
-import 'package:rental_motor_cycle/view/auth/login_screen.dart';
 
 class OnBoardingScreen extends StatefulWidget {
   const OnBoardingScreen({super.key});
@@ -66,7 +64,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
               ),
             ),
             Container(
-              width: Get.width,
+              width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
                 color: ColorUtils.white,
                 borderRadius: BorderRadius.only(

@@ -1,22 +1,23 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
+import 'package:rental_motor_cycle/model/bike_model.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import '../../utils/color_utils.dart';
 
 class BikeDetailsScreen extends StatelessWidget {
-  BikeDetailsScreen({super.key});
-  final bike = Get.arguments;
+  const BikeDetailsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final bike = ModalRoute.of(context)!.settings.arguments as BikeModel;
+
     return Scaffold(
       backgroundColor: ColorUtils.white,
       appBar: commonAppBar(
-        titleText: bike.brandName,
+        titleText: bike.brandName ?? "",
         context: context,
         isLeading: true,
         isCenterTitle: true,
@@ -51,8 +52,11 @@ class BikeDetailsScreen extends StatelessWidget {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      bike.imageUrl.isNotEmpty
-                          ? Image.file(File(bike.imageUrl), fit: BoxFit.cover)
+                      (bike.imageUrl ?? "").isNotEmpty
+                          ? Image.file(
+                            File(bike.imageUrl ?? ""),
+                            fit: BoxFit.cover,
+                          )
                           : Container(
                             color: ColorUtils.grey55,
                             child: Center(
@@ -90,12 +94,12 @@ class BikeDetailsScreen extends StatelessWidget {
                 children: [
                   _detailCard(
                     StringUtils.model,
-                    bike.model,
+                    bike.model ?? "",
                     Icons.directions_bike,
                   ),
                   _detailCard(
                     StringUtils.vehicleNumber,
-                    bike.numberPlate,
+                    bike.numberPlate ?? "",
                     Icons.confirmation_number,
                   ),
                   // _detailCard(
@@ -105,17 +109,17 @@ class BikeDetailsScreen extends StatelessWidget {
                   // ),
                   _detailCard(
                     StringUtils.location,
-                    bike.location,
+                    bike.location ?? "",
                     Icons.location_on,
                   ),
                   _detailCard(
                     StringUtils.fuelType,
-                    bike.fuelType,
+                    bike.fuelType ?? "",
                     Icons.local_gas_station,
                   ),
                   _detailCard(
                     StringUtils.mileage,
-                    "${bike.mileage} km/l",
+                    "${bike.mileage ?? 0} km/l",
                     Icons.speed,
                   ),
                   _detailCard(
@@ -125,7 +129,7 @@ class BikeDetailsScreen extends StatelessWidget {
                   ),
                   _detailCard(
                     StringUtils.description,
-                    bike.description,
+                    bike.description ?? "",
                     Icons.description,
                   ),
                   SizedBox(height: 25.h),

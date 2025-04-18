@@ -8,7 +8,7 @@ class BikeModel {
   // double? rentPerDay;
   String? location;
   String? fuelType;
-  // num? mileage;
+  num? mileage;
   num? engineCC;
   String? description;
   String? imageUrl;
@@ -33,7 +33,7 @@ class BikeModel {
     // this.rentPerDay,
     this.location,
     this.fuelType,
-    // this.mileage,
+    this.mileage,
     this.engineCC,
     this.description,
     this.imageUrl = "",
@@ -60,7 +60,7 @@ class BikeModel {
       // 'rentPerDay': rentPerDay,
       'location': location,
       'fuelType': fuelType,
-      // 'mileage': mileage,
+      'mileage': mileage,
       'engineCC': engineCC,
       'description': description,
       'imageUrl': imageUrl,
@@ -89,7 +89,7 @@ class BikeModel {
       // rentPerDay: (map['rentPerDay'] ?? 0).toDouble(),
       location: map['location'],
       fuelType: map['fuelType'],
-      // mileage: (map['mileage'] ?? 0).toDouble(),
+      mileage: (map['mileage'] ?? 0).toDouble(),
       engineCC: map['engineCC'] ?? 0,
       description: map['description'],
       imageUrl: map['imageUrl'] ?? '',

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
-import 'package:rental_motor_cycle/controller/bike_booking_controller.dart';
-import 'package:rental_motor_cycle/controller/bike_controller.dart';
 import 'package:rental_motor_cycle/model/bike_model.dart';
 import 'package:rental_motor_cycle/model/booking_model.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
@@ -11,7 +8,6 @@ import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/iamge_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import 'package:rental_motor_cycle/view/reservation/reservation_card_view.dart';
-
 import '../../blocs/bikes/bike_crud_bloc/bike_bloc.dart';
 import '../../blocs/bikes/bike_crud_bloc/bike_event.dart';
 import '../../blocs/book_bike/book_bike_home_bloc/book_bike_bloc.dart';
@@ -27,10 +23,6 @@ class ReservationScreen extends StatefulWidget {
 
 class _ReservationScreenState extends State<ReservationScreen>
     with SingleTickerProviderStateMixin {
-  // final BikeBookingController bikeBookingController =
-  //     Get.find<BikeBookingController>();
-  // final BikeController bikeController = Get.find<BikeController>();
-
   late TabController _tabController;
   String selectedFilter = StringUtils.thisWeek;
   DateTimeRange? customRange;
@@ -49,8 +41,6 @@ class _ReservationScreenState extends State<ReservationScreen>
   }
 
   initMethod() async {
-    // await bikeBookingController.fetchBookings();
-    // await bikeController.fetchBikes();
     context.read<BikeBloc>().add(FetchBikesEvent());
     context.read<BookBikeBloc>().add(FetchBookingsEvent());
   }

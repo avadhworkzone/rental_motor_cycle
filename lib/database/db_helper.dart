@@ -79,6 +79,7 @@ class DBHelper {
         engineCC INTEGER,
         description TEXT,
         isAvailable INTEGER DEFAULT 1, 
+        mileage REAL DEFAULT 0,
         imageUrl TEXT,
         userId INTEGER NOT NULL,
         createdAt TEXT,

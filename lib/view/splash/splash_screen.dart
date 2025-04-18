@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 import 'package:rental_motor_cycle/commonWidgets/common_assets.dart';
 import 'package:rental_motor_cycle/routs/app_page.dart';
 import 'package:rental_motor_cycle/utils/iamge_utils.dart';
-import 'package:rental_motor_cycle/utils/string_utils.dart';
 import '../../utils/shared_preference_utils.dart';
 
 class SplashScreen extends StatefulWidget {

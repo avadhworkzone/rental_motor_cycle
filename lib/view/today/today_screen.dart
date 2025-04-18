@@ -26,15 +26,11 @@ class TodayScreen extends StatefulWidget {
 
 class _TodayScreenState extends State<TodayScreen>
     with SingleTickerProviderStateMixin {
-  // final BikeBookingController bikeBookingController =
-  //     Get.find<BikeBookingController>();
-  // final BikeController bikeController = Get.find<BikeController>();
   final tabLabels = [StringUtils.pickUp, StringUtils.drop];
   late TabController _tabController;
 
   @override
   void initState() {
-    // Set the status bar to match AppBar color
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarColor: ColorUtils.primary,
@@ -43,14 +39,12 @@ class _TodayScreenState extends State<TodayScreen>
     );
     _tabController = TabController(length: 2, vsync: this);
     initMethod();
-    // bikeController.fetchBikes();
     super.initState();
   }
 
   initMethod() async {
     context.read<BikeBloc>().add(FetchBikesEvent());
     context.read<BookBikeBloc>().add(FetchBookingsEvent());
-    // await bikeBookingController.fetchBookings();
   }
 
   @override
@@ -71,16 +65,6 @@ class _TodayScreenState extends State<TodayScreen>
                 bookings.where((b) => isSameDay(b.pickupDate, now)).toList();
             final checkOutReservationList =
                 bookings.where((b) => isSameDay(b.dropoffDate, now)).toList();
-
-            // if (bookings.isEmpty) {
-            //   return Center(
-            //     child: CustomText(
-            //       StringUtils.noBookedBikes,
-            //       fontSize: 15.sp,
-            //       fontWeight: FontWeight.w600,
-            //     ),
-            //   );
-            // }
             return Scaffold(
               backgroundColor:
                   bookings.isEmpty ? ColorUtils.white : ColorUtils.greyF0,
@@ -128,15 +112,6 @@ class _TodayScreenState extends State<TodayScreen>
                         ),
                         labelColor: ColorUtils.primary,
                         unselectedLabelColor: Colors.black87,
-                        // indicatorColor:
-                        //     // isDarkTheme ? ColorUtils.white :
-                        //     ColorUtils.primary,
-                        // labelColor:
-                        //     // isDarkTheme ? ColorUtils.white :
-                        //     ColorUtils.primary,
-                        // unselectedLabelColor:
-                        //     // isDarkTheme ? ColorUtils.white :
-                        //     Colors.black,
                         indicatorSize: TabBarIndicatorSize.tab,
                         labelStyle: TextStyle(
                           fontWeight: FontWeight.bold,

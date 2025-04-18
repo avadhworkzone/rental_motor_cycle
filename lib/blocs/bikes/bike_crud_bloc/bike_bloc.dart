@@ -6,6 +6,7 @@ import 'package:rental_motor_cycle/blocs/bikes/bike_crud_bloc/bike_event.dart';
 import 'package:rental_motor_cycle/blocs/bikes/bike_crud_bloc/bike_state.dart';
 import 'package:rental_motor_cycle/database/db_helper.dart';
 import 'package:rental_motor_cycle/model/bike_model.dart';
+import 'package:rental_motor_cycle/model/booking_model.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 
 class BikeBloc extends Bloc<BikeEvent, BikeState> {
@@ -18,18 +19,60 @@ class BikeBloc extends Bloc<BikeEvent, BikeState> {
 
   int bikeLength = 0;
 
+  // Future<void> _onFetch(FetchBikesEvent event, Emitter<BikeState> emit) async {
+  //   print("📥 FetchBikesEvent received");
+  //   emit(BikeLoading());
+  //   try {
+  //     final bikes = await DBHelper.getBikes();
+  //     print("✅ Bikes fetched: ${bikes.length}");
+  //     bikeLength = bikes.length;
+  //     final list = bikes.map((e) => BikeModel.fromMap(e)).toList();
+  //     print("---list---${list.length}");
+  //     emit(BikeLoaded(list));
+  //   } catch (e) {
+  //     print("❌ Failed to fetch bikes: $e");
+  //     emit(BikeError('Failed to load bikes'));
+  //   }
+  // }
   Future<void> _onFetch(FetchBikesEvent event, Emitter<BikeState> emit) async {
     print("📥 FetchBikesEvent received");
     emit(BikeLoading());
+
     try {
-      final bikes = await DBHelper.getBikes();
-      print("✅ Bikes fetched: ${bikes.length}");
+      final bikesRaw = await DBHelper.getBikes();
+      final bookingsRaw =
+          await DBHelper.getBookings(); // assuming you have this
+      final bikes = bikesRaw.map((e) => BikeModel.fromMap(e)).toList();
+      final bookings = bookingsRaw.map((e) => BookingModel.fromMap(e)).toList();
+
       bikeLength = bikes.length;
-      final list = bikes.map((e) => BikeModel.fromMap(e)).toList();
-      print("---list---${list.length}");
-      emit(BikeLoaded(list));
+      print("✅ Bikes fetched: ${bikes.length}");
+      print("✅ Bookings fetched: ${bookings.length}");
+
+      for (final bike in bikes) {
+        final matchedBooking = bookings.firstWhere(
+          (booking) => booking.bikeId == bike.id,
+          orElse: () => BookingModel.empty(),
+        );
+
+        print(
+          "🚲 Bike ID: ${bike.id} | Brand: ${bike.brandName} | Model: ${bike.model}",
+        );
+
+        if (matchedBooking != null) {
+          print(
+            "   📦 Booked By: ${matchedBooking.userFullName} | "
+            "From: ${matchedBooking.pickupDate} ${matchedBooking.pickupTime} "
+            "To: ${matchedBooking.dropoffDate} ${matchedBooking.dropoffTime}",
+          );
+        } else {
+          print("   ✅ Available");
+        }
+      }
+
+      emit(BikeLoaded(bikes));
     } catch (e) {
-      print("❌ Failed to fetch bikes: $e");
+      print("❌ Failed to fetch bikes or bookings: $e");
       emit(BikeError('Failed to load bikes'));
     }
   }

@@ -387,6 +387,7 @@ class _SelectDateTimeForBookingScreenState
     depositAmount = deposit;
     tax = taxPercent;
     this.prepayment = prepayment;
+    setState(() {});
     // logs("--📅 Days Selected (based on date only): $numberOfDays");
     // logs("--💰 Rent Per Day: $rentPerDay");
     // logs("--🧮 Rent Without Discount: $rentWithoutDiscount");
@@ -471,6 +472,7 @@ class _SelectDateTimeForBookingScreenState
               _buildTextField(
                 emailController,
                 StringUtils.email,
+                keyboardType: TextInputType.emailAddress,
                 onChange: (value) {
                   checkFormValidity();
                   calculateSummary();

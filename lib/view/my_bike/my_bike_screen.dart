@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 import 'package:rental_motor_cycle/blocs/bikes/bike_crud_bloc/bike_bloc.dart';
 import 'package:rental_motor_cycle/blocs/bikes/bike_crud_bloc/bike_event.dart';
 import 'package:rental_motor_cycle/blocs/bikes/bike_crud_bloc/bike_state.dart';
@@ -12,8 +11,6 @@ import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import 'package:rental_motor_cycle/view/my_bike/dialogs/my_bike_dialogs.dart';
-import '../../controller/bike_controller.dart';
-import '../../controller/employee_controller.dart';
 
 /*class MyBikesScreen extends StatefulWidget {
   const MyBikesScreen({super.key});
@@ -356,22 +353,86 @@ class MyBikesScreen extends StatelessWidget {
 void confirmDelete(BuildContext context, int id) {
   bool isProcessing = false;
 
-  Get.defaultDialog(
-    title: StringUtils.deleteBike,
-    middleText: StringUtils.deleteConfirmation,
-    textConfirm: StringUtils.delete,
-    textCancel: StringUtils.cancel,
-    cancelTextColor: ColorUtils.black,
-    confirmTextColor: ColorUtils.black,
-    onConfirm: () async {
-      isProcessing = true;
-      await Future.delayed(Duration(milliseconds: 300));
-
-      // Dispatch the delete event to BLoC
-      context.read<BikeBloc>().add(DeleteBikeEvent(id));
-
-      isProcessing = false;
-      Get.back();
+  // Get.defaultDialog(
+  //   title: StringUtils.deleteBike,
+  //   middleText: StringUtils.deleteConfirmation,
+  //   textConfirm: StringUtils.delete,
+  //   textCancel: StringUtils.cancel,
+  //   cancelTextColor: ColorUtils.black,
+  //   confirmTextColor: ColorUtils.black,
+  //   onConfirm: () async {
+  //     isProcessing = true;
+  //     await Future.delayed(Duration(milliseconds: 300));
+  //
+  //     // Dispatch the delete event to BLoC
+  //     context.read<BikeBloc>().add(DeleteBikeEvent(id));
+  //
+  //     isProcessing = false;
+  //     Get.back();
+  //   },
+  // );
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        title: CustomText(
+          StringUtils.deleteBike,
+          fontWeight: FontWeight.bold,
+          fontSize: 18.sp,
+        ),
+        content: CustomText(
+          StringUtils.deleteConfirmation,
+          fontWeight: FontWeight.w500,
+          fontSize: 15.sp,
+        ),
+        actionsPadding: EdgeInsets.only(
+          left: 16.w,
+          right: 16.w,
+          top: 12.h,
+          bottom: 20.h,
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              foregroundColor: ColorUtils.black,
+              backgroundColor: ColorUtils.white,
+              elevation: 2,
+              minimumSize: Size(100.w, 48.h),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+                side: BorderSide(color: ColorUtils.grey99),
+              ),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: CustomText(StringUtils.cancel),
+          ),
+          SizedBox(width: 15.w),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              foregroundColor: ColorUtils.white,
+              backgroundColor: Colors.redAccent,
+              elevation: 3,
+              minimumSize: Size(100.w, 48.h),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await Future.delayed(Duration(milliseconds: 300));
+              context.read<BikeBloc>().add(DeleteBikeEvent(id));
+            },
+            child: CustomText(StringUtils.delete, color: ColorUtils.white),
+          ),
+        ],
+      );
     },
   );
 }
