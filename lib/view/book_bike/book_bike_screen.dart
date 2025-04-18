@@ -2,19 +2,15 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 import 'package:rental_motor_cycle/blocs/bikes/bike_crud_bloc/bike_bloc.dart';
 import 'package:rental_motor_cycle/blocs/bikes/bike_crud_bloc/bike_state.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
-import 'package:rental_motor_cycle/model/booking_model.dart';
-import 'package:rental_motor_cycle/routs/app_page.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/model/bike_model.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import 'package:rental_motor_cycle/view/book_bike/select_date_time_for_booking_screen.dart';
 import '../../blocs/bikes/bike_crud_bloc/bike_event.dart';
-import '../../controller/bike_controller.dart';
 //
 // class BookBikeScreen extends StatefulWidget {
 //   const BookBikeScreen({super.key});

@@ -1,13 +1,27 @@
 import 'package:flutter/cupertino.dart';
+import 'package:rental_motor_cycle/blocs/book_bike/book_bike_home_bloc/book_bike_bloc.dart';
 import 'package:rental_motor_cycle/model/bike_model.dart';
 import 'package:rental_motor_cycle/model/booking_model.dart';
 
 abstract class BookingFormEvent {}
 
-class InitializeBookingForm extends BookingFormEvent {
+class InitializeBookingsForm extends BookingFormEvent {
   final BikeModel bike;
   final BookingModel? booking;
-  InitializeBookingForm({required this.bike, this.booking});
+
+  InitializeBookingsForm({required this.bike, this.booking});
+}
+
+class BookingFormSubmitted extends BookingFormEvent {
+  final BikeModel bike;
+  final BookingModel? existingBooking;
+  final BookBikeBloc bookBikeBloc;
+
+  BookingFormSubmitted({
+    required this.bike,
+    this.existingBooking,
+    required this.bookBikeBloc,
+  });
 }
 
 class UpdateFromDate extends BookingFormEvent {
@@ -39,11 +53,6 @@ class PickDateTimeEvent extends BookingFormEvent {
     this.initialDate,
     required this.context,
   });
-}
-
-class BookingFormSubmitted extends BookingFormEvent {
-  final BookingModel? existingBooking;
-  BookingFormSubmitted({this.existingBooking});
 }
 
 class UpdateToDate extends BookingFormEvent {

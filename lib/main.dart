@@ -11,11 +11,9 @@ import 'package:rental_motor_cycle/blocs/book_bike/booking_form_bloc/booking_for
 import 'package:rental_motor_cycle/blocs/report/report_bloc.dart';
 import 'package:rental_motor_cycle/blocs/users/employee_bloc.dart';
 import 'package:rental_motor_cycle/blocs/users/employee_event.dart';
-import 'package:rental_motor_cycle/controller/badge_controller.dart';
 import 'package:rental_motor_cycle/controller/bike_booking_controller.dart';
 import 'package:rental_motor_cycle/controller/bike_controller.dart';
 import 'package:rental_motor_cycle/controller/employee_controller.dart';
-import 'package:rental_motor_cycle/view/setting/report_screen.dart';
 import 'routs/route_generator.dart';
 import 'utils/Theme/app_theme.dart';
 
@@ -31,7 +29,7 @@ Future<void> main() async {
   await Get.putAsync(() async => EmployeeController());
   await Get.putAsync(() async => BikeController());
   await Get.putAsync(() async => BikeBookingController());
-  await Get.putAsync(() async => BadgeController());
+  // await Get.putAsync(() async => BadgeController());
   runApp(const MyApp());
 }
 

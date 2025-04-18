@@ -30,27 +30,27 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
     SettingsScreen(),
   ];
 
-  final BadgeController badgeController = Get.find<BadgeController>();
+  // final BadgeController badgeController = Get.find<BadgeController>();
 
-  void clearBadge(int index) {
-    switch (index) {
-      case 0:
-        badgeController.calendarBadge.value = 0;
-        break;
-      case 1:
-        badgeController.roomsBadge.value = 0;
-        break;
-      case 2:
-        badgeController.reservationsBadge.value = 0;
-        break;
-      case 3:
-        badgeController.usersBadge.value = 0;
-        break;
-      case 4:
-        badgeController.settingsBadge.value = 0;
-        break;
-    }
-  }
+  // void clearBadge(int index) {
+  //   switch (index) {
+  //     case 0:
+  //       badgeController.calendarBadge.value = 0;
+  //       break;
+  //     case 1:
+  //       badgeController.roomsBadge.value = 0;
+  //       break;
+  //     case 2:
+  //       badgeController.reservationsBadge.value = 0;
+  //       break;
+  //     case 3:
+  //       badgeController.usersBadge.value = 0;
+  //       break;
+  //     case 4:
+  //       badgeController.settingsBadge.value = 0;
+  //       break;
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +137,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
     return GestureDetector(
       onTap: () {
         currentIndex.value = index;
-        clearBadge(index);
+        // clearBadge(index);
       },
       child: AnimatedContainer(
         duration: Duration(milliseconds: 300),

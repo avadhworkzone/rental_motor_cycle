@@ -9,6 +9,7 @@ import 'package:rental_motor_cycle/blocs/bikes/bike_crud_bloc/bike_event.dart';
 import 'package:rental_motor_cycle/blocs/bikes/bike_form_bloc/bike_form_event.dart';
 import 'package:rental_motor_cycle/blocs/bikes/bike_form_bloc/bike_form_state.dart';
 import 'package:rental_motor_cycle/blocs/book_bike/book_bike_home_bloc/book_bike_bloc.dart';
+import 'package:rental_motor_cycle/blocs/book_bike/book_bike_home_bloc/book_bike_event.dart';
 import 'package:rental_motor_cycle/blocs/book_bike/booking_form_bloc/booking_form_event.dart';
 import 'package:rental_motor_cycle/blocs/book_bike/booking_form_bloc/booking_form_state.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_snackbar.dart';
@@ -29,10 +30,10 @@ extension DateCompare on DateTime {
 
 class BooingFormBloc extends Bloc<BookingFormEvent, BookingFormState> {
   TextEditingController fromDateController = TextEditingController();
+  TextEditingController toDateController = TextEditingController();
   TextEditingController discountController = TextEditingController();
   TextEditingController taxController = TextEditingController();
   TextEditingController prePaymentController = TextEditingController();
-  TextEditingController toDateController = TextEditingController();
   final fullNameController = TextEditingController();
   final TextEditingController mileageController = TextEditingController();
   final TextEditingController rentController = TextEditingController();
@@ -40,18 +41,19 @@ class BooingFormBloc extends Bloc<BookingFormEvent, BookingFormState> {
   final TextEditingController depositController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
-  final Rxn<DateTime> fromDate = Rxn<DateTime>();
-  final Rxn<DateTime> toDate = Rxn<DateTime>();
-  final isValid = false.obs;
+  DateTime fromDate = DateTime.now();
+  DateTime toDate = DateTime.now();
+
+  bool isValid = false;
   List<BikeModel> selectedBikesList = [];
-  final RxDouble subtotal = 0.0.obs;
-  final RxDouble taxAmount = 0.0.obs;
-  final RxDouble grandTotal = 0.0.obs;
-  final RxDouble balance = 0.0.obs;
-  final RxDouble discount = 0.0.obs;
-  final RxDouble depositAmount = 0.0.obs;
-  final RxDouble tax = 0.0.obs;
-  final RxDouble prepayment = 0.0.obs;
+  double subtotal = 0.0;
+  double taxAmount = 0.0;
+  double grandTotal = 0.0;
+  double balance = 0.0;
+  double discount = 0.0;
+  double depositAmount = 0.0;
+  double tax = 0.0;
+  double prepayment = 0.0;
 
   String formatNum(num? value) {
     if (value == null) return '';
@@ -85,6 +87,8 @@ class BooingFormBloc extends Bloc<BookingFormEvent, BookingFormState> {
               toDateController: DateFormat(
                 'yyyy-MM-dd',
               ).format(booking.dropoffDate),
+              fromDate: booking.pickupDate,
+              toDate: booking.dropoffDate,
               balance: booking.balance,
               depositController: booking.securityDeposit,
               discount: booking.discount,
@@ -110,8 +114,9 @@ class BooingFormBloc extends Bloc<BookingFormEvent, BookingFormState> {
       discountController.text = formatDoubleOrInt(booking.discount);
       taxController.text = formatDoubleOrInt(booking.tax);
       prePaymentController.text = formatDoubleOrInt(booking.prepayment);
-      fromDate.value = booking.pickupDate;
-      toDate.value = booking.dropoffDate;
+      logs("---INSIDE IF booking.pickupDate----${booking.pickupDate}");
+      fromDate = booking.pickupDate;
+      toDate = booking.dropoffDate;
       final pickup = booking.pickupDate;
       fromDateController.text = DateFormat(
         'MMMM d, yyyy hh:mm a',
@@ -142,19 +147,123 @@ class BooingFormBloc extends Bloc<BookingFormEvent, BookingFormState> {
       );
     }
 
-    on<InitializeBookingForm>(_onInit);
+    on<InitializeBookingsForm>(_onInit);
     on<BookingFormValidateFields>((event, emit) {
+      logs("✅ VALIDATE fromDate: $fromDate");
+      logs("✅ VALIDATE toDate: $toDate");
       final isValid = _validateForm(); // A method you'll define below
       emit(state.copyWith(isValid: isValid));
     });
     on<CalculateBookingSummary>(_onCalculateSummary);
-    on<PickDateTimeEvent>((event, emit) async {});
+    // on<PickDateTimeEvent>((event, emit) async {});
     on<FromDateChanged>((event, emit) {
+      fromDate = event.fromDate;
+      logs("---On FromDateChanged event.fromDate----${event.fromDate}");
       emit(state.copyWith(fromDate: event.fromDate));
     });
 
     on<ToDateChanged>((event, emit) {
+      toDate = event.toDate;
       emit(state.copyWith(toDate: event.toDate));
+    });
+    on<BookingFormSubmitted>((event, emit) async {
+      emit(state.copyWith(isProcessing: true));
+
+      try {
+        final bike = event.bike;
+        final from = state.fromDate!;
+        final to = state.toDate!;
+        final duration = to.difference(from);
+
+        final pickupDate = DateTime(from.year, from.month, from.day);
+        final dropOffDate = DateTime(to.year, to.month, to.day);
+        final pickupTime = DateFormat('hh:mm a').format(from);
+        final dropOffTime = DateFormat('hh:mm a').format(to);
+
+        final booking = BookingModel(
+          id: event.existingBooking?.id,
+          userId: 1,
+          bikeId: bike.id ?? 0,
+          bikeName: bike.brandName ?? "",
+          bikeModel: bike.model ?? "",
+          userFullName: state.fullNameController,
+          userPhone: state.phoneController ?? "",
+          userEmail: state.emailController ?? "",
+          pickupDate: pickupDate,
+          dropoffDate: dropOffDate,
+          pickupTime: pickupTime,
+          dropoffTime: dropOffTime,
+          typeOfPayment: 'Cash',
+          rentPerDay: state.rentController ?? 0,
+          mileage: num.tryParse(state.mileageController ?? "") ?? 0,
+          extraPerKm: state.extraPerKmController ?? 0,
+          securityDeposit: state.depositController ?? 0,
+          subtotal: state.subtotal ?? 0,
+          balance: state.balance ?? 0,
+          durationInHours: duration.inHours.toDouble(),
+          totalRent: state.subtotal ?? 0,
+          finalAmountPayable: state.grandTotal ?? 0,
+          discount: state.discount ?? 0,
+          tax: double.tryParse(state.taxController ?? "") ?? 0,
+          prepayment: double.tryParse(state.prePaymentController ?? "") ?? 0,
+          bikes: [bike],
+          createdAt: DateTime.now(),
+        );
+
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final isPastOrToday =
+            (DateTime(
+                  pickupDate.year,
+                  pickupDate.month,
+                  pickupDate.day,
+                ).isBefore(today) ||
+                DateTime(
+                  pickupDate.year,
+                  pickupDate.month,
+                  pickupDate.day,
+                ).isAtSameMomentAs(today)) ||
+            (DateTime(
+                  dropOffDate.year,
+                  dropOffDate.month,
+                  dropOffDate.day,
+                ).isBefore(today) ||
+                DateTime(
+                  dropOffDate.year,
+                  dropOffDate.month,
+                  dropOffDate.day,
+                ).isAtSameMomentAs(today));
+        final bookBikeBloc = event.bookBikeBloc;
+
+        if (event.existingBooking == null) {
+          bookBikeBloc.add(AddBookingEvent(booking));
+        } else {
+          if (isPastOrToday) {
+            showCustomSnackBar(
+              message: StringUtils.youCannotUpdateCurrentBooking,
+              isError: true,
+            );
+            emit(state.copyWith(isProcessing: false));
+            return;
+          }
+          bookBikeBloc.add(UpdateBookingEvent(booking));
+        }
+
+        bookBikeBloc.add(FetchBookingsEvent());
+
+        emit(state.copyWith(isProcessing: false));
+        Get.back();
+        Get.back();
+        showCustomSnackBar(
+          message:
+              event.existingBooking == null
+                  ? StringUtils.bikeBookedSuccessfully
+                  : StringUtils.bookingUpdatedSuccessfully,
+        );
+      } catch (e) {
+        logs("Error in booking submission: $e");
+        emit(state.copyWith(isProcessing: false));
+      }
     });
 
     // on<BookingFormSubmitted>((event, emit) async {
@@ -211,8 +320,8 @@ class BooingFormBloc extends Bloc<BookingFormEvent, BookingFormState> {
     // });
   }
   bool _validateForm() {
-    final fromValid = fromDate.value != null;
-    final toValid = toDate.value != null;
+    final fromValid = fromDate != null;
+    final toValid = toDate != null;
     final fullNameValid = fullNameController.text.trim().isNotEmpty;
     final phoneValid = phoneController.text.trim().isNotEmpty;
     final extraPerKmValid = extraPerKmController.text.trim().isNotEmpty;
@@ -221,25 +330,29 @@ class BooingFormBloc extends Bloc<BookingFormEvent, BookingFormState> {
     final rentValid = rentController.text.trim().isNotEmpty;
     final emailValid = emailController.text.trim().isNotEmpty;
 
-    logs("📅 fromDate: ${fromDate.value} => ${fromValid ? '✅' : '❌'}");
-    logs("📅 toDate: ${toDate.value} => ${toValid ? '✅' : '❌'}");
-    logs(
-      "🧍 Full Name: '${fullNameController.text}' => ${fullNameValid ? '✅' : '❌'}",
-    );
-    logs("📞 Phone: '${phoneController.text}' => ${phoneValid ? '✅' : '❌'}");
-    logs(
-      "🛵 Extra per Km: '${extraPerKmController.text}' => ${extraPerKmValid ? '✅' : '❌'}",
-    );
-    logs(
-      "💰 Deposit: '${depositController.text}' => ${depositValid ? '✅' : '❌'}",
-    );
-    logs(
-      "📏 Mileage: '${mileageController.text}' => ${mileageValid ? '✅' : '❌'}",
-    );
-    logs("💸 Rent: '${rentController.text}' => ${rentValid ? '✅' : '❌'}");
-    logs("✉️ Email: '${emailController.text}' => ${emailValid ? '✅' : '❌'}");
-
-    return fromValid &&
+    // logs(
+    //   "📅 fromDateController: ${fromDateController.text} => ${fromValid ? '✅' : '❌'}",
+    // );
+    // logs(
+    //   "📅 toDateController: ${toDateController.text} => ${toValid ? '✅' : '❌'}",
+    // );
+    // logs(
+    //   "🧍 Full Name: '${fullNameController.text}' => ${fullNameValid ? '✅' : '❌'}",
+    // );
+    // logs("📞 Phone: '${phoneController.text}' => ${phoneValid ? '✅' : '❌'}");
+    // logs(
+    //   "🛵 Extra per Km: '${extraPerKmController.text}' => ${extraPerKmValid ? '✅' : '❌'}",
+    // );
+    // logs(
+    //   "💰 Deposit: '${depositController.text}' => ${depositValid ? '✅' : '❌'}",
+    // );
+    // logs(
+    //   "📏 Mileage: '${mileageController.text}' => ${mileageValid ? '✅' : '❌'}",
+    // );
+    // logs("💸 Rent: '${rentController.text}' => ${rentValid ? '✅' : '❌'}");
+    // logs("✉️ Email: '${emailController.text}' => ${emailValid ? '✅' : '❌'}");
+    isValid =
+        fromValid &&
         toValid &&
         fullNameValid &&
         phoneValid &&
@@ -248,49 +361,117 @@ class BooingFormBloc extends Bloc<BookingFormEvent, BookingFormState> {
         mileageValid &&
         rentValid &&
         emailValid;
+    return isValid;
   }
-
-  // bool _validateForm() {
-  //   return fromDate.value != null &&
-  //       toDate.value != null &&
-  //       fullNameController.text.trim().isNotEmpty &&
-  //       phoneController.text.trim().isNotEmpty &&
-  //       extraPerKmController.text.trim().isNotEmpty &&
-  //       depositController.text.trim().isNotEmpty &&
-  //       mileageController.text.trim().isNotEmpty &&
-  //       rentController.text.trim().isNotEmpty &&
-  //       emailController.text.trim().isNotEmpty;
-  // }
 
   void _onCalculateSummary(
     CalculateBookingSummary event,
     Emitter<BookingFormState> emit,
   ) {
-    DateTime? fromDateParsed, toDateParsed;
-    final fromText = fromDateController.text.trim();
-    final toText = toDateController.text.trim();
-    logs("---fromText----${fromText}");
-    logs("---toText----${toText}");
-    if (fromText.isEmpty || toText.isEmpty) {
-      logs("❌ Cannot calculate summary. From or To date is empty.");
+    logs("---ON calculate Summury---${fromDate}");
+    if (fromDate == null || toDate == null) {
+      logs("❌ Cannot calculate summary. From or To date is null.");
       return;
     }
-    try {
-      final format = DateFormat('MMMM d, yyyy hh:mm a');
-      logs("📅 From: ${fromDateController.text}");
-      logs("📅 To: ${toDateController.text}");
 
-      fromDateParsed = format.parse(fromText);
-      toDateParsed = format.parse(toText);
-    } catch (e) {
-      logs("❌ Error parsing date: $e");
+    final fromDateOnly = DateTime(fromDate.year, fromDate.month, fromDate.day);
+    final toDateOnly = DateTime(toDate.year, toDate.month, toDate.day);
+    final numberOfDays = toDateOnly.difference(fromDateOnly).inDays + 1;
+
+    double rentPerDay = double.tryParse(rentController.text) ?? 0;
+    double discountVal = double.tryParse(discountController.text) ?? 0;
+    double taxPercent = double.tryParse(taxController.text) ?? 0;
+    double prepayment = double.tryParse(prePaymentController.text) ?? 0;
+    double deposit = double.tryParse(depositController.text) ?? 0;
+
+    final rentWithoutDiscount = rentPerDay * numberOfDays;
+
+    // Discount > total guard
+    if (discountVal > rentWithoutDiscount) {
+      discountVal = rentWithoutDiscount;
+      discountController.text = discountVal.toStringAsFixed(0);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showCustomSnackBar(message: StringUtils.discountCantMoreThanTotal);
+      });
+    }
+
+    subtotal = rentWithoutDiscount;
+    discount = discountVal;
+    taxAmount = (subtotal - discount) * (taxPercent / 100);
+    grandTotal = subtotal + taxAmount - discount;
+
+    if (prepayment > grandTotal) {
+      prepayment = grandTotal;
+      prePaymentController.text = prepayment.toStringAsFixed(0);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showCustomSnackBar(
+          message: "Prepayment can't be more than total amount",
+        );
+      });
+    }
+
+    balance = grandTotal - prepayment;
+    tax = taxPercent;
+    this.prepayment = prepayment;
+    depositAmount = deposit;
+
+    emit(
+      state.copyWith(
+        rentController: rentPerDay,
+        subtotal: subtotal,
+        discount: discountVal,
+        taxController: taxPercent.toString(),
+        taxAmount: taxAmount,
+        grandTotal: grandTotal,
+        prePaymentController: prepayment.toString(),
+        balance: balance,
+        depositController: deposit,
+      ),
+    );
+  }
+
+  void _onInit(InitializeBookingsForm event, Emitter<BookingFormState> emit) {
+    final booking = event.booking;
+    if (booking != null) {
+      emit(
+        state.copyWith(
+          balance: booking.balance,
+          subtotal: booking.subtotal,
+          discount: booking.discount,
+          fromDate: booking.pickupDate,
+          toDate: booking.dropoffDate,
+          typeOfPayment: booking.typeOfPayment,
+          grandTotal: booking.finalAmountPayable,
+        ),
+      );
+    }
+  }
+
+  /*  void _onCalculateSummary(
+    CalculateBookingSummary event,
+    Emitter<BookingFormState> emit,
+  ) {
+    DateTime? fromDateParsed, toDateParsed;
+
+    // Get dates directly from the BLoC state, not the controller
+    fromDateParsed = fromDate;
+    toDateParsed = toDate;
+    // fromDateParsed = DateTime.parse(fromDateController.text);
+    // toDateParsed = DateTime.parse(toDateController.text);
+    logs("---fromDate----${fromDate}");
+    logs("---toDate----${toDate}");
+    logs("---fromDateController----${fromDateController.text}");
+    logs("---toDateController----${toDateController.text}");
+
+    if (fromDateParsed == null || toDateParsed == null) {
+      logs("❌ Cannot calculate summary. From or To date is null.");
       return;
     }
+
     logs("✅ Parsed From: $fromDateParsed");
     logs("✅ Parsed To: $toDateParsed");
-    // ✅ STORE these values in the bloc state
-    this.fromDate.value = fromDateParsed;
-    this.toDate.value = toDateParsed;
+
+    // If toDate is before fromDate, we can't calculate summary
     if (toDateParsed.isBefore(fromDateParsed)) {
       return;
     }
@@ -325,13 +506,13 @@ class BooingFormBloc extends Bloc<BookingFormEvent, BookingFormState> {
       });
     }
 
-    subtotal.value = rentWithoutDiscount;
-    discount.value = discountVal;
-    taxAmount.value = (subtotal.value - discount.value) * (taxPercent / 100);
-    grandTotal.value = subtotal.value + taxAmount.value - discount.value;
+    subtotal = rentWithoutDiscount;
+    discount = discountVal;
+    taxAmount = (subtotal - discount) * (taxPercent / 100);
+    grandTotal = subtotal + taxAmount - discount;
 
-    if (prepayment > grandTotal.value) {
-      prepayment = grandTotal.value;
+    if (prepayment > grandTotal) {
+      prepayment = grandTotal;
       prePaymentController.text = prepayment.toStringAsFixed(0);
       WidgetsBinding.instance.addPostFrameCallback((_) {
         showCustomSnackBar(
@@ -340,52 +521,46 @@ class BooingFormBloc extends Bloc<BookingFormEvent, BookingFormState> {
       });
     }
 
-    balance.value = grandTotal.value - prepayment;
-    tax.value = taxPercent;
-    this.prepayment.value = prepayment;
-    depositAmount.value = deposit;
-
+    balance = grandTotal - prepayment;
+    tax = taxPercent;
+    this.prepayment = prepayment;
+    depositAmount = deposit;
+    logs("--📅 Days Selected (based on date only): $numberOfDays");
+    logs("--💰 Rent Per Day: $rentPerDay");
+    logs("--🧮 Rent Without Discount: $rentWithoutDiscount");
+    logs("--🎁 Discount: $discountVal");
+    logs("--💸 Tax Percent: $taxPercent");
+    logs("--🪙 Prepayment: $prepayment");
+    logs("--🔐 Deposit: $deposit");
+    logs("--📊 Subtotal: ${subtotal}");
+    logs("--🧾 Tax Amount: ${taxAmount}");
+    logs("--💳 Grand Total: ${grandTotal}");
+    logs("--🧮 Balance: ${balance}");
     // If you want, emit new state values too:
     emit(
       state.copyWith(
-        fromDate: fromDateParsed,
-        toDate: toDateParsed,
         rentController: rentPerDay,
-        subtotal: subtotal.value,
+        subtotal: subtotal,
         discount: discountVal,
         taxController: taxPercent.toString(),
-        taxAmount: taxAmount.value,
-        grandTotal: grandTotal.value,
+        taxAmount: taxAmount,
+        grandTotal: grandTotal,
         prePaymentController: prepayment.toString(),
-        balance: balance.value,
+        balance: balance,
         depositController: deposit,
       ),
     );
-  }
+  }*/
 
-  void _onInit(InitializeBookingForm event, Emitter<BookingFormState> emit) {
-    final booking = event.booking;
-    if (booking != null) {
-      emit(
-        state.copyWith(
-          // taxController: booking.tax.toString(),
-          balance: booking.balance,
-          subtotal: booking.subtotal,
-          discount: booking.discount,
-          // fromDate: booking.pickupDate,
-          // toDate: booking.dropoffDate,
-          // depositController: booking.securityDeposit,
-          // emailController: booking.userEmail,
-          // extraPerKmController: booking.extraPerKm,
-          // fullNameController: booking.userFullName,
-          // phoneController: booking.userPhone,
-          // mileageController: booking.mileage.toString(),
-          // rentController: booking.rentPerDay,
-          typeOfPayment: booking.typeOfPayment,
-          // prePaymentController: booking.prepayment.toString(),
-          grandTotal: booking.finalAmountPayable,
-        ),
-      );
-    }
-  }
+  // bool _validateForm() {
+  //   return fromDate  != null &&
+  //       toDate  != null &&
+  //       fullNameController.text.trim().isNotEmpty &&
+  //       phoneController.text.trim().isNotEmpty &&
+  //       extraPerKmController.text.trim().isNotEmpty &&
+  //       depositController.text.trim().isNotEmpty &&
+  //       mileageController.text.trim().isNotEmpty &&
+  //       rentController.text.trim().isNotEmpty &&
+  //       emailController.text.trim().isNotEmpty;
+  // }
 }

@@ -16,13 +16,20 @@ class BikeBloc extends Bloc<BikeEvent, BikeState> {
     on<DeleteBikeEvent>(_onDelete);
   }
 
+  int bikeLength = 0;
+
   Future<void> _onFetch(FetchBikesEvent event, Emitter<BikeState> emit) async {
+    print("📥 FetchBikesEvent received");
     emit(BikeLoading());
     try {
       final bikes = await DBHelper.getBikes();
+      print("✅ Bikes fetched: ${bikes.length}");
+      bikeLength = bikes.length;
       final list = bikes.map((e) => BikeModel.fromMap(e)).toList();
+      print("---list---${list.length}");
       emit(BikeLoaded(list));
     } catch (e) {
+      print("❌ Failed to fetch bikes: $e");
       emit(BikeError('Failed to load bikes'));
     }
   }

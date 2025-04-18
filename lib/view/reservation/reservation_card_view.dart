@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:rental_motor_cycle/commonWidgets/custom_btn.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_snackbar.dart';
-import 'package:rental_motor_cycle/controller/bike_booking_controller.dart';
 import 'package:rental_motor_cycle/model/bike_model.dart';
 import 'package:rental_motor_cycle/model/booking_model.dart';
-import 'package:rental_motor_cycle/routs/app_page.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import 'package:rental_motor_cycle/view/book_bike/booking_details_screen.dart';
+import 'package:rental_motor_cycle/view/book_bike/select_date_time_for_booking_screen.dart';
+import '../../blocs/book_bike/book_bike_home_bloc/book_bike_bloc.dart';
+import '../../blocs/book_bike/book_bike_home_bloc/book_bike_event.dart';
 
 class ReservationCardView extends StatelessWidget {
   final bool canEditDelete;
@@ -38,7 +39,12 @@ class ReservationCardView extends StatelessWidget {
         (booking.subtotal - booking.discount) * (booking.tax / 100);
     return InkWell(
       onTap: () {
-        Get.to(() => BookingDetailsScreen(booking: booking));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BookingDetailsScreen(booking: booking),
+          ),
+        );
       },
       child: Card(
         margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
@@ -68,9 +74,18 @@ class ReservationCardView extends StatelessWidget {
                           IconButton(
                             icon: Icon(Icons.edit, color: ColorUtils.primary),
                             onPressed: () {
-                              Get.toNamed(
-                                AppRoutes.selectDateTimeForBookingScreen,
-                                arguments: {'bike': bike, 'booking': booking},
+                              logs("---bike---${bike.brandName}");
+                              logs("---booking---${booking.bikeName}");
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) =>
+                                          SelectDateTimeForBookingScreen(
+                                            booking: booking,
+                                            bike: bike,
+                                          ),
+                                ),
                               );
                             },
                             // onPressed:
@@ -80,9 +95,27 @@ class ReservationCardView extends StatelessWidget {
                             IconButton(
                               icon: Icon(Icons.delete, color: ColorUtils.red),
                               onPressed: () async {
-                                await _deleteReservation(booking.id!);
-                                await Get.find<BikeBookingController>()
-                                    .fetchBookings();
+                                await _deleteReservation(
+                                  context: context,
+                                  onConfirm: () async {
+                                    context.read<BookBikeBloc>().add(
+                                      DeleteBookingEvent(booking.id!),
+                                    );
+                                    Navigator.pop(context);
+
+                                    context.read<BookBikeBloc>().add(
+                                      FetchBookingsEvent(),
+                                    );
+                                    showCustomSnackBar(
+                                      message:
+                                          StringUtils
+                                              .bookingDeletedSuccessfully,
+                                    );
+                                  },
+                                );
+                                // context.read<BookBikeBloc>().add(
+                                //   FetchBookingsEvent(),
+                                // );
                               },
                             ),
                         ],
@@ -282,7 +315,10 @@ class ReservationCardView extends StatelessWidget {
     );
   }
 
-  Future<void> _deleteReservation(int reservationId) async {
+  Future<void> _deleteReservation({
+    required BuildContext context,
+    required VoidCallback onConfirm,
+  }) async {
     Get.defaultDialog(
       title: "",
       backgroundColor: Colors.white,
@@ -318,7 +354,7 @@ class ReservationCardView extends StatelessWidget {
                     vertical: 10.h,
                   ),
                 ),
-                onPressed: () => Get.back(),
+                onPressed: () => Navigator.pop(context),
                 child: CustomText(
                   StringUtils.no,
                   fontSize: 15.sp,
@@ -334,15 +370,23 @@ class ReservationCardView extends StatelessWidget {
                     vertical: 10.h,
                   ),
                 ),
-                onPressed: () async {
-                  await Get.find<BikeBookingController>().deleteBooking(
-                    reservationId,
-                  );
-                  Get.back();
-                  await Get.find<BikeBookingController>().fetchBookings();
-                  showCustomSnackBar(
-                    message: StringUtils.bookingDeletedSuccessfully,
-                  );
+                // onPressed: () async {
+                //   context.read<BookBikeBloc>().add(
+                //     DeleteBookingEvent(reservationId),
+                //   );
+                //   // await Get.find<BikeBookingController>().deleteBooking(
+                //   //   reservationId,
+                //   // );
+                //   Navigator.pop(context);
+                //   context.read<BookBikeBloc>().add(FetchBookingsEvent());
+                //   // await Get.find<BikeBookingController>().fetchBookings();
+                //   showCustomSnackBar(
+                //     message: StringUtils.bookingDeletedSuccessfully,
+                //   );
+                // },
+                onPressed: () {
+                  Navigator.pop(context); // Close dialog first
+                  Future.delayed(Duration.zero, onConfirm); // Run passed logic
                 },
                 child: CustomText(
                   StringUtils.yes,

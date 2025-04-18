@@ -6,7 +6,6 @@ import 'package:rental_motor_cycle/commonWidgets/custom_snackbar.dart';
 import 'package:rental_motor_cycle/routs/app_page.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
-import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/shared_preference_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import 'package:rental_motor_cycle/utils/download_db.dart';
@@ -14,8 +13,6 @@ import '../../controller/employee_controller.dart';
 import '../../controller/bike_controller.dart';
 import '../../controller/bike_booking_controller.dart';
 import '../../database/db_helper.dart';
-import '../../controller/badge_controller.dart';
-import '../auth/login_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   final isDarkMode = false.obs;
@@ -24,7 +21,9 @@ class SettingsScreen extends StatelessWidget {
   final EmployeeController employeeController = Get.find();
   final BikeController bikeController = Get.find();
   final BikeBookingController bikeBookingController = Get.find();
-  final BadgeController badgeController = Get.find();
+
+  SettingsScreen({super.key});
+  // final BadgeController badgeController = Get.find();
 
   /// Reset Specific Table or Entire Database
   void resetDatabase({String? table}) async {
@@ -64,11 +63,11 @@ class SettingsScreen extends StatelessWidget {
     });
 
     // ✅ Update badge counts **AFTER** database operations are complete
-    Future.delayed(Duration(milliseconds: 500), () {
-      if (Get.isRegistered<BadgeController>()) {
-        badgeController.updateBadgeCounts();
-      }
-    });
+    // Future.delayed(Duration(milliseconds: 500), () {
+    //   if (Get.isRegistered<BadgeController>()) {
+    //     badgeController.updateBadgeCounts();
+    //   }
+    // });
 
     isLoading.value = false; // ✅ Stop loading
     showCustomSnackBar(

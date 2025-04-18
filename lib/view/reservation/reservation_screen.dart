@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:rental_motor_cycle/controller/bike_booking_controller.dart';
@@ -11,6 +12,12 @@ import 'package:rental_motor_cycle/utils/iamge_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import 'package:rental_motor_cycle/view/reservation/reservation_card_view.dart';
 
+import '../../blocs/bikes/bike_crud_bloc/bike_bloc.dart';
+import '../../blocs/bikes/bike_crud_bloc/bike_event.dart';
+import '../../blocs/book_bike/book_bike_home_bloc/book_bike_bloc.dart';
+import '../../blocs/book_bike/book_bike_home_bloc/book_bike_event.dart';
+import '../../blocs/book_bike/book_bike_home_bloc/book_bike_state.dart';
+
 class ReservationScreen extends StatefulWidget {
   const ReservationScreen({super.key});
 
@@ -20,9 +27,9 @@ class ReservationScreen extends StatefulWidget {
 
 class _ReservationScreenState extends State<ReservationScreen>
     with SingleTickerProviderStateMixin {
-  final BikeBookingController bikeBookingController =
-      Get.find<BikeBookingController>();
-  final BikeController bikeController = Get.find<BikeController>();
+  // final BikeBookingController bikeBookingController =
+  //     Get.find<BikeBookingController>();
+  // final BikeController bikeController = Get.find<BikeController>();
 
   late TabController _tabController;
   String selectedFilter = StringUtils.thisWeek;
@@ -42,13 +49,15 @@ class _ReservationScreenState extends State<ReservationScreen>
   }
 
   initMethod() async {
-    await bikeBookingController.fetchBookings();
-    await bikeController.fetchBikes();
+    // await bikeBookingController.fetchBookings();
+    // await bikeController.fetchBikes();
+    context.read<BikeBloc>().add(FetchBikesEvent());
+    context.read<BookBikeBloc>().add(FetchBookingsEvent());
   }
 
   List<BookingModel> getFilteredReservations(String type) {
     final now = DateTime.now();
-    final all = bikeBookingController.bookingList;
+    final all = context.read<BookBikeBloc>().bookingList;
 
     List<BookingModel> list =
         all.where((r) {
@@ -141,62 +150,74 @@ class _ReservationScreenState extends State<ReservationScreen>
                 ],
               ),
             ),
-          Expanded(
-            child: Obx(() {
-              final filteredList = getFilteredReservations(currentTab);
+          BlocBuilder<BookBikeBloc, BookBikeState>(
+            builder: (context, state) {
+              if (state is BookBikeLoading) {
+                return Center(child: CircularProgressIndicator());
+              }
+              if (state is BookBikeLoaded) {
+                final bikes = state.bikes;
+                final bookings = state.bookings;
+                final filteredList = getFilteredReservations(currentTab);
 
-              if (filteredList.isEmpty) {
-                return Center(
-                  child: CustomText(
-                    StringUtils.noReservationsFound,
-                    fontWeight: FontWeight.w600,
+                if (filteredList.isEmpty) {
+                  return SizedBox(
+                    height: 600.h,
+                    child: Center(
+                      child: CustomText(
+                        StringUtils.noReservationsFound,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  );
+                }
+                return Expanded(
+                  child: ListView.builder(
+                    itemCount: filteredList.length,
+                    itemBuilder: (context, index) {
+                      final reservation = filteredList[index];
+                      // Match the bike by bikeId
+                      BikeModel? matchingBike;
+                      try {
+                        matchingBike = bikes.firstWhere(
+                          (bike) => bike.id == reservation.bikeId,
+                        );
+                      } catch (e) {
+                        matchingBike = null;
+                      }
+
+                      return ReservationCardView(
+                        booking: reservation,
+                        canEditDelete: currentTab != StringUtils.history,
+                        bike:
+                            matchingBike ??
+                            BikeModel(
+                              id: -1,
+                              brandName: "Unknown",
+                              model: "N/A",
+                              numberPlate: "N/A",
+                              location: "N/A",
+                              fuelType: "N/A",
+                              engineCC: 0,
+                              description: "Bike not found",
+                              imageUrl: "",
+                              userId: -1,
+                              createdAt: DateTime.now(),
+                              kmLimit: 0,
+                              makeYear: 0,
+                              transmission: "N/A",
+                              seater: 1,
+                              fuelIncluded: "N/A",
+                            ),
+
+                        isFromToday: false,
+                      );
+                    },
                   ),
                 );
               }
-
-              return ListView.builder(
-                itemCount: filteredList.length,
-                itemBuilder: (context, index) {
-                  final reservation = filteredList[index];
-                  // Match the bike by bikeId
-                  BikeModel? matchingBike;
-                  try {
-                    matchingBike = bikeController.bikeList.firstWhere(
-                      (bike) => bike.id == reservation.bikeId,
-                    );
-                  } catch (e) {
-                    matchingBike = null;
-                  }
-
-                  return ReservationCardView(
-                    booking: reservation,
-                    canEditDelete: currentTab != StringUtils.history,
-                    bike:
-                        matchingBike ??
-                        BikeModel(
-                          id: -1,
-                          brandName: "Unknown",
-                          model: "N/A",
-                          numberPlate: "N/A",
-                          location: "N/A",
-                          fuelType: "N/A",
-                          engineCC: 0,
-                          description: "Bike not found",
-                          imageUrl: "",
-                          userId: -1,
-                          createdAt: DateTime.now(),
-                          kmLimit: 0,
-                          makeYear: 0,
-                          transmission: "N/A",
-                          seater: 1,
-                          fuelIncluded: "N/A",
-                        ),
-
-                    isFromToday: false,
-                  );
-                },
-              );
-            }),
+              return SizedBox();
+            },
           ),
         ],
       ),

@@ -364,17 +364,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
 */
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:rental_motor_cycle/controller/bike_booking_controller.dart';
-import 'package:rental_motor_cycle/controller/bike_controller.dart';
+import 'package:rental_motor_cycle/blocs/book_bike/book_bike_home_bloc/book_bike_state.dart';
 import 'package:rental_motor_cycle/model/booking_model.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import 'package:rental_motor_cycle/view/book_bike/booking_details_screen.dart';
-import 'package:visibility_detector/visibility_detector.dart';
+import '../../blocs/bikes/bike_crud_bloc/bike_bloc.dart';
+import '../../blocs/bikes/bike_crud_bloc/bike_event.dart';
+import '../../blocs/book_bike/book_bike_home_bloc/book_bike_bloc.dart';
+import '../../blocs/book_bike/book_bike_home_bloc/book_bike_event.dart';
 
 const Duration paginationChunk = Duration(days: 180); // 6 months
 
@@ -386,8 +388,8 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
-  final BikeBookingController bikeBookingController = Get.find();
-  final BikeController bikeController = Get.find();
+  // final BikeBookingController bikeBookingController = Get.find();
+  // final BikeController bikeController = Get.find();
   // late Worker _reservationListener;
   bool isLoading = true;
   DateTime selectedMonth = DateTime.now();
@@ -411,17 +413,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   Future<void> initializeScreen() async {
     setState(() => isLoading = true);
-
-    await bikeController.fetchBikes();
-    await bikeBookingController.fetchBookings();
-
+    //
+    // await bikeController.fetchBikes();
+    // await bikeBookingController.fetchBookings();
+    context.read<BikeBloc>().add(FetchBikesEvent());
+    context.read<BookBikeBloc>().add(FetchBookingsEvent());
     await Future.delayed(Duration(milliseconds: 500), () {
       setCalenderDates(isFromInit: true);
     });
 
     final initialOffset = ((calenderDates.length ~/ 2) * cellWidth);
     bookingRowControllers = List.generate(
-      bikeController.bikeList.length,
+      context.read<BikeBloc>().bikeLength,
+      // bikeController.bikeList.length,
       (_) => ScrollController(initialScrollOffset: initialOffset),
     );
 
@@ -790,126 +794,163 @@ class _CalendarScreenState extends State<CalendarScreen> {
         ),
 
         /// Booking rows vertically stacked
-        Expanded(
-          child:
-              bikeController.bikeList.isEmpty
-                  ? Center(
-                    child: CustomText(
-                      StringUtils.noBikesAddedYet,
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  )
-                  : ListView.builder(
-                    itemCount: bikeController.bikeList.length,
-                    itemBuilder: (context, index) {
-                      final bike = bikeController.bikeList[index];
-                      final controller =
-                          (index < bookingRowControllers.length)
-                              ? bookingRowControllers[index]
-                              : ScrollController(); // fallback (optional)
-                      if (bookingRowControllers.length !=
-                          bikeController.bikeList.length) {
-                        return Center(child: CircularProgressIndicator());
-                      }
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Bike name (fixed)
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                              vertical: 10.h,
-                              horizontal: 5.w,
-                            ),
-                            child: CustomText(
-                              bike.brandName ?? '',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16.sp,
-                            ),
+        BlocBuilder<BookBikeBloc, BookBikeState>(
+          builder: (context, state) {
+            logs("---state---$state");
+            if (state is BookBikeLoading) {
+              return Center(child: CircularProgressIndicator());
+            }
+            if (state is BookBikeLoaded) {
+              final bikes = state.bikes;
+              final bookings = state.bookings;
+              logs("---bikes---${state.bikes}");
+              logs("---bookings---${state.bookings}");
+              if (bikes.isEmpty) {
+                return Center(
+                  child: CustomText(
+                    StringUtils.noBikesAddedYet,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                );
+              }
+              return Expanded(
+                child:
+                    bikes.isEmpty
+                        ? Center(
+                          child: CustomText(
+                            StringUtils.noBikesAddedYet,
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w600,
                           ),
+                        )
+                        : ListView.builder(
+                          itemCount: bikes.length,
+                          itemBuilder: (context, index) {
+                            final bike = bikes[index];
+                            final controller =
+                                (index < bookingRowControllers.length)
+                                    ? bookingRowControllers[index]
+                                    : ScrollController(); // fallback (optional)
+                            if (bookingRowControllers.length != bikes.length) {
+                              return Center(child: CircularProgressIndicator());
+                            }
 
-                          // Scrollable Booking Grid
-                          SingleChildScrollView(
-                            controller: controller,
-                            scrollDirection: Axis.horizontal,
-                            child: Stack(
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Grid Background Cells
-                                Row(
-                                  children: List.generate(
-                                    calenderDates.length,
-                                    (dateIndex) {
-                                      return Container(
-                                        width: 50.w,
-                                        height: 50.w,
-                                        margin: EdgeInsets.symmetric(
-                                          horizontal: 1.w,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: ColorUtils.greyDF,
-                                        ),
-                                      );
-                                    },
+                                // Bike name (fixed)
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 10.h,
+                                    horizontal: 5.w,
+                                  ),
+                                  child: CustomText(
+                                    bike.brandName ?? '',
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16.sp,
                                   ),
                                 ),
 
-                                /// Booking Bars for this bike
-                                ...bikeBookingController.bookingList
-                                    .where((booking) {
-                                      return booking.bikeName == bike.brandName;
-                                    })
-                                    .map((booking) {
-                                      final startIndex = calenderDates
-                                          .indexWhere(
-                                            (d) => isSameDay(
-                                              d,
-                                              booking.pickupDate,
-                                            ),
-                                          );
-                                      final endIndex = calenderDates.indexWhere(
-                                        (d) =>
-                                            isSameDay(d, booking.dropoffDate),
-                                      );
-                                      final duration =
-                                          endIndex - startIndex + 1;
-
-                                      if (startIndex == -1 || endIndex == -1) {
-                                        return SizedBox.shrink();
-                                      }
-
-                                      return Positioned(
-                                        left: (startIndex * cellWidth) + 1.w,
-                                        child: InkWell(
-                                          onTap: () {
-                                            Get.to(
-                                              () => BookingDetailsScreen(
-                                                booking: booking,
+                                // Scrollable Booking Grid
+                                SingleChildScrollView(
+                                  controller: controller,
+                                  scrollDirection: Axis.horizontal,
+                                  child: Stack(
+                                    children: [
+                                      // Grid Background Cells
+                                      Row(
+                                        children: List.generate(
+                                          calenderDates.length,
+                                          (dateIndex) {
+                                            return Container(
+                                              width: 50.w,
+                                              height: 50.w,
+                                              margin: EdgeInsets.symmetric(
+                                                horizontal: 1.w,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: ColorUtils.greyDF,
                                               ),
                                             );
                                           },
-                                          child: Container(
-                                            width: (duration * cellWidth) - 2.w,
-                                            height: 50.w,
-                                            alignment: Alignment.centerRight,
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 6.w,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: Color(0xFFFFC9A5),
-                                            ),
-                                            child: Center(
-                                              child: CustomText(
-                                                booking.userFullName,
-                                                fontSize: 12.sp,
-                                                fontWeight: FontWeight.w500,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                          ),
                                         ),
-                                      );
-                                      /*              return Positioned(
+                                      ),
+
+                                      /// Booking Bars for this bike
+                                      ...bookings
+                                          .where((booking) {
+                                            return booking.bikeName ==
+                                                bike.brandName;
+                                          })
+                                          .map((booking) {
+                                            final startIndex = calenderDates
+                                                .indexWhere(
+                                                  (d) => isSameDay(
+                                                    d,
+                                                    booking.pickupDate,
+                                                  ),
+                                                );
+                                            final endIndex = calenderDates
+                                                .indexWhere(
+                                                  (d) => isSameDay(
+                                                    d,
+                                                    booking.dropoffDate,
+                                                  ),
+                                                );
+                                            final duration =
+                                                endIndex - startIndex + 1;
+
+                                            if (startIndex == -1 ||
+                                                endIndex == -1) {
+                                              return SizedBox.shrink();
+                                            }
+
+                                            return Positioned(
+                                              left:
+                                                  (startIndex * cellWidth) +
+                                                  1.w,
+                                              child: InkWell(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder:
+                                                          (context) =>
+                                                              BookingDetailsScreen(
+                                                                booking:
+                                                                    booking,
+                                                              ),
+                                                    ),
+                                                  );
+                                                },
+                                                child: Container(
+                                                  width:
+                                                      (duration * cellWidth) -
+                                                      2.w,
+                                                  height: 50.w,
+                                                  alignment:
+                                                      Alignment.centerRight,
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: 6.w,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: Color(0xFFFFC9A5),
+                                                  ),
+                                                  child: Center(
+                                                    child: CustomText(
+                                                      booking.userFullName,
+                                                      fontSize: 12.sp,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                            /*              return Positioned(
                                         left: startIndex * cellWidth,
                                         child: ClipPath(
                                           clipper: ParallelogramClipper(),
@@ -932,14 +973,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                           ),
                                         ),
                                       );*/
-                                    }),
+                                          }),
+                                    ],
+                                  ),
+                                ),
                               ],
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
+                            );
+                          },
+                        ),
+              );
+            }
+            return SizedBox();
+          },
         ),
       ],
     );
@@ -1354,13 +1399,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   children: [
                     TextButton(
                       onPressed: () {
-                        Get.back();
+                        Navigator.pop(context);
                       },
                       child: Text("CANCEL"),
                     ),
                     TextButton(
                       onPressed: () {
-                        Get.back();
+                        Navigator.pop(context);
                         selectedMonth = chosenDateTime;
                         calenderCenterDate = chosenDateTime;
                         calenderDates.clear();

@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:rental_motor_cycle/controller/bike_booking_controller.dart';
-import 'package:rental_motor_cycle/controller/bike_controller.dart';
+import 'package:rental_motor_cycle/blocs/bikes/bike_crud_bloc/bike_bloc.dart';
+import 'package:rental_motor_cycle/blocs/bikes/bike_crud_bloc/bike_event.dart';
+import 'package:rental_motor_cycle/blocs/book_bike/book_bike_home_bloc/book_bike_bloc.dart';
+import 'package:rental_motor_cycle/blocs/book_bike/book_bike_home_bloc/book_bike_state.dart';
 import 'package:rental_motor_cycle/model/booking_model.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/iamge_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:rental_motor_cycle/view/book_bike/booking_details_screen.dart';
 import 'package:rental_motor_cycle/view/my_bike/dialogs/my_bike_dialogs.dart';
 import 'package:table_calendar/table_calendar.dart';
+import '../../blocs/book_bike/book_bike_home_bloc/book_bike_event.dart';
 
 class TodayScreen extends StatefulWidget {
   const TodayScreen({super.key});
@@ -23,9 +26,9 @@ class TodayScreen extends StatefulWidget {
 
 class _TodayScreenState extends State<TodayScreen>
     with SingleTickerProviderStateMixin {
-  final BikeBookingController bikeBookingController =
-      Get.find<BikeBookingController>();
-  final BikeController bikeController = Get.find<BikeController>();
+  // final BikeBookingController bikeBookingController =
+  //     Get.find<BikeBookingController>();
+  // final BikeController bikeController = Get.find<BikeController>();
   final tabLabels = [StringUtils.pickUp, StringUtils.drop];
   late TabController _tabController;
 
@@ -40,12 +43,14 @@ class _TodayScreenState extends State<TodayScreen>
     );
     _tabController = TabController(length: 2, vsync: this);
     initMethod();
-    bikeController.fetchBikes();
+    // bikeController.fetchBikes();
     super.initState();
   }
 
   initMethod() async {
-    await bikeBookingController.fetchBookings();
+    context.read<BikeBloc>().add(FetchBikesEvent());
+    context.read<BookBikeBloc>().add(FetchBookingsEvent());
+    // await bikeBookingController.fetchBookings();
   }
 
   @override
@@ -53,112 +58,122 @@ class _TodayScreenState extends State<TodayScreen>
     bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
     return SafeArea(
-      child: Obx(() {
-        return Scaffold(
-          backgroundColor:
-              bikeBookingController.bookingList.isEmpty
-                  ? ColorUtils.white
-                  : ColorUtils.greyF0,
-          floatingActionButton: SafeArea(
-            child: FloatingActionButton(
-              onPressed: () => showAddBikeBottomSheet(context),
-              child: Icon(Icons.add),
-            ),
-          ),
-          appBar: AppBar(
-            toolbarHeight: 100.h,
-            backgroundColor: ColorUtils.primary,
-            title: CustomText(
-              StringUtils.todayBooking,
-              fontSize: 22.sp,
-              color: ColorUtils.white,
-              fontWeight: FontWeight.bold,
-            ),
-            elevation: 0,
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(60),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
+      child: BlocBuilder<BookBikeBloc, BookBikeState>(
+        builder: (context, state) {
+          if (state is BookBikeLoading) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (state is BookBikeLoaded) {
+            final bikes = state.bikes;
+            final bookings = state.bookings;
+            final now = DateTime.now();
+            final checkInReservationList =
+                bookings.where((b) => isSameDay(b.pickupDate, now)).toList();
+            final checkOutReservationList =
+                bookings.where((b) => isSameDay(b.dropoffDate, now)).toList();
+
+            if (bookings.isEmpty) {
+              return Center(
+                child: CustomText(
+                  StringUtils.noBookedBikes,
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w600,
                 ),
-                color: ColorUtils.primary,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
+              );
+            }
+            return Scaffold(
+              backgroundColor:
+                  bookings.isEmpty ? ColorUtils.white : ColorUtils.greyF0,
+              floatingActionButton: SafeArea(
+                child: FloatingActionButton(
+                  onPressed: () => showAddBikeBottomSheet(context),
+                  child: Icon(Icons.add),
+                ),
+              ),
+              appBar: AppBar(
+                toolbarHeight: 100.h,
+                backgroundColor: ColorUtils.primary,
+                title: CustomText(
+                  StringUtils.todayBooking,
+                  fontSize: 22.sp,
+                  color: ColorUtils.white,
+                  fontWeight: FontWeight.bold,
+                ),
+                elevation: 0,
+                bottom: PreferredSize(
+                  preferredSize: const Size.fromHeight(60),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                    color: ColorUtils.primary,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: TabBar(
-                    controller: _tabController,
-                    indicator: BoxDecoration(
-                      color: ColorUtils.primary.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(25),
+                      child: TabBar(
+                        controller: _tabController,
+                        indicator: BoxDecoration(
+                          color: ColorUtils.primary.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        labelColor: ColorUtils.primary,
+                        unselectedLabelColor: Colors.black87,
+                        // indicatorColor:
+                        //     // isDarkTheme ? ColorUtils.white :
+                        //     ColorUtils.primary,
+                        // labelColor:
+                        //     // isDarkTheme ? ColorUtils.white :
+                        //     ColorUtils.primary,
+                        // unselectedLabelColor:
+                        //     // isDarkTheme ? ColorUtils.white :
+                        //     Colors.black,
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        labelStyle: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontFamily: FontUtils.cerebriSans,
+                          fontSize: 14.sp,
+                        ),
+                        dividerColor: Colors.transparent,
+                        tabs:
+                            tabLabels.map((label) => Tab(text: label)).toList(),
+                        onTap: (_) => setState(() {}),
+                      ),
                     ),
-                    labelColor: ColorUtils.primary,
-                    unselectedLabelColor: Colors.black87,
-                    // indicatorColor:
-                    //     // isDarkTheme ? ColorUtils.white :
-                    //     ColorUtils.primary,
-                    // labelColor:
-                    //     // isDarkTheme ? ColorUtils.white :
-                    //     ColorUtils.primary,
-                    // unselectedLabelColor:
-                    //     // isDarkTheme ? ColorUtils.white :
-                    //     Colors.black,
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    labelStyle: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontFamily: FontUtils.cerebriSans,
-                      fontSize: 14.sp,
-                    ),
-                    dividerColor: Colors.transparent,
-                    tabs: tabLabels.map((label) => Tab(text: label)).toList(),
-                    onTap: (_) => setState(() {}),
                   ),
                 ),
               ),
-            ),
-          ),
 
-          body: Obx(() {
-            if (bikeBookingController.bookingList.isEmpty) {
-              return const Center(child: CustomText(StringUtils.noBookedBikes));
-            }
-
-            final now = DateTime.now();
-            final checkInReservationList =
-                bikeBookingController.bookingList
-                    .where((b) => isSameDay(b.pickupDate, now))
-                    .toList();
-            final checkOutReservationList =
-                bikeBookingController.bookingList
-                    .where((b) => isSameDay(b.dropoffDate, now))
-                    .toList();
-
-            return TabBarView(
-              controller: _tabController,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                checkInReservationList.isEmpty
-                    ? const Center(child: CustomText(StringUtils.noPickUpToday))
-                    : BookingList(bookingList: checkInReservationList),
-                checkOutReservationList.isEmpty
-                    ? const Center(
-                      child: CustomText(StringUtils.noDropOffToday),
-                    )
-                    : BookingList(bookingList: checkOutReservationList),
-              ],
+              body: TabBarView(
+                controller: _tabController,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  checkInReservationList.isEmpty
+                      ? const Center(
+                        child: CustomText(StringUtils.noPickUpToday),
+                      )
+                      : BookingList(bookingList: checkInReservationList),
+                  checkOutReservationList.isEmpty
+                      ? const Center(
+                        child: CustomText(StringUtils.noDropOffToday),
+                      )
+                      : BookingList(bookingList: checkOutReservationList),
+                ],
+              ),
             );
-          }),
-        );
-      }),
+          }
+          return SizedBox();
+        },
+      ),
     );
   }
 }
@@ -247,7 +262,14 @@ class BookingList extends StatelessWidget {
 
                     return DataRow(
                       onSelectChanged: (_) {
-                        Get.to(() => BookingDetailsScreen(booking: booking));
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                    BookingDetailsScreen(booking: booking),
+                          ),
+                        );
                       },
                       color: WidgetStateProperty.all(
                         isEvenRow ? Colors.white : Colors.grey[100]!,
