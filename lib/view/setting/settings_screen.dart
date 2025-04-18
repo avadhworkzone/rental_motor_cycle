@@ -125,17 +125,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         // await txn.execute("DELETE FROM Users;");
         // await db.rawDelete('DELETE FROM Users');
         await employeeController.fetchUsers();
-      }
-      else if (table == "Bikes") {
-
+      } else if (table == "Bikes") {
         await db.execute("DELETE FROM Bikes;");
         await bikeController.fetchBikes();
       } else if (table == "Bookings") {
-
         await db.execute("DELETE FROM Bookings;");
         await bikeBookingController.fetchBookings();
       } else {
-
         await db.execute("DELETE FROM Bookings;");
         await db.execute("DELETE FROM Bikes;");
         await db.execute("DELETE FROM Users;");
@@ -146,16 +142,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
       await db.execute("PRAGMA foreign_keys = ON;");
       setState(() {
-        isLoading.value =false;
+        isLoading.value = false;
       });
-
     } catch (e) {
       showCustomSnackBar(
         message: "ERROR___${StringUtils.databaseResetFailed} ${e.toString()}",
         isError: true,
       );
       setState(() {
-        isLoading.value =false;
+        isLoading.value = false;
       });
     }
     // });
@@ -168,11 +163,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
 
     setState(() {
-      isLoading.value =false;
+      isLoading.value = false;
     });
     showCustomSnackBar(
       message:
-      "${table ?? StringUtils.allData} ${StringUtils.resetSuccessfully}",
+          "${table ?? StringUtils.allData} ${StringUtils.resetSuccessfully}",
       isError: true,
     );
   }
@@ -233,7 +228,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     fontSize: 15.sp,
                     fontWeight: FontWeight.w500,
                   ),
-                  onTap: () =>  showResetOptions(table: "Bikes")///resetDatabase(table: "Bikes"),
+                  onTap: () => showResetOptions(table: "Bikes"),
+
+                  ///resetDatabase(table: "Bikes"),
                 ),
                 ListTile(
                   leading: Icon(Icons.event, color: Colors.purple),
@@ -242,7 +239,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     fontSize: 15.sp,
                     fontWeight: FontWeight.w500,
                   ),
-                  onTap: () => showResetOptions(table: "Bookings"),///resetDatabase(table: "Bookings"),
+                  onTap: () => showResetOptions(table: "Bookings"),
+
+                  ///resetDatabase(table: "Bookings"),
                 ),
                 ListTile(
                   leading: Icon(
@@ -327,7 +326,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   /// ✅ Show Confirmation Dialog Before Reset
   void showResetOptions({String? table}) {
-
     final tableName = table ?? StringUtils.allData;
 
     Get.defaultDialog(
@@ -382,10 +380,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 onPressed: () async {
-
-                   Get.back();
+                  Get.back();
                   await resetDatabase(table: table);
-
                 },
                 child: CustomText(
                   StringUtils.yesReset,
