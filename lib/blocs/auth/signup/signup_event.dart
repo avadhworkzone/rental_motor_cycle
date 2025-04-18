@@ -11,3 +11,5 @@ class SignupSubmitted extends SignupEvent {
     required this.fullname,
   });
 }
+
+class FetchLoginUsers extends SignupEvent {}

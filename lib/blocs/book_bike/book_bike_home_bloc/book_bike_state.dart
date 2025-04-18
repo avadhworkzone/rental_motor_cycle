@@ -14,20 +14,10 @@ class BookBikeLoaded extends BookBikeState {
   BookBikeLoaded({required this.bikes, required this.bookings});
 }
 
-// class BookBikeLoaded extends BookBikeState {
-//   final List<BikeModel> bikes;
-//   BookBikeLoaded(this.bikes);
-// }
-
 class BookBikeError extends BookBikeState {
   final String message;
   BookBikeError(this.message);
 }
-
-// class BookingsLoaded extends BookBikeState {
-//   final List<BookingModel> bookings;
-//   BookingsLoaded(this.bookings);
-// }
 
 class BookingSuccess extends BookBikeState {
   final String message;

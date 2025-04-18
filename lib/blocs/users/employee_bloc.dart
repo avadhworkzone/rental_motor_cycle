@@ -12,13 +12,16 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
     on<DeleteUser>(_onDeleteUser);
   }
 
+  final userList = [];
+
   Future<void> _onFetchUsers(
     FetchUsers event,
     Emitter<EmployeeState> emit,
   ) async {
     emit(EmployeeLoading());
     final users = await DBHelper.getUsers();
-    final userList = users.map((e) => UserModel.fromMap(e)).toList();
+    var userList = users.map((e) => UserModel.fromMap(e)).toList();
+    userList = userList;
     emit(EmployeeLoaded(userList));
   }
 

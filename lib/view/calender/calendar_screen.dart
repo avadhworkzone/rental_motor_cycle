@@ -806,11 +806,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
               logs("---bikes---${state.bikes}");
               logs("---bookings---${state.bookings}");
               if (bikes.isEmpty) {
-                return Center(
-                  child: CustomText(
-                    StringUtils.noBikesAddedYet,
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w600,
+                return SizedBox(
+                  height: 550.h,
+                  child: Center(
+                    child: CustomText(
+                      StringUtils.noBikesAddedYet,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 );
               }

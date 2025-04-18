@@ -296,12 +296,6 @@ class BookingDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<BooingFormBloc, BookingFormState>(
       builder: (context, state) {
-        // if (bloc == null) {
-        //   return const Scaffold(
-        //     body: Center(child: CircularProgressIndicator()),
-        //   );
-        // }
-
         double taxAmount =
             (booking.subtotal - booking.discount) * (booking.tax / 100);
 

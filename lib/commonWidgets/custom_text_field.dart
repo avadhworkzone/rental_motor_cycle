@@ -93,9 +93,9 @@ class CommonTextField extends StatelessWidget {
         autofocus: autoFocus,
         obscureText: obscureValue ?? false,
         style: TextStyle(
-          color: isDarkTheme?ColorUtils.white:ColorUtils.black21,
+          color: isDarkTheme ? ColorUtils.white : ColorUtils.black21,
           fontSize: 16.sp,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w400,
           fontFamily: FontUtils.cerebriSans,
         ),
         keyboardType: keyBoardType ?? TextInputType.text,
@@ -125,7 +125,10 @@ class CommonTextField extends StatelessWidget {
             horizontal: 20.w,
             vertical: 14.h,
           ), // Enhanced padding
-          fillColor: isDarkTheme?ColorUtils.darkThemeBg:Colors.white, // Light background
+          fillColor:
+              isDarkTheme
+                  ? ColorUtils.darkThemeBg
+                  : Colors.white, // Light background
           filled: true, // Enables background fill
           labelText:
               (labelText?.isNotEmpty ?? false) ? labelText.toString().tr : "",
@@ -151,7 +154,10 @@ class CommonTextField extends StatelessWidget {
           // 🔥 When the text field is focused
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.r),
-            borderSide: BorderSide(color: isDarkTheme?ColorUtils.grey99:ColorUtils.primary, width: 2.0),
+            borderSide: BorderSide(
+              color: isDarkTheme ? ColorUtils.grey99 : ColorUtils.primary,
+              width: 2.0,
+            ),
           ),
 
           // ❌ When there is an error
@@ -166,12 +172,6 @@ class CommonTextField extends StatelessWidget {
             borderSide: BorderSide(color: ColorUtils.red, width: 2.0),
           ),
 
-          // // 🏆 Adds a subtle shadow for a modern look
-          // enabledBorder: OutlineInputBorder(
-          //   borderRadius: BorderRadius.circular(12.r),
-          //   borderSide: BorderSide(color: ColorUtils.grey99, width: 1.5),
-          // ),
-
           // 🚀 Shadow effect
           errorStyle: TextStyle(
             color: ColorUtils.red,
@@ -185,36 +185,6 @@ class CommonTextField extends StatelessWidget {
           prefixIcon: pIcon,
           suffix: suffix,
         ),
-
-        /*     decoration: InputDecoration(
-          contentPadding: EdgeInsets.zero,
-          fillColor: Colors.transparent,
-          counter: counter,
-          filled: true,
-          labelText:
-              (labelText?.isNotEmpty ?? false) ? labelText.toString().tr : "",
-          labelStyle: TextStyle(
-            color: ColorUtils.grey99,
-            fontSize: 16.sp,
-            fontWeight: FontWeight.w500,
-            fontFamily: FontUtils.cerebriSans,
-          ),
-          errorStyle: TextStyle(
-            color: ColorUtils.red,
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w500,
-            fontFamily: FontUtils.cerebriSans,
-          ),
-          errorText: hasError ? errorMessage : null,
-          suffixIcon: sIcon,
-          prefixIcon: pIcon,
-          suffix: suffix,
-          // hintText: showLabel! ? '' : hintText.toString().tr,
-          // hintStyle: TextStyle(
-          //     color: ColorUtils.grey,
-          //     fontSize: 17.sp,
-          //     fontFamily: FontUtils.cerebriSans),
-        ),*/
       ),
     );
   }

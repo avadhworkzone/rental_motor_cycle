@@ -36,11 +36,23 @@ class _SplashScreenState extends State<SplashScreen> {
         SharedPreferenceUtils.onBoarding,
         true,
       );
-      Get.offAllNamed(AppRoutes.onBoardingScreen);
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        AppRoutes.onBoardingScreen,
+        (route) => false,
+      );
     } else if (isLoggedIn) {
-      Get.offAllNamed(AppRoutes.bottomNavigationBarScreen);
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        AppRoutes.bottomNavigationBarScreen,
+        (route) => false,
+      );
     } else {
-      Get.offAllNamed(AppRoutes.loginScreen);
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        AppRoutes.loginScreen,
+        (route) => false,
+      );
     }
   }
 

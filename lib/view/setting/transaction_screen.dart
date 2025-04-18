@@ -254,15 +254,15 @@ class _TransactionScreenState extends State<TransactionScreen> {
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
 import 'package:rental_motor_cycle/blocs/report/report_bloc.dart';
 import 'package:rental_motor_cycle/blocs/report/report_event.dart';
 import 'package:rental_motor_cycle/blocs/report/report_state.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
-import 'package:rental_motor_cycle/controller/bike_booking_controller.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
+
+import '../../blocs/book_bike/book_bike_home_bloc/book_bike_bloc.dart';
 
 class TransactionScreen extends StatefulWidget {
   const TransactionScreen({super.key});
@@ -285,7 +285,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
     super.initState();
     filterController.text = selectedFilter;
 
-    final bookings = Get.find<BikeBookingController>().bookingList;
+    final bookings = context.read<BookBikeBloc>().bookingList;
     context.read<ReportBloc>().add(
       LoadReportData(bookings: bookings, selectedFilter: selectedFilter),
     );

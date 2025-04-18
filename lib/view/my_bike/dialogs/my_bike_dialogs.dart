@@ -10,13 +10,10 @@ import 'package:rental_motor_cycle/blocs/bikes/bike_form_bloc/bike_form_event.da
 import 'package:rental_motor_cycle/blocs/bikes/bike_form_bloc/bike_form_state.dart';
 import 'package:rental_motor_cycle/commonWidgets/common_dropdown.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_btn.dart';
-import 'package:rental_motor_cycle/commonWidgets/custom_snackbar.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_text_field.dart';
-import 'package:rental_motor_cycle/controller/bike_controller.dart';
 import 'package:rental_motor_cycle/model/bike_model.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
-import 'package:rental_motor_cycle/utils/shared_preference_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 
 void showAddBikeBottomSheet(BuildContext context, {BikeModel? bike}) {
@@ -742,25 +739,25 @@ Future<void> profileScreenDialogBox({
   );
 }
 
-void confirmDelete(int id) {
-  final BikeController bikeController = Get.find<BikeController>();
-  var isProcessing = false;
-  Get.defaultDialog(
-    title: StringUtils.deleteBike,
-    middleText: StringUtils.deleteConfirmation,
-    textConfirm: StringUtils.delete,
-    textCancel: StringUtils.cancel,
-    cancelTextColor: ColorUtils.black,
-    confirmTextColor: ColorUtils.black,
-    onConfirm: () async {
-      isProcessing = true;
-      // isProcessing.value = true;
-      await Future.delayed(Duration(milliseconds: 300));
-      await bikeController.deleteBike(id);
-      await bikeController.fetchBikes();
-      isProcessing = false;
-      // isProcessing.value = false;
-      Get.back();
-    },
-  );
-}
+// void confirmDelete(BuildContext context,int id) {
+//   // final BikeController bikeController = Get.find<BikeController>();
+//   var isProcessing = false;
+//   Get.defaultDialog(
+//     title: StringUtils.deleteBike,
+//     middleText: StringUtils.deleteConfirmation,
+//     textConfirm: StringUtils.delete,
+//     textCancel: StringUtils.cancel,
+//     cancelTextColor: ColorUtils.black,
+//     confirmTextColor: ColorUtils.black,
+//     onConfirm: () async {
+//       isProcessing = true;
+//       // isProcessing.value = true;
+//       await Future.delayed(Duration(milliseconds: 300));
+//       context.read<BikeBloc>().add(DeleteBikeEvent(id));
+//       context.read<BikeBloc>().add(FetchBikesEvent());
+//       isProcessing = false;
+//       // isProcessing.value = false;
+//       Get.back();
+//     },
+//   );
+// }

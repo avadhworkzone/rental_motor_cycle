@@ -125,7 +125,11 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                         logs(
                           "-IN Onboading BUTTON SET---onBoardingSeen: $hasSeenOnboarding, isLoggedIn: $isLoggedIn",
                         );
-                        Get.offAllNamed(AppRoutes.loginScreen);
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          AppRoutes.loginScreen,
+                          (route) => false,
+                        );
                       },
                       title: StringUtils.startRiding,
                     ),

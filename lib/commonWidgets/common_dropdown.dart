@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
 
+import '../utils/iamge_utils.dart';
+
 typedef OnChanged = void Function(String? value);
 
 class CommonDropdown extends StatelessWidget {
@@ -26,7 +28,7 @@ class CommonDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
+      padding: EdgeInsets.symmetric(vertical: 5.h),
       child: DropdownButtonFormField<String>(
         value: selectedValue,
         decoration: InputDecoration(
@@ -34,13 +36,14 @@ class CommonDropdown extends StatelessWidget {
             horizontal: 20.w,
             vertical: 14.h,
           ),
-          fillColor: isDarkTheme?ColorUtils.darkThemeBg:Colors.white,
+          fillColor: isDarkTheme ? ColorUtils.darkThemeBg : Colors.white,
           filled: true,
           labelText: labelText.tr,
           labelStyle: TextStyle(
             color: ColorUtils.grey99,
             fontSize: 16.sp,
             fontWeight: FontWeight.w500,
+            fontFamily: FontUtils.cerebriSans,
           ),
 
           // Default border

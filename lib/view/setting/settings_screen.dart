@@ -1,23 +1,23 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:rental_motor_cycle/blocs/users/employee_event.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_snackbar.dart';
 import 'package:rental_motor_cycle/routs/app_page.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
-import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/shared_preference_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
 import 'package:rental_motor_cycle/utils/download_db.dart';
+import '../../blocs/bikes/bike_crud_bloc/bike_bloc.dart';
+import '../../blocs/bikes/bike_crud_bloc/bike_event.dart';
+import '../../blocs/book_bike/book_bike_home_bloc/book_bike_bloc.dart';
+import '../../blocs/book_bike/book_bike_home_bloc/book_bike_event.dart';
+import '../../blocs/users/employee_bloc.dart';
 import '../../controller/employee_controller.dart';
-import '../../controller/bike_controller.dart';
-import '../../controller/bike_booking_controller.dart';
 import '../../database/db_helper.dart';
-import '../../controller/badge_controller.dart';
-import '../auth/login_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -29,13 +29,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   final isLoading = false.obs;
 
-  final EmployeeController employeeController = Get.find();
+  // final EmployeeController employeeController = Get.find();
 
-  final BikeController bikeController = Get.find();
+  // final BikeController bikeController = Get.find();
 
-  final BikeBookingController bikeBookingController = Get.find();
+  // final BikeBookingController bikeBookingController = Get.find();
 
-  final BadgeController badgeController = Get.find();
+  // final BadgeController badgeController = Get.find();
 
   /// Reset Specific Table or Entire Database
   //  resetDatabase({String? table}) async {
@@ -124,20 +124,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
         // await txn.execute("DELETE FROM Users;");
         // await db.rawDelete('DELETE FROM Users');
-        await employeeController.fetchUsers();
+
+        context.read<EmployeeBloc>().add(FetchUsers());
       } else if (table == "Bikes") {
         await db.execute("DELETE FROM Bikes;");
-        await bikeController.fetchBikes();
+        context.read<BikeBloc>().add(FetchBikesEvent());
       } else if (table == "Bookings") {
         await db.execute("DELETE FROM Bookings;");
-        await bikeBookingController.fetchBookings();
+        context.read<BookBikeBloc>().add(FetchBookingsEvent());
       } else {
         await db.execute("DELETE FROM Bookings;");
         await db.execute("DELETE FROM Bikes;");
         await db.execute("DELETE FROM Users;");
-        await employeeController.fetchUsers();
-        await bikeController.fetchBikes();
-        await bikeBookingController.fetchBookings();
+        context.read<EmployeeBloc>().add(FetchUsers());
+        context.read<BikeBloc>().add(FetchBikesEvent());
+        context.read<BookBikeBloc>().add(FetchBookingsEvent());
       }
 
       await db.execute("PRAGMA foreign_keys = ON;");
@@ -156,11 +157,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // });
 
     // ✅ Update badge counts **AFTER** database operations are complete
-    Future.delayed(Duration(milliseconds: 500), () {
-      if (Get.isRegistered<BadgeController>()) {
-        badgeController.updateBadgeCounts();
-      }
-    });
+    // Future.delayed(Duration(milliseconds: 500), () {
+    //   if (Get.isRegistered<BadgeController>()) {
+    //     badgeController.updateBadgeCounts();
+    //   }
+    // });
 
     setState(() {
       isLoading.value = false;
@@ -265,7 +266,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     fontWeight: FontWeight.w500,
                   ),
                   onTap: () async {
-                    Get.toNamed(AppRoutes.myBikesScreen);
+                    Navigator.pushNamed(context, AppRoutes.myBikesScreen);
                     // await DownloadDBFile.downloadDBFile();
                   },
                 ),
@@ -277,7 +278,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     fontWeight: FontWeight.w500,
                   ),
                   onTap: () async {
-                    Get.toNamed(AppRoutes.employeesScreen);
+                    Navigator.pushNamed(context, AppRoutes.employeesScreen);
+
                     // await DownloadDBFile.downloadDBFile();
                   },
                 ),
@@ -289,7 +291,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     fontWeight: FontWeight.w500,
                   ),
                   onTap: () async {
-                    Get.toNamed(AppRoutes.reportScreen);
+                    Navigator.pushNamed(context, AppRoutes.reportScreen);
                   },
                 ),
                 ListTile(
@@ -300,7 +302,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     fontWeight: FontWeight.w500,
                   ),
                   onTap: () async {
-                    Get.toNamed(AppRoutes.transactionScreen);
+                    Navigator.pushNamed(context, AppRoutes.transactionScreen);
                   },
                 ),
 
@@ -313,7 +315,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   onTap: () async {
                     await SharedPreferenceUtils.clearPreference();
-                    Get.offNamed(AppRoutes.loginScreen);
+                    Navigator.pushReplacementNamed(
+                      context,
+                      AppRoutes.loginScreen,
+                    );
                   },
                 ),
               ],

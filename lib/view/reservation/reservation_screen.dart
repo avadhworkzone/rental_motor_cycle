@@ -166,7 +166,7 @@ class _ReservationScreenState extends State<ReservationScreen>
                     child: Center(
                       child: CustomText(
                         StringUtils.noReservationsFound,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   );

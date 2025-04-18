@@ -64,7 +64,7 @@ class _TodayScreenState extends State<TodayScreen>
             return Center(child: CircularProgressIndicator());
           }
           if (state is BookBikeLoaded) {
-            final bikes = state.bikes;
+            // final bikes = state.bikes;
             final bookings = state.bookings;
             final now = DateTime.now();
             final checkInReservationList =
@@ -72,15 +72,15 @@ class _TodayScreenState extends State<TodayScreen>
             final checkOutReservationList =
                 bookings.where((b) => isSameDay(b.dropoffDate, now)).toList();
 
-            if (bookings.isEmpty) {
-              return Center(
-                child: CustomText(
-                  StringUtils.noBookedBikes,
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              );
-            }
+            // if (bookings.isEmpty) {
+            //   return Center(
+            //     child: CustomText(
+            //       StringUtils.noBookedBikes,
+            //       fontSize: 15.sp,
+            //       fontWeight: FontWeight.w600,
+            //     ),
+            //   );
+            // }
             return Scaffold(
               backgroundColor:
                   bookings.isEmpty ? ColorUtils.white : ColorUtils.greyF0,
@@ -159,12 +159,18 @@ class _TodayScreenState extends State<TodayScreen>
                 children: [
                   checkInReservationList.isEmpty
                       ? const Center(
-                        child: CustomText(StringUtils.noPickUpToday),
+                        child: CustomText(
+                          StringUtils.noPickUpToday,
+                          fontWeight: FontWeight.w500,
+                        ),
                       )
                       : BookingList(bookingList: checkInReservationList),
                   checkOutReservationList.isEmpty
                       ? const Center(
-                        child: CustomText(StringUtils.noDropOffToday),
+                        child: CustomText(
+                          StringUtils.noDropOffToday,
+                          fontWeight: FontWeight.w500,
+                        ),
                       )
                       : BookingList(bookingList: checkOutReservationList),
                 ],

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:rental_motor_cycle/controller/badge_controller.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
@@ -30,59 +29,11 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
     SettingsScreen(),
   ];
 
-  // final BadgeController badgeController = Get.find<BadgeController>();
-
-  // void clearBadge(int index) {
-  //   switch (index) {
-  //     case 0:
-  //       badgeController.calendarBadge.value = 0;
-  //       break;
-  //     case 1:
-  //       badgeController.roomsBadge.value = 0;
-  //       break;
-  //     case 2:
-  //       badgeController.reservationsBadge.value = 0;
-  //       break;
-  //     case 3:
-  //       badgeController.usersBadge.value = 0;
-  //       break;
-  //     case 4:
-  //       badgeController.settingsBadge.value = 0;
-  //       break;
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       extendBody: true,
-      // extendBody: false, // Removes floating bottom bar
-      // appBar: AppBar(
-      //   backgroundColor: ColorUtils.primary,
-      //   leading: Icon(
-      //     Icons.calendar_month,
-      //     size: 30.sp,
-      //     color: ColorUtils.white,
-      //   ),
-      //
-      //   // ✅ Replace with your logo
-      //   title: CustomText(
-      //     StringUtils.calendar,
-      //     color: ColorUtils.white,
-      //     fontWeight: FontWeight.bold,
-      //     fontSize: 22.sp,
-      //   ),
-      //   actions: [
-      //     IconButton(
-      //       icon: Icon(Icons.search, color: ColorUtils.white),
-      //       onPressed: () {
-      //         // Get.to(()=>SearchReservation());
-      //         //  showSearch(context: context, delegate: DataSearch());
-      //       },
-      //     ),
-      //   ],
-      // ),
       body: Obx(() => screens[currentIndex.value]),
       bottomNavigationBar: Obx(
         () => SafeArea(

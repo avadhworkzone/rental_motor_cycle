@@ -238,7 +238,12 @@ class _BookBikeScreenState extends State<BookBikeScreen> {
             return const Center(child: CircularProgressIndicator());
           } else if (state is BikeLoaded) {
             if (state.bikes.isEmpty) {
-              return Center(child: CustomText(StringUtils.noBookedBikes));
+              return Center(
+                child: CustomText(
+                  StringUtils.noBikesFound,
+                  fontWeight: FontWeight.w500,
+                ),
+              );
             }
             return ListView.builder(
               itemCount: state.bikes.length,
@@ -327,11 +332,6 @@ class _BookBikeScreenState extends State<BookBikeScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Navigator.pushNamed(
-                    //   context,
-                    //   AppRoutes.selectDateTimeForBookingScreen,
-                    //   arguments: {'bike': bike, 'booking': null},
-                    // );
                     Navigator.push(
                       context,
                       MaterialPageRoute(

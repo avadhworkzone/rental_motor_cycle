@@ -9,15 +9,10 @@ import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_btn.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_snackbar.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_text_field.dart';
-import 'package:rental_motor_cycle/controller/employee_controller.dart';
-import 'package:get/get.dart';
 import 'package:rental_motor_cycle/routs/app_page.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/iamge_utils.dart';
-import 'package:rental_motor_cycle/utils/shared_preference_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
-import 'package:rental_motor_cycle/view/bottom_navigation_bar_screen.dart';
-import 'package:rental_motor_cycle/view/auth/signup_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// without bloc login code
@@ -170,7 +165,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 //   }
 // }
 
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -186,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => LoginBloc(employeeController: Get.find<EmployeeController>()),
+      create: (_) => LoginBloc(context: context),
       child: Scaffold(
         appBar: commonAppBar(
           titleText: StringUtils.login,
@@ -203,7 +197,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   listener: (context, state) {
                     if (state is LoginSuccess) {
                       showCustomSnackBar(message: StringUtils.loginSuccessful);
-                      Get.offAllNamed(AppRoutes.bottomNavigationBarScreen);
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        AppRoutes.bottomNavigationBarScreen,
+                        (route) => false,
+                      );
                     } else if (state is LoginFailure) {
                       showCustomSnackBar(message: state.message);
                     }
@@ -212,39 +210,47 @@ class _LoginScreenState extends State<LoginScreen> {
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        LocalAssets(height: 200.h, imagePath: AssetUtils.splashLogo),
+                        LocalAssets(
+                          height: 200.h,
+                          imagePath: AssetUtils.splashLogo,
+                        ),
                         SizedBox(height: 50.h),
                         CommonTextField(
                           textEditController: usernameController,
                           labelText: StringUtils.userName,
-                          validator: (value) =>
-                          value!.isEmpty ? StringUtils.enterUserName : null,
+                          validator:
+                              (value) =>
+                                  value!.isEmpty
+                                      ? StringUtils.enterUserName
+                                      : null,
                         ),
                         SizedBox(height: 10.h),
                         CommonTextField(
                           textEditController: passwordController,
                           labelText: StringUtils.password,
                           obscureValue: true,
-                          validator: (value) => value!.length < 6
-                              ? StringUtils.passwordMustBeSixCharaters
-                              : null,
+                          validator:
+                              (value) =>
+                                  value!.length < 6
+                                      ? StringUtils.passwordMustBeSixCharaters
+                                      : null,
                         ),
                         SizedBox(height: 20.h),
                         state is LoginLoading
                             ? CircularProgressIndicator()
                             : CustomBtn(
-                          onTap: () {
-                            if (_formKey.currentState!.validate()) {
-                              BlocProvider.of<LoginBloc>(context).add(
-                                LoginButtonPressed(
-                                  username: usernameController.text.trim(),
-                                  password: passwordController.text.trim(),
-                                ),
-                              );
-                            }
-                          },
-                          title: StringUtils.login,
-                        ),
+                              onTap: () {
+                                if (_formKey.currentState!.validate()) {
+                                  BlocProvider.of<LoginBloc>(context).add(
+                                    LoginButtonPressed(
+                                      username: usernameController.text.trim(),
+                                      password: passwordController.text.trim(),
+                                    ),
+                                  );
+                                }
+                              },
+                              title: StringUtils.login,
+                            ),
                         SizedBox(height: 20.h),
                         RichText(
                           text: TextSpan(
@@ -263,10 +269,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                   fontWeight: FontWeight.bold,
                                   fontFamily: FontUtils.cerebriSans,
                                 ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    Get.offAllNamed(AppRoutes.signupScreen);
-                                  },
+                                recognizer:
+                                    TapGestureRecognizer()
+                                      ..onTap = () {
+                                        Navigator.pushNamedAndRemoveUntil(
+                                          context,
+                                          AppRoutes.signupScreen,
+                                          (route) => false,
+                                        );
+                                      },
                               ),
                             ],
                           ),
