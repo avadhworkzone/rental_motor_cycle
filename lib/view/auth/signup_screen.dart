@@ -152,6 +152,8 @@ class SignupScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+
     return BlocProvider(
       create: (_) => SignupBloc(context: context),
       child: BlocConsumer<SignupBloc, SignupState>(
@@ -161,7 +163,7 @@ class SignupScreen extends StatelessWidget {
             Navigator.pushNamedAndRemoveUntil(
               context,
               AppRoutes.loginScreen,
-                  (route) => false,
+              (route) => false,
             );
           } else if (state is SignupFailure) {
             showCustomSnackBar(message: state.error);
@@ -184,8 +186,12 @@ class SignupScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         LocalAssets(
-                          height: 200.h,
-                          imagePath: AssetUtils.splashLogo,
+                          height: 300.h,
+                          width: double.infinity,
+                          imagePath:
+                              isDarkTheme
+                                  ? AssetUtils.splashLogoDark
+                                  : AssetUtils.splashLogo,
                         ),
                         SizedBox(height: 50.h),
                         CommonTextField(
@@ -241,7 +247,10 @@ class SignupScreen extends StatelessWidget {
                             text: StringUtils.alreadyHaveAnAccount,
                             style: TextStyle(
                               fontSize: 14.sp,
-                              color: ColorUtils.black,
+                              color:
+                                  isDarkTheme
+                                      ? ColorUtils.white
+                                      : ColorUtils.black,
                               fontFamily: FontUtils.cerebriSans,
                             ),
                             children: [
@@ -259,7 +268,7 @@ class SignupScreen extends StatelessWidget {
                                         Navigator.pushNamedAndRemoveUntil(
                                           context,
                                           AppRoutes.loginScreen,
-                                              (route) => false,
+                                          (route) => false,
                                         );
                                       },
                               ),

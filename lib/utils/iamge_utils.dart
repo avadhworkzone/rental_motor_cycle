@@ -5,6 +5,7 @@ class FontUtils {
 class AssetUtils {
   static String imagePath = 'assets/images/';
   static String splashLogo = '${imagePath}splash_logo.jpg';
+  static String splashLogoDark = '${imagePath}splash_logo_dark.png';
 }
 
 class IconUtils {

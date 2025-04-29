@@ -221,6 +221,8 @@ class _BookBikeScreenState extends State<BookBikeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: commonAppBar(
         titleText: StringUtils.bookBike,
@@ -249,7 +251,7 @@ class _BookBikeScreenState extends State<BookBikeScreen> {
               itemCount: state.bikes.length,
               itemBuilder: (context, index) {
                 final bike = state.bikes[index];
-                return _buildBikeDetailsView(bike);
+                return _buildBikeDetailsView(bike, isDarkTheme);
               },
             );
           } else if (state is BikeError) {
@@ -262,11 +264,12 @@ class _BookBikeScreenState extends State<BookBikeScreen> {
     );
   }
 
-  Widget _buildBikeDetailsView(BikeModel bike) {
+  Widget _buildBikeDetailsView(BikeModel bike, bool isDarkTheme) {
     return Card(
       elevation: 4,
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+      color: isDarkTheme ? ColorUtils.darkThemeBg : Colors.white,
       child: Padding(
         padding: EdgeInsets.all(16.w),
         child: Column(
@@ -299,12 +302,17 @@ class _BookBikeScreenState extends State<BookBikeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _iconText(Icons.settings, bike.transmission ?? ""),
+                _iconText(Icons.settings, bike.transmission ?? "", isDarkTheme),
                 _iconText(
                   Icons.event_seat,
                   "${bike.seater} ${StringUtils.seater}",
+                  isDarkTheme,
                 ),
-                _iconText(Icons.local_gas_station, bike.fuelType ?? ""),
+                _iconText(
+                  Icons.local_gas_station,
+                  bike.fuelType ?? "",
+                  isDarkTheme,
+                ),
               ],
             ),
             Divider(height: 12.h, color: Colors.grey.shade300),
@@ -313,7 +321,7 @@ class _BookBikeScreenState extends State<BookBikeScreen> {
               "${StringUtils.availableAt} ${bike.location}",
               fontSize: 14.sp,
               fontWeight: FontWeight.w600,
-              color: Colors.black87,
+              color: isDarkTheme ? Colors.white : Colors.black87,
             ),
             SizedBox(height: 12.h),
             Row(
@@ -326,8 +334,9 @@ class _BookBikeScreenState extends State<BookBikeScreen> {
                     _textRow(
                       "${StringUtils.kmLimit}: ",
                       "${bike.kmLimit} ${StringUtils.km}",
+                      isDarkTheme,
                     ),
-                    _textRow("", bike.fuelIncluded ?? ""),
+                    _textRow("", bike.fuelIncluded ?? "", isDarkTheme),
                   ],
                 ),
                 ElevatedButton(
@@ -362,7 +371,11 @@ class _BookBikeScreenState extends State<BookBikeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _textRow("${StringUtils.makeYear}: ", bike.makeYear.toString()),
+                _textRow(
+                  "${StringUtils.makeYear}: ",
+                  bike.makeYear.toString(),
+                  isDarkTheme,
+                ),
               ],
             ),
           ],
@@ -371,17 +384,26 @@ class _BookBikeScreenState extends State<BookBikeScreen> {
     );
   }
 
-  Widget _iconText(IconData icon, String text) {
+  Widget _iconText(IconData icon, String text, bool isDarkTheme) {
     return Row(
       children: [
-        Icon(icon, size: 20.w, color: Colors.black54),
+        Icon(
+          icon,
+          size: 20.w,
+          color: isDarkTheme ? Colors.white : Colors.black54,
+        ),
         SizedBox(width: 4.w),
-        CustomText(text, fontSize: 12.sp, fontWeight: FontWeight.w500),
+        CustomText(
+          text,
+          fontSize: 12.sp,
+          fontWeight: FontWeight.w500,
+          color: isDarkTheme ? Colors.white : Colors.black87,
+        ),
       ],
     );
   }
 
-  Widget _textRow(String label, String value) {
+  Widget _textRow(String label, String value, bool isDarkTheme) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 2.h),
       child: Row(
@@ -390,13 +412,13 @@ class _BookBikeScreenState extends State<BookBikeScreen> {
             label,
             fontSize: 14.sp,
             fontWeight: FontWeight.w600,
-            color: Colors.black54,
+            color: isDarkTheme ? Colors.white : Colors.black54,
           ),
           CustomText(
             value,
             fontSize: 14.sp,
             fontWeight: FontWeight.w500,
-            color: Colors.black87,
+            color: isDarkTheme ? Colors.white : Colors.black87,
           ),
         ],
       ),

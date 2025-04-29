@@ -19,4 +19,10 @@ class ColorUtils {
   static const Color blueFE = Color(0xff4996FE);
   static const Color darkBlue35 = Color(0xff1A2E35);
   static const Color darkGrey8A = Color(0xff7C858A);
+
+  // 🔥 Add dark theme colors
+  static const Color darkGrey = Color(0xFF2C2C2E); // Dark background gray
+  static const Color darkText = Color(0xFFE5E5E5); // Light gray text
+  static const Color darkBackground = Color(0xFF1C1C1E); // Page background
+  static const Color darkCard = Color(0xFF2A2A2C); // Cards or containers
 }

@@ -329,7 +329,15 @@ class _TransactionScreenState extends State<TransactionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDarkTheme ? Color(0xFF1E1E1E) : Colors.white;
+    final cardColor = isDarkTheme ? Color(0xFF2C2C2C) : Colors.white;
+    final shadowColor = isDarkTheme ? Colors.black26 : Colors.black12;
+    final secondaryTextColor =
+        isDarkTheme ? Colors.grey[400] : Colors.grey[700];
+
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: commonAppBar(
         titleText: StringUtils.transactionReport,
         context: context,
@@ -350,11 +358,11 @@ class _TransactionScreenState extends State<TransactionScreen> {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: cardColor,
                   borderRadius: BorderRadius.circular(12.r),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black12,
+                      color: shadowColor,
                       blurRadius: 8,
                       offset: Offset(0, 2),
                     ),
@@ -368,7 +376,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w500,
                     ),
-                    const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                    Icon(Icons.arrow_drop_down, color: secondaryTextColor),
                   ],
                 ),
               ),
@@ -401,11 +409,11 @@ class _TransactionScreenState extends State<TransactionScreen> {
                               margin: const EdgeInsets.only(bottom: 12),
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: cardColor,
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black12,
+                                    color: shadowColor,
                                     blurRadius: 10,
                                     offset: Offset(0, 4),
                                   ),
@@ -464,7 +472,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
                                           SizedBox(height: 4.h),
                                           CustomText(
                                             item['date'],
-                                            color: Colors.grey,
+                                            color: secondaryTextColor,
                                           ),
                                         ],
                                       ),

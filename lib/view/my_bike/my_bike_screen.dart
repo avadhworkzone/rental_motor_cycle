@@ -196,6 +196,7 @@ class MyBikesScreen extends StatelessWidget {
       ),
 
       floatingActionButton: FloatingActionButton(
+        backgroundColor: ColorUtils.primary,
         onPressed: () => showAddBikeBottomSheet(context),
         child: Icon(Icons.add),
       ),
@@ -352,6 +353,7 @@ class MyBikesScreen extends StatelessWidget {
 
 void confirmDelete(BuildContext context, int id) {
   bool isProcessing = false;
+  bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
   // Get.defaultDialog(
   //   title: StringUtils.deleteBike,
@@ -411,7 +413,10 @@ void confirmDelete(BuildContext context, int id) {
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: CustomText(StringUtils.cancel),
+            child: CustomText(
+              StringUtils.cancel,
+              color: isDarkTheme ? ColorUtils.black21 : ColorUtils.black21,
+            ),
           ),
           SizedBox(width: 15.w),
           ElevatedButton(

@@ -13,9 +13,10 @@ class BikeDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bike = ModalRoute.of(context)!.settings.arguments as BikeModel;
+    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: ColorUtils.white,
+      backgroundColor: isDarkTheme ? Colors.black : ColorUtils.white,
       appBar: commonAppBar(
         titleText: bike.brandName ?? "",
         context: context,
@@ -96,11 +97,13 @@ class BikeDetailsScreen extends StatelessWidget {
                     StringUtils.model,
                     bike.model ?? "",
                     Icons.directions_bike,
+                    isDarkTheme,
                   ),
                   _detailCard(
                     StringUtils.vehicleNumber,
                     bike.numberPlate ?? "",
                     Icons.confirmation_number,
+                    isDarkTheme,
                   ),
                   // _detailCard(
                   //   StringUtils.rentPerDay,
@@ -111,26 +114,31 @@ class BikeDetailsScreen extends StatelessWidget {
                     StringUtils.location,
                     bike.location ?? "",
                     Icons.location_on,
+                    isDarkTheme,
                   ),
                   _detailCard(
                     StringUtils.fuelType,
                     bike.fuelType ?? "",
                     Icons.local_gas_station,
+                    isDarkTheme,
                   ),
                   _detailCard(
                     StringUtils.mileage,
                     "${bike.mileage ?? 0} km/l",
                     Icons.speed,
+                    isDarkTheme,
                   ),
                   _detailCard(
                     StringUtils.engineCC,
                     "${bike.engineCC} CC",
                     Icons.engineering,
+                    isDarkTheme,
                   ),
                   _detailCard(
                     StringUtils.description,
                     bike.description ?? "",
                     Icons.description,
+                    isDarkTheme,
                   ),
                   SizedBox(height: 25.h),
                 ],
@@ -143,12 +151,18 @@ class BikeDetailsScreen extends StatelessWidget {
   }
 
   /// Detail Card Widget
-  Widget _detailCard(String title, String value, IconData icon) {
+  Widget _detailCard(
+    String title,
+    String value,
+    IconData icon,
+    bool isDarkTheme,
+  ) {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkTheme ? Colors.grey.shade900 : Colors.white,
+
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
@@ -167,13 +181,13 @@ class BikeDetailsScreen extends StatelessWidget {
                   title,
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
-                  color: ColorUtils.black21,
+                  color: isDarkTheme ? ColorUtils.white : ColorUtils.black21,
                 ),
                 SizedBox(height: 4.h),
                 CustomText(
                   value,
                   fontSize: 14.sp,
-                  color: Colors.black87,
+                  color: isDarkTheme ? ColorUtils.white : Colors.black87,
                   fontWeight: FontWeight.w500,
                 ),
               ],

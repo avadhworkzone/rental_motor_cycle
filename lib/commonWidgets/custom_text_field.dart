@@ -154,10 +154,7 @@ class CommonTextField extends StatelessWidget {
           // 🔥 When the text field is focused
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.r),
-            borderSide: BorderSide(
-              color: isDarkTheme ? ColorUtils.grey99 : ColorUtils.primary,
-              width: 2.0,
-            ),
+            borderSide: BorderSide(color: ColorUtils.primary, width: 2.0),
           ),
 
           // ❌ When there is an error

@@ -23,11 +23,15 @@ Future<void> main() async {
     DeviceOrientation.portraitDown,
   ]);
   await GetStorage.init();
-  runApp(const MyApp());
+  final storage = GetStorage();
+  final isDarkMode = storage.read('isDarkMode') ?? false;
+  runApp(MyApp(isDarkMode: isDarkMode));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isDarkMode;
+
+  const MyApp({super.key, required this.isDarkMode});
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +64,8 @@ class MyApp extends StatelessWidget {
           ],
           child: GetMaterialApp(
             debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme, // Light theme
+            theme: isDarkMode ? ThemeData.dark() : ThemeData.light(),
+            // theme: AppTheme.lightTheme,
             // darkTheme: AppTheme.darkTheme, // Dark theme
             // themeMode: ThemeMode.system,
             routes: AppPages.routes,

@@ -294,6 +294,8 @@ class BookingDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+
     return BlocBuilder<BooingFormBloc, BookingFormState>(
       builder: (context, state) {
         double taxAmount =
@@ -320,14 +322,20 @@ class BookingDetailsScreen extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                   SizedBox(height: 6.h),
-                  _buildInfoRow(Icons.person, booking.userFullName ?? ""),
+                  _buildInfoRow(
+                    Icons.person,
+                    booking.userFullName ?? "",
+                    isDarkTheme,
+                  ),
                   _buildInfoRow(
                     Icons.phone,
                     "${StringUtils.phone}: ${booking.userPhone}",
+                    isDarkTheme,
                   ),
                   _buildInfoRow(
                     Icons.email,
                     "${StringUtils.email}: ${booking.userEmail}",
+                    isDarkTheme,
                   ),
 
                   SizedBox(height: 30.h),
@@ -340,14 +348,17 @@ class BookingDetailsScreen extends StatelessWidget {
                   _buildInfoRow(
                     Icons.motorcycle,
                     "${StringUtils.bike}: ${booking.bikeName} (${booking.bikeModel})",
+                    isDarkTheme,
                   ),
                   _buildInfoRow(
                     Icons.calendar_today,
                     "${StringUtils.pickUp}: ${DateFormat('dd-MM-yyyy').format(booking.pickupDate)}",
+                    isDarkTheme,
                   ),
                   _buildInfoRow(
                     Icons.calendar_today_outlined,
                     "${StringUtils.drop}: ${DateFormat('dd-MM-yyyy').format(booking.dropoffDate)}",
+                    isDarkTheme,
                   ),
                   SizedBox(height: 10.h),
 
@@ -356,7 +367,8 @@ class BookingDetailsScreen extends StatelessWidget {
                     padding: EdgeInsets.all(16.w),
                     margin: EdgeInsets.only(top: 24.h),
                     decoration: BoxDecoration(
-                      color: ColorUtils.white,
+                      color:
+                          isDarkTheme ? ColorUtils.darkCard : ColorUtils.white,
                       borderRadius: BorderRadius.circular(16.r),
                       boxShadow: [
                         BoxShadow(
@@ -387,7 +399,7 @@ class BookingDetailsScreen extends StatelessWidget {
                           "Cash",
                         ),
                         SizedBox(height: 12.h),
-                        _sectionHeader(StringUtils.costBreakdown),
+                        _sectionHeader(StringUtils.costBreakdown, isDarkTheme),
                         _buildInfoRowForPayment(
                           "${StringUtils.subtotal}:",
                           "\$${booking.subtotal.toStringAsFixed(2)}",
@@ -406,14 +418,14 @@ class BookingDetailsScreen extends StatelessWidget {
                         ),
 
                         SizedBox(height: 12.h),
-                        _sectionHeader(StringUtils.advancePayment),
+                        _sectionHeader(StringUtils.advancePayment, isDarkTheme),
                         _buildInfoRowForPayment(
                           "${StringUtils.prepaid}:",
                           "-\$${booking.prepayment.toStringAsFixed(2)}",
                         ),
 
                         SizedBox(height: 12.h),
-                        _sectionHeader(StringUtils.finalAmount),
+                        _sectionHeader(StringUtils.finalAmount, isDarkTheme),
                         _buildInfoRowForPayment(
                           "${StringUtils.balance}:",
                           "\$${booking.balance.toStringAsFixed(2)}",
@@ -433,7 +445,10 @@ class BookingDetailsScreen extends StatelessWidget {
                           "${StringUtils.totalToCollectNow}: \$${(booking.balance + booking.securityDeposit).toStringAsFixed(2)}",
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color:
+                              isDarkTheme
+                                  ? ColorUtils.darkText
+                                  : Colors.black87,
                         ),
                       ],
                     ),
@@ -446,7 +461,10 @@ class BookingDetailsScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(30.r),
                         border: Border.all(
-                          color: ColorUtils.grey99,
+                          color:
+                              isDarkTheme
+                                  ? ColorUtils.darkGrey
+                                  : ColorUtils.grey99,
                           width: 1.w,
                         ),
                       ),
@@ -474,23 +492,30 @@ class BookingDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _sectionHeader(String title) {
+  Widget _sectionHeader(String title, bool isDarkTheme) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 4.h),
       child: CustomText(
         title,
         fontWeight: FontWeight.w600,
-        color: Colors.grey.shade600,
+        color:
+            isDarkTheme
+                ? ColorUtils.darkText.withOpacity(0.7)
+                : Colors.grey.shade600,
       ),
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String text) {
+  Widget _buildInfoRow(IconData icon, String text, bool isDarkTheme) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 4.h),
       child: Row(
         children: [
-          Icon(icon, size: 20.sp, color: ColorUtils.grey99),
+          Icon(
+            icon,
+            size: 20.sp,
+            color: isDarkTheme ? ColorUtils.darkText : ColorUtils.grey99,
+          ),
           SizedBox(width: 8.w),
           Expanded(child: CustomText(text, fontSize: 16.sp)),
         ],

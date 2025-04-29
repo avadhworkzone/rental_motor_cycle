@@ -97,7 +97,7 @@ class ReservationCardView extends StatelessWidget {
                               onPressed: () async {
                                 await _deleteReservation(
                                   context: context,
-                                  onConfirm: () async {
+                                  onPressed: () {
                                     context.read<BookBikeBloc>().add(
                                       DeleteBookingEvent(booking.id!),
                                     );
@@ -111,6 +111,10 @@ class ReservationCardView extends StatelessWidget {
                                           StringUtils
                                               .bookingDeletedSuccessfully,
                                     );
+                                    // Future.delayed(
+                                    //   Duration.zero,
+                                    //   onConfirm,
+                                    // ); // Trigger callback
                                   },
                                 );
                                 // context.read<BookBikeBloc>().add(
@@ -317,88 +321,172 @@ class ReservationCardView extends StatelessWidget {
 
   Future<void> _deleteReservation({
     required BuildContext context,
-    required VoidCallback onConfirm,
+    required void Function() onPressed,
   }) async {
-    Get.defaultDialog(
-      title: "",
-      backgroundColor: Colors.white,
-      contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.warning_amber_rounded, size: 48.sp, color: Colors.red),
-          SizedBox(height: 12.h),
-          CustomText(
-            StringUtils.deleteReservationTitle,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w700,
-            color: Colors.black,
+    final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: isDarkTheme ? Colors.grey[850] : Colors.white,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 20.w,
+            vertical: 20.h,
           ),
-          SizedBox(height: 12.h),
-          CustomText(
-            StringUtils.deleteReservationMessage,
-            textAlign: TextAlign.center,
-            fontSize: 15.sp,
-            color: Colors.black87,
-          ),
-          SizedBox(height: 20.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  backgroundColor: Colors.grey[300],
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 24.w,
-                    vertical: 10.h,
-                  ),
-                ),
-                onPressed: () => Navigator.pop(context),
-                child: CustomText(
-                  StringUtils.no,
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w700,
-                ),
+              Icon(Icons.warning_amber_rounded, size: 48.sp, color: Colors.red),
+              SizedBox(height: 12.h),
+              CustomText(
+                StringUtils.deleteReservationTitle,
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w700,
+                color: isDarkTheme ? Colors.white : Colors.black,
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.red,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 24.w,
-                    vertical: 10.h,
+              SizedBox(height: 12.h),
+              CustomText(
+                StringUtils.deleteReservationMessage,
+                textAlign: TextAlign.center,
+                fontSize: 15.sp,
+                color: isDarkTheme ? Colors.white70 : Colors.black87,
+              ),
+              SizedBox(height: 20.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor:
+                          isDarkTheme ? Colors.white : Colors.black,
+                      backgroundColor:
+                          isDarkTheme ? Colors.grey[700] : Colors.grey[300],
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 24.w,
+                        vertical: 10.h,
+                      ),
+                    ),
+                    onPressed: () => Navigator.pop(dialogContext),
+                    child: CustomText(
+                      StringUtils.no,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w700,
+                      color: isDarkTheme ? Colors.white : Colors.black,
+                    ),
                   ),
-                ),
-                // onPressed: () async {
-                //   context.read<BookBikeBloc>().add(
-                //     DeleteBookingEvent(reservationId),
-                //   );
-                //   // await Get.find<BikeBookingController>().deleteBooking(
-                //   //   reservationId,
-                //   // );
-                //   Navigator.pop(context);
-                //   context.read<BookBikeBloc>().add(FetchBookingsEvent());
-                //   // await Get.find<BikeBookingController>().fetchBookings();
-                //   showCustomSnackBar(
-                //     message: StringUtils.bookingDeletedSuccessfully,
-                //   );
-                // },
-                onPressed: () {
-                  Navigator.pop(context); // Close dialog first
-                  Future.delayed(Duration.zero, onConfirm); // Run passed logic
-                },
-                child: CustomText(
-                  StringUtils.yes,
-                  color: ColorUtils.white,
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w700,
-                ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.red,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 24.w,
+                        vertical: 10.h,
+                      ),
+                    ),
+                    onPressed: onPressed,
+                    child: CustomText(
+                      StringUtils.yes,
+                      color: ColorUtils.white,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
+
+  //
+  // Future<void> _deleteReservation({
+  //   required BuildContext context,
+  //   required VoidCallback onConfirm,
+  // }) async {
+  //   Get.defaultDialog(
+  //     title: "",
+  //     backgroundColor: Colors.white,
+  //     contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+  //     content: Column(
+  //       mainAxisSize: MainAxisSize.min,
+  //       children: [
+  //         Icon(Icons.warning_amber_rounded, size: 48.sp, color: Colors.red),
+  //         SizedBox(height: 12.h),
+  //         CustomText(
+  //           StringUtils.deleteReservationTitle,
+  //           fontSize: 18.sp,
+  //           fontWeight: FontWeight.w700,
+  //           color: Colors.black,
+  //         ),
+  //         SizedBox(height: 12.h),
+  //         CustomText(
+  //           StringUtils.deleteReservationMessage,
+  //           textAlign: TextAlign.center,
+  //           fontSize: 15.sp,
+  //           color: Colors.black87,
+  //         ),
+  //         SizedBox(height: 20.h),
+  //         Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //           children: [
+  //             ElevatedButton(
+  //               style: ElevatedButton.styleFrom(
+  //                 foregroundColor: Colors.black,
+  //                 backgroundColor: Colors.grey[300],
+  //                 padding: EdgeInsets.symmetric(
+  //                   horizontal: 24.w,
+  //                   vertical: 10.h,
+  //                 ),
+  //               ),
+  //               onPressed: () => Navigator.pop(context),
+  //               child: CustomText(
+  //                 StringUtils.no,
+  //                 fontSize: 15.sp,
+  //                 fontWeight: FontWeight.w700,
+  //               ),
+  //             ),
+  //             ElevatedButton(
+  //               style: ElevatedButton.styleFrom(
+  //                 foregroundColor: Colors.white,
+  //                 backgroundColor: Colors.red,
+  //                 padding: EdgeInsets.symmetric(
+  //                   horizontal: 24.w,
+  //                   vertical: 10.h,
+  //                 ),
+  //               ),
+  //               // onPressed: () async {
+  //               //   context.read<BookBikeBloc>().add(
+  //               //     DeleteBookingEvent(reservationId),
+  //               //   );
+  //               //   // await Get.find<BikeBookingController>().deleteBooking(
+  //               //   //   reservationId,
+  //               //   // );
+  //               //   Navigator.pop(context);
+  //               //   context.read<BookBikeBloc>().add(FetchBookingsEvent());
+  //               //   // await Get.find<BikeBookingController>().fetchBookings();
+  //               //   showCustomSnackBar(
+  //               //     message: StringUtils.bookingDeletedSuccessfully,
+  //               //   );
+  //               // },
+  //               onPressed: () {
+  //                 Navigator.pop(context); // Close dialog first
+  //                 Future.delayed(Duration.zero, onConfirm); // Run passed logic
+  //               },
+  //               child: CustomText(
+  //                 StringUtils.yes,
+  //                 color: ColorUtils.white,
+  //                 fontSize: 15.sp,
+  //                 fontWeight: FontWeight.w700,
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }

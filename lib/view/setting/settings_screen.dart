@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:rental_motor_cycle/blocs/users/employee_event.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_appbar.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_snackbar.dart';
@@ -27,7 +29,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool isDarkMode = false;
   bool isLoading = false;
-
+  final storage = GetStorage();
   resetDatabase({String? table}) async {
     if (isLoading) return;
     setState(() {
@@ -94,6 +96,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = storage.read('isDarkMode') ?? false;
+
     return Scaffold(
       appBar: commonAppBar(
         titleText: StringUtils.settings,
@@ -110,15 +114,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ? Center(child: CircularProgressIndicator())
               : Column(
                 children: [
-                  // SwitchListTile(
-                  //   title: CustomText(StringUtils.darkMode),
-                  //   value: isDarkMode,
-                  //   onChanged: (value) {
-                  //     isDarkMode = value;
-                  //     setState(() {});
-                  //     // Get.changeTheme(value ? ThemeData.dark() : ThemeData.light());
-                  //   },
-                  // ),
+                  SwitchListTile(
+                    title: CustomText(StringUtils.darkMode),
+                    value: isDarkMode,
+                    onChanged: (value) {
+                      isDarkMode = value;
+                      storage.write('isDarkMode', value);
+                      setState(() {});
+                      Get.changeTheme(
+                        value ? ThemeData.dark() : ThemeData.light(),
+                      );
+                    },
+                  ),
                   ListTile(
                     leading: Icon(Icons.delete, color: Colors.red),
                     title: CustomText(
@@ -165,20 +172,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           table: "Bookings",
                         ),
                   ),
-                  ListTile(
-                    leading: Icon(
-                      Icons.insert_drive_file_outlined,
-                      color: Colors.blue,
-                    ),
-                    title: CustomText(
-                      StringUtils.downloadDb,
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    onTap: () async {
-                      await DownloadDBFile.downloadDBFile();
-                    },
-                  ),
+                  // ListTile(
+                  //   leading: Icon(
+                  //     Icons.insert_drive_file_outlined,
+                  //     color: Colors.blue,
+                  //   ),
+                  //   title: CustomText(
+                  //     StringUtils.downloadDb,
+                  //     fontSize: 15.sp,
+                  //     fontWeight: FontWeight.w500,
+                  //   ),
+                  //   onTap: () async {
+                  //     await DownloadDBFile.downloadDBFile();
+                  //   },
+                  // ),
                   ListTile(
                     leading: Icon(Icons.pedal_bike, color: Colors.orange),
                     title: CustomText(
@@ -188,7 +195,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     onTap: () async {
                       Navigator.pushNamed(context, AppRoutes.myBikesScreen);
-                      // await DownloadDBFile.downloadDBFile();
                     },
                   ),
                   ListTile(
@@ -200,8 +206,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     onTap: () async {
                       Navigator.pushNamed(context, AppRoutes.employeesScreen);
-
-                      // await DownloadDBFile.downloadDBFile();
                     },
                   ),
                   ListTile(
@@ -228,17 +232,61 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
 
                   ListTile(
-                    leading: Icon(Icons.logout, color: Colors.red),
+                    leading: const Icon(Icons.logout, color: Colors.red),
                     title: CustomText(
                       StringUtils.logout,
                       fontSize: 15.sp,
                       fontWeight: FontWeight.w500,
                     ),
-                    onTap: () async {
-                      await SharedPreferenceUtils.clearPreference();
-                      Navigator.pushReplacementNamed(
-                        context,
-                        AppRoutes.loginScreen,
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          final isDarkMode =
+                              Theme.of(context).brightness == Brightness.dark;
+                          return AlertDialog(
+                            backgroundColor:
+                                isDarkMode ? Colors.grey[850] : Colors.white,
+                            title: CustomText(
+                              StringUtils.confirmLogout,
+
+                              color: isDarkMode ? Colors.white : Colors.black,
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            content: CustomText(
+                              StringUtils.areYouSureWantToLogOut,
+                              color:
+                                  isDarkMode ? Colors.white70 : Colors.black87,
+                            ),
+                            actions: [
+                              TextButton(
+                                child: CustomText(
+                                  StringUtils.cancel,
+                                  color:
+                                      isDarkMode ? Colors.white : Colors.black,
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                ),
+                                child: const CustomText(StringUtils.logout),
+                                onPressed: () async {
+                                  Navigator.pop(context);
+                                  await SharedPreferenceUtils.clearPreference();
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    AppRoutes.loginScreen,
+                                  );
+                                },
+                              ),
+                            ],
+                          );
+                        },
                       );
                     },
                   ),
@@ -250,6 +298,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   /// ✅ Show Confirmation Dialog Before Reset
   void showResetOptions({required BuildContext context, String? table}) {
     final tableName = table ?? StringUtils.allData;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     showDialog(
       context: context,
@@ -257,8 +306,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           false, // This will make the dialog non-dismissable by tapping outside
       builder: (BuildContext context) {
         return AlertDialog(
-          title: CustomText(""),
-          backgroundColor: Colors.white,
+          backgroundColor: isDarkMode ? Colors.grey[850] : Colors.white,
           contentPadding: EdgeInsets.symmetric(
             horizontal: 20.w,
             vertical: 20.h,
@@ -272,14 +320,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 StringUtils.resetDatabaseTitle,
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w700,
-                color: Colors.black,
+                color: isDarkMode ? Colors.white : Colors.black,
               ),
               SizedBox(height: 12.h),
               CustomText(
                 "${StringUtils.resetDatabaseMsg} $tableName?",
                 textAlign: TextAlign.center,
                 fontSize: 15.sp,
-                color: Colors.black87,
+                color: isDarkMode ? Colors.white70 : Colors.black87,
               ),
               SizedBox(height: 20.h),
               Row(
@@ -287,8 +335,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.black,
-                      backgroundColor: Colors.grey[300],
+                      foregroundColor: isDarkMode ? Colors.white : Colors.black,
+                      backgroundColor:
+                          isDarkMode ? Colors.grey[700] : Colors.grey[300],
                       padding: EdgeInsets.symmetric(
                         horizontal: 24.w,
                         vertical: 10.h,
@@ -298,6 +347,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         () => Navigator.of(context).pop(), // Close the dialog
                     child: CustomText(
                       StringUtils.cancel,
+                      color: isDarkMode ? Colors.white : Colors.black,
                       fontSize: 15.sp,
                       fontWeight: FontWeight.w700,
                     ),

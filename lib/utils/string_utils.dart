@@ -236,6 +236,8 @@ class StringUtils {
   static const resetBookings = "Reset Bookings";
   static const downloadDb = "Download db";
   static const logout = "Logout";
+  static const confirmLogout = "Confirm Logout";
+  static const areYouSureWantToLogOut = "Are you sure you want to log out?";
   static const resetDatabaseTitle = "Reset Database";
   static const resetDatabaseMsg = "Are you sure you want to reset";
   static const yesReset = "Yes, Reset";

@@ -388,20 +388,16 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
-  // final BikeBookingController bikeBookingController = Get.find();
-  // final BikeController bikeController = Get.find();
-  // late Worker _reservationListener;
-  bool isLoading = true;
+  bool isLoading = false;
   DateTime selectedMonth = DateTime.now();
   DateTime calenderCenterDate = DateTime.now();
   late ScrollController scrollController;
   List<DateTime> calenderDates = [];
   bool isDataLoad = false;
   late ScrollController dateHeaderController;
-  // late ScrollController bookingGridController;
   late List<ScrollController> bookingRowControllers;
   bool _isSyncingScroll = false;
-  final double cellWidth = 50.w + 1.w * 2; // Cell width + margin on both sides
+  final double cellWidth = 50.w + 1.w * 2;
 
   @override
   void initState() {
@@ -662,92 +658,114 @@ class _CalendarScreenState extends State<CalendarScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       updateSelectedMonthFromScroll(dateHeaderController.offset);
     });
+    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        toolbarHeight: 100.h,
-        backgroundColor: ColorUtils.primary,
-        flexibleSpace: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Left: Title and Month/Year
-                GestureDetector(
-                  onTap: onDateTap,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CustomText(
-                        StringUtils.calendar,
-                        fontSize: 22.sp,
-                        color: ColorUtils.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.calendar_month_rounded,
-                            size: 16.sp,
-                            color: ColorUtils.white,
-                          ),
-                          SizedBox(width: 4.w),
-                          CustomText(
-                            DateFormat('MMMM yyyy').format(selectedMonth),
-                            fontSize: 14.sp,
-                            color: ColorUtils.white,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          Icon(
-                            Icons.keyboard_arrow_down,
-                            size: 18.sp,
-                            color: ColorUtils.white,
-                          ),
-                        ],
-                      ),
-                    ],
+    return BlocListener<BookBikeBloc, BookBikeState>(
+      listenWhen: (prev, curr) => curr is BookBikeLoaded,
+      listener: (context, state) {
+        if (state is BookBikeLoaded) {
+          final initialOffset = ((calenderDates.length ~/ 2) * cellWidth);
+          bookingRowControllers = List.generate(
+            state.bikes.length,
+            (_) => ScrollController(initialScrollOffset: initialOffset),
+          );
+          setupScrollSync();
+          if (mounted) setState(() {});
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          toolbarHeight: 100.h,
+          backgroundColor: ColorUtils.primary,
+          flexibleSpace: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Left: Title and Month/Year
+                  GestureDetector(
+                    onTap: () {
+                      onDateTap(isDarkTheme);
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CustomText(
+                          StringUtils.calendar,
+                          fontSize: 22.sp,
+                          color: ColorUtils.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.calendar_month_rounded,
+                              size: 16.sp,
+                              color: ColorUtils.white,
+                            ),
+                            SizedBox(width: 4.w),
+                            CustomText(
+                              DateFormat('MMMM yyyy').format(selectedMonth),
+                              fontSize: 14.sp,
+                              color: ColorUtils.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            Icon(
+                              Icons.keyboard_arrow_down,
+                              size: 18.sp,
+                              color: ColorUtils.white,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
 
-                // Right: Go to Today button
-                ElevatedButton.icon(
-                  onPressed: scrollToToday,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Theme.of(context).primaryColor,
-                    elevation: 3,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 10.w,
-                      vertical: 8.h,
+                  // Right: Go to Today button
+                  ElevatedButton.icon(
+                    onPressed: scrollToToday,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Theme.of(context).primaryColor,
+                      elevation: 3,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10.w,
+                        vertical: 8.h,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
+                    icon: Icon(
+                      Icons.today,
+                      size: 18.sp,
+                      color: ColorUtils.primary,
+                    ),
+                    label: CustomText(
+                      "Today",
+                      fontSize: 14.sp,
+                      color: ColorUtils.black21,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  icon: Icon(Icons.today, size: 18.sp),
-                  label: CustomText(
-                    "Today",
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
-      ),
 
-      body:
-          isLoading
-              ? Center(child: CircularProgressIndicator())
-              : buildCalendarBody(),
+        body:
+            isLoading
+                ? Center(child: CircularProgressIndicator())
+                : buildCalendarBody(isDarkTheme),
+      ),
     );
   }
 
-  Widget buildCalendarBody() {
+  Widget buildCalendarBody(bool isDarkTheme) {
     return Column(
       children: [
         SizedBox(height: 10.h),
@@ -770,20 +788,37 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 height: 50.w,
                 margin: EdgeInsets.symmetric(horizontal: 1.w),
                 decoration: BoxDecoration(
-                  color: isToday ? ColorUtils.primary : ColorUtils.greyDF,
+                  color:
+                      isToday
+                          ? ColorUtils.primary
+                          : isDarkTheme
+                          ? ColorUtils.darkGrey
+                          : ColorUtils.greyDF,
+
+                  // color: isToday ? ColorUtils.primary : ColorUtils.greyDF,
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CustomText(
                       DateFormat('E').format(date).substring(0, 2),
-                      color: isToday ? ColorUtils.white : ColorUtils.black21,
+                      color:
+                          isToday
+                              ? ColorUtils.white
+                              : isDarkTheme
+                              ? ColorUtils.white
+                              : ColorUtils.black21,
                       fontSize: 12.sp,
                     ),
                     CustomText(
                       DateFormat('dd').format(date),
                       fontSize: 15.sp,
-                      color: isToday ? ColorUtils.white : ColorUtils.black21,
+                      color:
+                          isToday
+                              ? ColorUtils.white
+                              : isDarkTheme
+                              ? ColorUtils.white
+                              : ColorUtils.black21,
                       fontWeight: FontWeight.w500,
                     ),
                   ],
@@ -849,10 +884,20 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                     vertical: 10.h,
                                     horizontal: 5.w,
                                   ),
-                                  child: CustomText(
-                                    bike.brandName ?? '',
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16.sp,
+                                  child: Row(
+                                    children: [
+                                      CustomText(
+                                        bike.brandName ?? '',
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16.sp,
+                                      ),
+                                      SizedBox(width: 5.w),
+                                      CustomText(
+                                        "(${bike.model ?? ''})",
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 14.sp,
+                                      ),
+                                    ],
                                   ),
                                 ),
 
@@ -874,7 +919,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                                 horizontal: 1.w,
                                               ),
                                               decoration: BoxDecoration(
-                                                color: ColorUtils.greyDF,
+                                                color:
+                                                    isDarkTheme
+                                                        ? ColorUtils.darkGrey
+                                                        : ColorUtils.greyDF,
                                               ),
                                             );
                                           },
@@ -884,8 +932,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                       /// Booking Bars for this bike
                                       ...bookings
                                           .where((booking) {
-                                            return booking.bikeName ==
-                                                bike.brandName;
+                                            return booking.bikeId == bike.id;
                                           })
                                           .map((booking) {
                                             final startIndex = calenderDates
@@ -945,6 +992,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                                     child: CustomText(
                                                       booking.userFullName,
                                                       fontSize: 12.sp,
+
+                                                      color:
+                                                          isDarkTheme
+                                                              ? ColorUtils
+                                                                  .black21
+                                                              : ColorUtils
+                                                                  .black21,
                                                       fontWeight:
                                                           FontWeight.w500,
                                                       overflow:
@@ -954,29 +1008,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                                 ),
                                               ),
                                             );
-                                            /*              return Positioned(
-                                        left: startIndex * cellWidth,
-                                        child: ClipPath(
-                                          clipper: ParallelogramClipper(),
-                                          child: Container(
-                                            width: duration * cellWidth,
-                                            height: 50.w,
-                                            alignment: Alignment.centerRight,
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 6.w,
-                                            ),
-                                            color: const Color(0xFFFFC9A5),
-                                            child: Center(
-                                              child: CustomText(
-                                                booking.userFullName,
-                                                fontSize: 12.sp,
-                                                fontWeight: FontWeight.w500,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      );*/
                                           }),
                                     ],
                                   ),
@@ -994,367 +1025,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  ///Dinesh Sir design Working code
-  /*Widget buildCalendarBody() {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          SizedBox(height: 10),
-          Obx(() {
-            logs(
-              "-----bookingList.length----${bikeBookingController.bookingList.length}",
-            );
-            return SizedBox(
-              width: Get.width,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  /// Sidebar with Month + Room Names
-                  SizedBox(
-                    width: 130.w,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(height: 50.h),
-                        Column(
-                          children:
-                              bikeController.bikeList.map((e) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    Get.bottomSheet(
-                                      Container(
-                                        padding: EdgeInsets.all(16),
-                                        decoration: BoxDecoration(
-                                          color: ColorUtils.white,
-                                          borderRadius: BorderRadius.vertical(
-                                            top: Radius.circular(16),
-                                          ),
-                                        ),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            CustomText(StringUtils.bike),
-                                            ListTile(
-                                              title: Text(
-                                                e.name ?? "",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              // subtitle: Text("Room ID: ${room.id}\n${room.roomDesc}"),
-                                              subtitle: CustomText(
-                                                e.model ?? "",
-                                              ),
-                                              trailing: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  IconButton(
-                                                    icon: Icon(
-                                                      Icons.edit,
-                                                      color: ColorUtils.primary,
-                                                    ),
-                                                    onPressed: () {
-                                                      // Get.back();
-                                                      // addEditRoomBottomSheet(
-                                                      //   room: e,
-                                                      // );
-                                                    },
-                                                  ),
-                                                  IconButton(
-                                                    icon: Icon(
-                                                      Icons.delete,
-                                                      color: ColorUtils.red,
-                                                    ),
-                                                    onPressed: () {
-                                                      Get.back();
-                                                      confirmDelete(e.id!);
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    height: 50.h,
-                                    margin: EdgeInsets.fromLTRB(2, 0, 2, 2),
-                                    decoration: BoxDecoration(
-                                      color: ColorUtils.primary,
-                                      borderRadius: BorderRadius.circular(5.r),
-                                    ),
-                                    child: Center(
-                                      child: CustomText(
-                                        e.name ?? "",
-                                        fontSize: 20.sp,
-                                        color: ColorUtils.white,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  /// Calendar Grid
-                  Expanded(
-                    child: SizedBox(
-                      height: (bikeController.bikeList.length + 1) * 51.5,
-                      width: Get.width,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        controller: scrollController,
-                        child: Stack(
-                          children: [
-                            /// Calendar Day Headers + Grid
-                            Row(
-                              children: List.generate(calenderDates.length, (
-                                index,
-                              ) {
-                                bool isCurrentDate =
-                                    DateFormat(
-                                      "dd-MM-yyyy",
-                                    ).format(calenderDates[index]) ==
-                                    DateFormat(
-                                      "dd-MM-yyyy",
-                                    ).format(DateTime.now());
-
-                                return VisibilityDetector(
-                                  key: ValueKey(
-                                    calenderDates[index].millisecondsSinceEpoch,
-                                  ),
-                                  onVisibilityChanged: (info) {
-                                    if (info.visibleFraction == 1.0 &&
-                                        DateFormat(
-                                              "MM-yyyy",
-                                            ).format(selectedMonth) !=
-                                            DateFormat(
-                                              "MM-yyyy",
-                                            ).format(calenderDates[index])) {
-                                      setState(
-                                        () =>
-                                            selectedMonth =
-                                                calenderDates[index],
-                                      );
-                                      if (calenderDates[index].isAfter(
-                                        calenderCenterDate,
-                                      )) {
-                                        setAfterDates();
-                                      } else {
-                                        setBeforeDates();
-                                      }
-                                    }
-                                  },
-                                  child: Column(
-                                    children: [
-                                      SizedBox(
-                                        height: 51.5,
-                                        width: 50,
-                                        child: Column(
-                                          children: [
-                                            Text("${calenderDates[index].day}"),
-                                            Text(
-                                              DateFormat("EEE")
-                                                  .format(calenderDates[index])
-                                                  .substring(0, 2),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 50,
-                                        child: Stack(
-                                          clipBehavior: Clip.none,
-                                          children: [
-                                            Column(
-                                              children:
-                                                  bikeController.bikeList.map((
-                                                    e,
-                                                  ) {
-                                                    return InkWell(
-                                                      onTap: () async {
-                                                        // await addEditReservationBottomSheet();
-                                                      },
-                                                      child: Container(
-                                                        height: 51.5,
-                                                        width: 50,
-                                                        decoration: BoxDecoration(
-                                                          border: Border.all(
-                                                            color: ColorUtils
-                                                                .grey99
-                                                                .withValues(
-                                                                  alpha: 0.3,
-                                                                ),
-                                                            width: 0.4,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    );
-                                                  }).toList(),
-                                            ),
-                                            if (isCurrentDate)
-                                              Center(
-                                                child: SizedBox(
-                                                  height:
-                                                      bikeController
-                                                          .bikeList
-                                                          .length *
-                                                      51.5,
-                                                  width: 50,
-                                                  child: Stack(
-                                                    children: [
-                                                      Center(
-                                                        child: VerticalDivider(
-                                                          color:
-                                                              ColorUtils
-                                                                  .primary,
-                                                        ),
-                                                      ),
-                                                      Align(
-                                                        alignment:
-                                                            Alignment.topCenter,
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets.only(
-                                                                top: 5,
-                                                                left: 1,
-                                                              ),
-                                                          child: CircleAvatar(
-                                                            radius: 6,
-                                                            backgroundColor:
-                                                                ColorUtils
-                                                                    .primary,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }),
-                            ),
-
-                            /// Reservation Bars
-                            for (
-                              int i = 0;
-                              i < bikeBookingController.bookingList.length;
-                              i++
-                            )
-                              Builder(
-                                builder: (context) {
-                                  final booking =
-                                      bikeBookingController.bookingList[i];
-                                  if (booking.bikeId == 0) {
-                                    return SizedBox();
-                                  }
-
-                                  final inDays =
-                                      booking.dropoffDate
-                                          .difference(booking.pickupDate)
-                                          .inDays;
-                                  logs("-----inDays----$inDays");
-
-                                  final containIndex = calenderDates.indexWhere(
-                                    (date) =>
-                                        DateFormat("yyyy-MM-dd").format(date) ==
-                                        DateFormat(
-                                          "yyyy-MM-dd",
-                                        ).format(booking.pickupDate),
-                                  );
-
-                                  if (containIndex == -1) {
-                                    return SizedBox();
-                                  }
-
-                                  final roomIdIndex = bikeController.bikeList
-                                      .indexWhere(
-                                        (room) => room.id == booking.bikeId,
-                                      );
-                                  return Positioned(
-                                    top: ((roomIdIndex + 1) * 51.5) + 2.5,
-                                    left: (containIndex * 50),
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        Get.to(
-                                          () => BookingDetailsScreen(
-                                            booking: booking,
-                                          ),
-                                        );
-                                      },
-                                      child: Container(
-                                        height: 45.h,
-                                        width: ((inDays + 1) * 50.w),
-                                        decoration: BoxDecoration(
-                                          color: Colors.transparent,
-                                          borderRadius: BorderRadius.circular(
-                                            50.r,
-                                          ),
-                                        ),
-                                        child: Center(
-                                          child: Container(
-                                            height: 45.h,
-                                            width: (inDays * 50.w),
-                                            decoration: BoxDecoration(
-                                              color: CommonMethod()
-                                                  .reservationColor(booking),
-                                              borderRadius:
-                                                  BorderRadius.circular(50.r),
-                                            ),
-                                            child: Center(
-                                              child: CustomText(
-                                                booking.userFullName,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                color:
-                                                    booking.prepayment == 0
-                                                        ? ColorUtils.black
-                                                        : ColorUtils.white,
-                                                fontSize: 15.sp,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }),
-        ],
-      ),
-    );
-  }*/
   bool isSameDay(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
   DateTime chosenDateTime = DateTime.now();
 
-  void onDateTap() {
-    iosDatePicker(context);
+  void onDateTap(bool isDarkTheme) {
+    iosDatePicker(context, isDarkTheme);
 
     // if (Platform.isIOS) {
     //   iosDatePicker(context);
@@ -1375,13 +1053,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
     }
   }
 
-  iosDatePicker(BuildContext context) {
+  iosDatePicker(BuildContext context, bool isDarkTheme) {
     showCupertinoModalPopup(
       context: context,
       builder: (BuildContext builder) {
         return Container(
           height: MediaQuery.of(context).copyWith().size.height * 0.35,
-          color: ColorUtils.white,
+          color: isDarkTheme ? ColorUtils.darkThemeBg : ColorUtils.white,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -1405,7 +1083,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: Text("CANCEL"),
+                      child: CustomText("CANCEL"),
                     ),
                     TextButton(
                       onPressed: () {
@@ -1415,7 +1093,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         calenderDates.clear();
                         setCalenderDates();
                       },
-                      child: Text("OK"),
+                      child: CustomText("OK"),
                     ),
                   ],
                 ),
@@ -1455,41 +1133,3 @@ class CommonMethod {
           ? Colors.green
           : Colors.orange;
 }
-
-/*class SlantedBox extends StatelessWidget {
-  final Color color;
-  final double width;
-  final double height;
-
-  const SlantedBox({
-    Key? key,
-    required this.color,
-    this.width = 100,
-    this.height = 40,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipPath(
-      clipper: ParallelogramClipper(),
-      child: Container(width: width, height: height, color: color),
-    );
-  }
-}
-
-class ParallelogramClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    const double slant = 20; // how slanted you want it
-    final path = Path();
-    path.moveTo(slant, 0);
-    path.lineTo(size.width, 0);
-    path.lineTo(size.width - slant, size.height);
-    path.lineTo(0, size.height);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
-}*/

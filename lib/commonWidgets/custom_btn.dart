@@ -34,7 +34,7 @@ class CustomBtn extends StatelessWidget {
     return Container(
       width: width ?? Get.width,
       decoration: BoxDecoration(
-        color: bgColor ?? theme.primaryColor,
+        color: bgColor ?? ColorUtils.primary,
         // border: Border.all(color: borderColor ?? theme.primaryColor),
         borderRadius: BorderRadius.circular(radius ?? 5.r),
         boxShadow: [

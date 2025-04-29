@@ -67,11 +67,17 @@ class _TodayScreenState extends State<TodayScreen>
                 bookings.where((b) => isSameDay(b.dropoffDate, now)).toList();
             return Scaffold(
               backgroundColor:
-                  bookings.isEmpty ? ColorUtils.white : ColorUtils.greyF0,
+                  isDarkTheme
+                      ? ColorUtils.darkThemeBg
+                      : bookings.isEmpty
+                      ? ColorUtils.white
+                      : ColorUtils.greyF0,
+
               floatingActionButton: SafeArea(
                 child: FloatingActionButton(
+                  backgroundColor: ColorUtils.primary,
                   onPressed: () => showAddBikeBottomSheet(context),
-                  child: Icon(Icons.add),
+                  child: Icon(Icons.add, color: ColorUtils.white),
                 ),
               ),
               appBar: AppBar(
@@ -166,16 +172,21 @@ class BookingList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDarkTheme ? ColorUtils.darkThemeBg : Colors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color:
+                    isDarkTheme
+                        ? Colors.blueGrey.withOpacity(0.1)
+                        : Colors.black.withOpacity(0.08),
                 blurRadius: 12,
                 spreadRadius: 2,
                 offset: const Offset(0, 4),
@@ -186,12 +197,17 @@ class BookingList extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             child: DataTable(
               headingRowColor: WidgetStateProperty.all(
-                ColorUtils.primary.withOpacity(0.25),
+                isDarkTheme
+                    ? ColorUtils.primary.withOpacity(0.2)
+                    : ColorUtils.primary.withOpacity(0.25),
               ),
               dividerThickness: 0,
               columnSpacing: 24,
               horizontalMargin: 12,
-              dataTextStyle: TextStyle(fontSize: 14.sp),
+              dataTextStyle: TextStyle(
+                fontSize: 14.sp,
+                color: isDarkTheme ? ColorUtils.white : Colors.black,
+              ),
               headingTextStyle: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -253,7 +269,11 @@ class BookingList extends StatelessWidget {
                         );
                       },
                       color: WidgetStateProperty.all(
-                        isEvenRow ? Colors.white : Colors.grey[100]!,
+                        isDarkTheme
+                            ? (isEvenRow
+                                ? ColorUtils.darkThemeBg.withOpacity(0.5)
+                                : ColorUtils.darkThemeBg.withOpacity(0.3))
+                            : (isEvenRow ? Colors.white : Colors.grey[100]!),
                       ),
                       cells: [
                         DataCell(CustomText(booking.userFullName)),

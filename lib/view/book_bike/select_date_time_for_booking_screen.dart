@@ -156,7 +156,7 @@ class _SelectDateTimeForBookingScreenState
     context.read<BookBikeBloc>().add(FetchBookingsEvent());
   }
 
-  Future<void> pickDateTime(bool isFrom) async {
+  Future<void> pickDateTime(bool isFrom, bool isDarkTheme) async {
     DateTime now = DateTime.now();
     final initial =
         isFrom
@@ -181,13 +181,18 @@ class _SelectDateTimeForBookingScreenState
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: ColorUtils.primary,
-              onPrimary: ColorUtils.white,
-              onSurface: ColorUtils.black,
+              primary:
+                  Colors
+                      .blue, // Customize the primary color (buttons, selected dates)
+              onPrimary: Colors.white, // Text on primary color (e.g., buttons)
+              onSurface:
+                  Colors.white, // Set date text color to white for visibility
+              surface: Colors.black,
             ),
             textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(foregroundColor: ColorUtils.primary),
+              style: TextButton.styleFrom(foregroundColor: Colors.white),
             ),
+            dialogBackgroundColor: Colors.black,
           ),
           child: child!,
         );
@@ -245,6 +250,9 @@ class _SelectDateTimeForBookingScreenState
                                 ? ColorUtils.primary
                                 : isDisabled
                                 ? Colors.grey
+                                : Theme.of(context).brightness ==
+                                    Brightness.dark
+                                ? Colors.white
                                 : Colors.black,
                         fontWeight:
                             isSelected
@@ -407,17 +415,21 @@ class _SelectDateTimeForBookingScreenState
     final parsedPrepayment = double.tryParse(prePaymentController.text) ?? 0.0;
     final hasPrepayment =
         prePaymentController.text.isNotEmpty && parsedPrepayment > 0;
+    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+
     bool hasDateChanged =
         !isEditing ||
         booking!.pickupDate != fromDate ||
         booking!.dropoffDate != toDate;
     return Scaffold(
+      backgroundColor: isDarkTheme ? Colors.black : ColorUtils.white,
       appBar: commonAppBar(
         titleText: StringUtils.selectDates,
         context: context,
         isLeading: true,
         isCenterTitle: true,
         fontSize: 20.sp,
+        backgroundColor: isDarkTheme ? Colors.black : ColorUtils.white,
         fontWeight: FontWeight.w600,
       ),
       body: SingleChildScrollView(
@@ -427,7 +439,7 @@ class _SelectDateTimeForBookingScreenState
             children: [
               /// From Date
               GestureDetector(
-                onTap: () => pickDateTime(true),
+                onTap: () => pickDateTime(true, isDarkTheme),
                 child: AbsorbPointer(
                   child: CommonTextField(
                     textEditController: fromDateController,
@@ -439,7 +451,7 @@ class _SelectDateTimeForBookingScreenState
 
               /// To Date
               GestureDetector(
-                onTap: () => pickDateTime(false),
+                onTap: () => pickDateTime(false, isDarkTheme),
                 child: AbsorbPointer(
                   child: CommonTextField(
                     textEditController: toDateController,
@@ -572,7 +584,8 @@ class _SelectDateTimeForBookingScreenState
                 padding: EdgeInsets.all(16.w),
                 margin: EdgeInsets.only(top: 24.h),
                 decoration: BoxDecoration(
-                  color: ColorUtils.white,
+                  color: isDarkTheme ? Colors.grey[900] : ColorUtils.white,
+
                   borderRadius: BorderRadius.circular(16.r),
                   boxShadow: [
                     BoxShadow(
@@ -652,7 +665,7 @@ class _SelectDateTimeForBookingScreenState
                         "${StringUtils.totalToCollectNow}: \$${(balance + depositAmount).toStringAsFixed(2)}",
                         fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: isDarkTheme ? Colors.white : Colors.black87,
                       ),
                     ),
                   ],

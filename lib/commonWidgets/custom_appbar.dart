@@ -20,15 +20,14 @@ AppBar commonAppBar({
   // bool isBackButton = true,
   bool isNotificationButton = true,
 }) {
-  // bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+  bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
   return AppBar(
     centerTitle: isCenterTitle ?? true,
 
-    // backgroundColor: isDarkTheme?ColorUtils.darkThemeBg:ColorUtils.white,
+    backgroundColor: backgroundColor,
     // toolbarHeight: 7.5.h,
     // leading: SizedBox(),
-    backgroundColor: backgroundColor,
     leading:
         (isLeading ?? false)
             ? Padding(
@@ -39,7 +38,9 @@ AppBar commonAppBar({
                 },
                 child: Icon(
                   Icons.arrow_back_outlined,
-                  color: iconColor ?? ColorUtils.black,
+                  color:
+                      iconColor ??
+                      (isDarkTheme ? ColorUtils.white : ColorUtils.black),
                 ),
               ),
             )
@@ -47,9 +48,9 @@ AppBar commonAppBar({
     leadingWidth: (isLeading ?? false) ? 56.w : 0,
     title: CustomText(
       titleText,
-      color: fontColor ?? ColorUtils.black21,
+      // color: fontColor ?? ColorUtils.black21,
       fontSize: fontSize ?? 17.sp,
-      fontWeight: fontWeight ?? FontWeight.w500,
+      color: fontColor ?? (isDarkTheme ? ColorUtils.white : ColorUtils.black21),
     ),
   );
 }

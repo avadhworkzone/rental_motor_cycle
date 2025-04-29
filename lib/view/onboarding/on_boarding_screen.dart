@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:rental_motor_cycle/commonWidgets/common_assets.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_btn.dart';
 import 'package:rental_motor_cycle/routs/app_page.dart';
@@ -20,11 +21,28 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<Widget> _images = [
-    LocalAssets(imagePath: AssetUtils.splashLogo),
-    LocalAssets(imagePath: AssetUtils.splashLogo),
-    LocalAssets(imagePath: AssetUtils.splashLogo),
-  ];
+  List<Widget> _images = [];
+
+  @override
+  void initState() {
+    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+
+    _images = [
+      LocalAssets(
+        imagePath:
+            isDarkTheme ? AssetUtils.splashLogoDark : AssetUtils.splashLogo,
+      ),
+      LocalAssets(
+        imagePath:
+            isDarkTheme ? AssetUtils.splashLogoDark : AssetUtils.splashLogo,
+      ),
+      LocalAssets(
+        imagePath:
+            isDarkTheme ? AssetUtils.splashLogoDark : AssetUtils.splashLogo,
+      ),
+    ];
+    super.initState();
+  }
 
   void _onPageChanged(int index) {
     setState(() {
