@@ -147,7 +147,6 @@ class _ReservationScreenState extends State<ReservationScreen>
               }
               if (state is BookBikeLoaded) {
                 final bikes = state.bikes;
-                final bookings = state.bookings;
                 final filteredList = getFilteredReservations(currentTab);
 
                 if (filteredList.isEmpty) {

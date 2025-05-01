@@ -65,7 +65,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
       grouped[groupKey]!.add({
         "date": DateFormat("dd MMM yyyy").format(checkoutDate),
         "amount": (item.balance as num).toDouble(),
-        "guest": item.userFullName ?? "Unknown",
+        "guest": item.userFullName,
       });
     }
 

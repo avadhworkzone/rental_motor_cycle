@@ -324,7 +324,7 @@ class BookingDetailsScreen extends StatelessWidget {
                   SizedBox(height: 6.h),
                   _buildInfoRow(
                     Icons.person,
-                    booking.userFullName ?? "",
+                    booking.userFullName,
                     isDarkTheme,
                   ),
                   _buildInfoRow(
@@ -500,7 +500,7 @@ class BookingDetailsScreen extends StatelessWidget {
         fontWeight: FontWeight.w600,
         color:
             isDarkTheme
-                ? ColorUtils.darkText.withOpacity(0.7)
+                ? ColorUtils.darkText.withValues(alpha: 0.7)
                 : Colors.grey.shade600,
       ),
     );

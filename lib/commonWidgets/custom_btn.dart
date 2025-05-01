@@ -30,7 +30,7 @@ class CustomBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    Theme.of(context);
     return Container(
       width: width ?? Get.width,
       decoration: BoxDecoration(

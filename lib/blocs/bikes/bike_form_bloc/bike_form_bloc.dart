@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_use_of_visible_for_testing_member
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -104,7 +106,7 @@ class BikeFormBloc extends Bloc<BikeFormEvent, BikeFormState> {
           userId: int.parse(userId),
           kmLimit: double.parse(kmLimitController.text.trim()),
           makeYear: int.parse(makeYearController.text.trim()),
-          transmission: state.selectedTransmission!,
+          transmission: state.selectedTransmission,
           seater: int.parse(state.selectedSeater!),
           fuelIncluded: state.selectedFuelIncluded!,
         );

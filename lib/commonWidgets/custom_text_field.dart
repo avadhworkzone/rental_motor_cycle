@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_in_if_null_operators
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

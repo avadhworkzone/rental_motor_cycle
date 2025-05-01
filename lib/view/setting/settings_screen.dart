@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,6 +13,7 @@ import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'package:rental_motor_cycle/utils/shared_preference_utils.dart';
 import 'package:rental_motor_cycle/utils/string_utils.dart';
+// ignore: unused_import
 import 'package:rental_motor_cycle/utils/download_db.dart';
 import '../../blocs/bikes/bike_crud_bloc/bike_bloc.dart';
 import '../../blocs/bikes/bike_crud_bloc/bike_event.dart';

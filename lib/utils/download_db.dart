@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'dart:developer';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
@@ -7,7 +9,7 @@ class DownloadDBFile {
   /// Requests storage permissions for Android and iOS
   static Future<bool> requestPermissions() async {
     if (Platform.isAndroid) {
-      print('heloooi');
+      // logs('heloooi');
       if (await Permission.storage.request().isGranted) {
         return true;
       }
@@ -54,8 +56,9 @@ class DownloadDBFile {
         downloadsDir = await getApplicationDocumentsDirectory(); // iOS
       }
 
-      if (downloadsDir == null)
+      if (downloadsDir == null) {
         throw Exception("Downloads directory not found!");
+      }
 
       // Copy database file to downloads folder
       String newFilePath = '${downloadsDir.path}/my_database.db';

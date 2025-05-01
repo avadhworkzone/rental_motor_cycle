@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import, invalid_use_of_visible_for_testing_member, unnecessary_null_comparison
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -77,10 +79,10 @@ class BooingFormBloc extends Bloc<BookingFormEvent, BookingFormState> {
     : super(
         (booking != null
             ? BookingFormState(
-              emailController: booking.userEmail ?? "",
-              fullNameController: booking.userFullName ?? "",
+              emailController: booking.userEmail,
+              fullNameController: booking.userFullName,
               isValid: true,
-              phoneController: booking.userPhone ?? "",
+              phoneController: booking.userPhone,
               fromDateController: DateFormat(
                 'yyyy-MM-dd',
               ).format(booking.pickupDate),
@@ -104,9 +106,9 @@ class BooingFormBloc extends Bloc<BookingFormEvent, BookingFormState> {
             : BookingFormState.initial()),
       ) {
     if (booking != null) {
-      fullNameController.text = booking.userFullName ?? '';
-      phoneController.text = booking.userPhone ?? '';
-      emailController.text = booking.userEmail ?? '';
+      fullNameController.text = booking.userFullName;
+      phoneController.text = booking.userPhone;
+      emailController.text = booking.userEmail;
       mileageController.text = formatNum(booking.mileage);
       rentController.text = formatDoubleOrInt(booking.rentPerDay);
       extraPerKmController.text = formatDoubleOrInt(booking.extraPerKm);
@@ -368,7 +370,7 @@ class BooingFormBloc extends Bloc<BookingFormEvent, BookingFormState> {
     CalculateBookingSummary event,
     Emitter<BookingFormState> emit,
   ) {
-    logs("---ON calculate Summury---${fromDate}");
+    logs("---ON calculate Summury---$fromDate");
     if (fromDate == null || toDate == null) {
       logs("❌ Cannot calculate summary. From or To date is null.");
       return;

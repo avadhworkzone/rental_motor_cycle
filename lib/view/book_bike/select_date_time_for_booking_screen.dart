@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_comparison, unused_local_variable, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -192,7 +194,7 @@ class _SelectDateTimeForBookingScreenState
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(foregroundColor: Colors.white),
             ),
-            dialogBackgroundColor: Colors.black,
+            dialogTheme: DialogThemeData(backgroundColor: Colors.black),
           ),
           child: child!,
         );
@@ -283,7 +285,7 @@ class _SelectDateTimeForBookingScreenState
           pickedTime.hour,
           pickedTime.minute,
         );
-        print(
+        logs(
           '---Final Picked DateTime (${isFrom ? 'From' : 'To'})--- $finalDateTime',
         );
         if (isFrom) {
@@ -417,10 +419,6 @@ class _SelectDateTimeForBookingScreenState
         prePaymentController.text.isNotEmpty && parsedPrepayment > 0;
     bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
-    bool hasDateChanged =
-        !isEditing ||
-        booking!.pickupDate != fromDate ||
-        booking!.dropoffDate != toDate;
     return Scaffold(
       backgroundColor: isDarkTheme ? Colors.black : ColorUtils.white,
       appBar: commonAppBar(

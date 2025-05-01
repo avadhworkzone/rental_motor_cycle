@@ -28,28 +28,28 @@ class LocalAssets extends StatelessWidget {
           height: height,
           width: width,
           scale: scaleSize,
-          color: imgColor,
+          // color: imgColor,
           fit: boxFit,
         )
         : SvgPicture.asset(
           imagePath,
           height: height,
           width: width,
-          color: imgColor,
+          // color: imgColor,
         );
   }
 }
 
 class NetWorkAssets extends StatelessWidget {
   const NetWorkAssets({
-    Key? key,
+    super.key,
     required this.imageUrl,
     this.height,
     this.width,
     this.scaleSize,
     this.boxFit,
     this.radius,
-  }) : super(key: key);
+  });
   final String imageUrl;
   final double? height, width, scaleSize, radius;
   final BoxFit? boxFit;

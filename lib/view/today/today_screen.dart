@@ -185,8 +185,8 @@ class BookingList extends StatelessWidget {
               BoxShadow(
                 color:
                     isDarkTheme
-                        ? Colors.blueGrey.withOpacity(0.1)
-                        : Colors.black.withOpacity(0.08),
+                        ? Colors.blueGrey.withValues(alpha: 0.1)
+                        : Colors.black.withValues(alpha: 0.08),
                 blurRadius: 12,
                 spreadRadius: 2,
                 offset: const Offset(0, 4),
@@ -198,8 +198,8 @@ class BookingList extends StatelessWidget {
             child: DataTable(
               headingRowColor: WidgetStateProperty.all(
                 isDarkTheme
-                    ? ColorUtils.primary.withOpacity(0.2)
-                    : ColorUtils.primary.withOpacity(0.25),
+                    ? ColorUtils.primary.withValues(alpha: 0.2)
+                    : ColorUtils.primary.withValues(alpha: 0.25),
               ),
               dividerThickness: 0,
               columnSpacing: 24,
@@ -271,8 +271,8 @@ class BookingList extends StatelessWidget {
                       color: WidgetStateProperty.all(
                         isDarkTheme
                             ? (isEvenRow
-                                ? ColorUtils.darkThemeBg.withOpacity(0.5)
-                                : ColorUtils.darkThemeBg.withOpacity(0.3))
+                                ? ColorUtils.darkThemeBg.withValues(alpha: 0.5)
+                                : ColorUtils.darkThemeBg.withValues(alpha: 0.3))
                             : (isEvenRow ? Colors.white : Colors.grey[100]!),
                       ),
                       cells: [

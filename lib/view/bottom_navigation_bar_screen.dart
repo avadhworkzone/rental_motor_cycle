@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rental_motor_cycle/utils/Theme/app_text_style.dart';
@@ -86,9 +88,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
     return GestureDetector(
       onTap: () {
         currentIndex = index;
-        setState(() {
-
-        });
+        setState(() {});
         // clearBadge(index);
       },
       child: AnimatedContainer(
@@ -97,7 +97,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
         decoration: BoxDecoration(
           color:
               currentIndex == index
-                  ? ColorUtils.primary.withOpacity(0.2)
+                  ? ColorUtils.primary.withValues(alpha: 0.2)
                   : Colors.transparent,
           borderRadius: BorderRadius.circular(16.r),
         ),

@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:rental_motor_cycle/utils/color_utils.dart';
 import 'app_text_style.dart';
@@ -78,7 +80,7 @@ class AppTheme {
     ),
   );
 
-  static final ThemeData  darkTheme = ThemeData(
+  static final ThemeData darkTheme = ThemeData(
     scaffoldBackgroundColor: ColorUtils.darkThemeBg,
     cardColor: ColorUtils.darkThemeBg,
     // cardColor: const Color(0xff474747),

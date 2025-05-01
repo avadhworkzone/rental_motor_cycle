@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:rental_motor_cycle/blocs/bikes/bike_crud_bloc/bike_event.dart';
 import 'package:rental_motor_cycle/blocs/bikes/bike_crud_bloc/bike_state.dart';
@@ -35,7 +32,7 @@ class BikeBloc extends Bloc<BikeEvent, BikeState> {
   //   }
   // }
   Future<void> _onFetch(FetchBikesEvent event, Emitter<BikeState> emit) async {
-    print("📥 FetchBikesEvent received");
+    logs("📥 FetchBikesEvent received");
     emit(BikeLoading());
 
     try {
@@ -46,8 +43,8 @@ class BikeBloc extends Bloc<BikeEvent, BikeState> {
       final bookings = bookingsRaw.map((e) => BookingModel.fromMap(e)).toList();
 
       bikeLength = bikes.length;
-      print("✅ Bikes fetched: ${bikes.length}");
-      print("✅ Bookings fetched: ${bookings.length}");
+      logs("✅ Bikes fetched: ${bikes.length}");
+      logs("✅ Bookings fetched: ${bookings.length}");
 
       for (final bike in bikes) {
         final matchedBooking = bookings.firstWhere(
@@ -55,24 +52,20 @@ class BikeBloc extends Bloc<BikeEvent, BikeState> {
           orElse: () => BookingModel.empty(),
         );
 
-        print(
+        logs(
           "🚲 Bike ID: ${bike.id} | Brand: ${bike.brandName} | Model: ${bike.model}",
         );
 
-        if (matchedBooking != null) {
-          print(
-            "   📦 Booked By: ${matchedBooking.userFullName} | "
-            "From: ${matchedBooking.pickupDate} ${matchedBooking.pickupTime} "
-            "To: ${matchedBooking.dropoffDate} ${matchedBooking.dropoffTime}",
-          );
-        } else {
-          print("   ✅ Available");
-        }
+        logs(
+          "   📦 Booked By: ${matchedBooking.userFullName} | "
+          "From: ${matchedBooking.pickupDate} ${matchedBooking.pickupTime} "
+          "To: ${matchedBooking.dropoffDate} ${matchedBooking.dropoffTime}",
+        );
       }
 
       emit(BikeLoaded(bikes));
     } catch (e) {
-      print("❌ Failed to fetch bikes or bookings: $e");
+      logs("❌ Failed to fetch bikes or bookings: $e");
       emit(BikeError('Failed to load bikes'));
     }
   }

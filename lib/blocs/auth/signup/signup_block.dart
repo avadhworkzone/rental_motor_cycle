@@ -3,12 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:rental_motor_cycle/blocs/auth/signup/signup_event.dart';
 import 'package:rental_motor_cycle/blocs/auth/signup/signup_state.dart';
-import 'package:rental_motor_cycle/blocs/users/employee_bloc.dart';
-import 'package:rental_motor_cycle/blocs/users/employee_event.dart';
-import 'package:rental_motor_cycle/controller/employee_controller.dart';
 import 'package:rental_motor_cycle/database/db_helper.dart';
 import 'package:rental_motor_cycle/model/login_user_model.dart';
-import 'package:rental_motor_cycle/model/user_model.dart';
 
 class SignupBloc extends Bloc<SignupEvent, SignupState> {
   final BuildContext context;

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:rental_motor_cycle/commonWidgets/custom_snackbar.dart';
 import 'package:rental_motor_cycle/model/bike_model.dart';
@@ -287,32 +286,6 @@ class ReservationCardView extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               fontWeight: FontWeight.w500,
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPriceRow(
-    String label,
-    double value, {
-    bool isBold = false,
-    Color color = ColorUtils.black,
-    String? strValue,
-  }) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 2.h),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          CustomText(
-            label,
-            fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
-          ),
-          CustomText(
-            strValue ?? "\$${value.toStringAsFixed(2)}",
-            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-            color: color,
           ),
         ],
       ),
