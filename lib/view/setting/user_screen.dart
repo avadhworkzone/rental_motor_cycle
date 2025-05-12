@@ -566,7 +566,11 @@ class _EmployeesState extends State<EmployeesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: isDarkTheme ? Colors.black : Colors.white,
+
       appBar: commonAppBar(
         titleText: StringUtils.users,
         context: context,

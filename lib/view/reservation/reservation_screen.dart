@@ -98,8 +98,11 @@ class _ReservationScreenState extends State<ReservationScreen>
       StringUtils.history,
     ];
     final currentTab = tabLabels[_tabController.index];
+    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: isDarkTheme ? Colors.black : Colors.white,
+
       appBar: AppBar(
         backgroundColor: ColorUtils.primary,
         title: CustomText(

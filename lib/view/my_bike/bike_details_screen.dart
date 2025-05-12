@@ -22,6 +22,8 @@ class BikeDetailsScreen extends StatelessWidget {
         context: context,
         isLeading: true,
         isCenterTitle: true,
+        backgroundColor: isDarkTheme ? Colors.black : Colors.white,
+
         fontSize: 20.sp,
         fontWeight: FontWeight.w600,
       ),

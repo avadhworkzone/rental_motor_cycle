@@ -35,6 +35,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
   Widget build(BuildContext context) {
     bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+      backgroundColor: isDarkTheme ? Colors.black : Colors.white,
       extendBody: true,
       body: screens[currentIndex],
       bottomNavigationBar: SafeArea(

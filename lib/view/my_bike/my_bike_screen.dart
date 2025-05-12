@@ -184,7 +184,11 @@ class MyBikesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: isDarkTheme ? Colors.black : Colors.white,
+
       appBar: commonAppBar(
         titleText: StringUtils.myBikes,
         context: context,

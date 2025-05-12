@@ -100,8 +100,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = storage.read('isDarkMode') ?? false;
+    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: isDarkTheme ? Colors.black : Colors.white,
+
       appBar: commonAppBar(
         titleText: StringUtils.settings,
         context: context,

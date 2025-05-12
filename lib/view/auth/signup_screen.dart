@@ -171,7 +171,11 @@ class SignupScreen extends StatelessWidget {
         },
         builder: (context, state) {
           return Scaffold(
+            backgroundColor: isDarkTheme ? Colors.black : Colors.white,
+
             appBar: commonAppBar(
+              backgroundColor: isDarkTheme ? Colors.black : Colors.white,
+
               titleText: StringUtils.signup,
               context: context,
               isLeading: false,

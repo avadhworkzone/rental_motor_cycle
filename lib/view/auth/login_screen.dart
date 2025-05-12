@@ -184,7 +184,9 @@ class _LoginScreenState extends State<LoginScreen> {
     return BlocProvider(
       create: (_) => LoginBloc(context: context),
       child: Scaffold(
+        backgroundColor: isDarkTheme ? Colors.black : Colors.white,
         appBar: commonAppBar(
+          backgroundColor: isDarkTheme ? Colors.black : Colors.white,
           titleText: StringUtils.login,
           context: context,
           isLeading: false,

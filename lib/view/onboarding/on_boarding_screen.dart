@@ -25,8 +25,10 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   List<Widget> _images = [];
 
   @override
-  void initState() {
-    bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
     _images = [
       LocalAssets(
@@ -42,7 +44,6 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             isDarkTheme ? AssetUtils.splashLogoDark : AssetUtils.splashLogo,
       ),
     ];
-    super.initState();
   }
 
   void _onPageChanged(int index) {
@@ -54,14 +55,18 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+
     return SafeArea(
       top: false,
       child: Scaffold(
+        backgroundColor: isDarkTheme ? Colors.black : Colors.white,
         body: Column(
           children: [
             Expanded(
               child: Container(
-                color: theme.secondaryHeaderColor,
+                // color: theme.secondaryHeaderColor,
+                color: isDarkTheme ? Colors.black : Colors.white,
                 child: Stack(
                   children: [
                     PageView(

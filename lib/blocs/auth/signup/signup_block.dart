@@ -60,6 +60,12 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
       final loginUserList =
           rawLoginUserList.map((e) => LoginUserModel.fromMap(e)).toList();
       loginUsersList = loginUserList;
+      // ✅ Log all registered users
+      for (var user in loginUsersList) {
+        debugPrint(
+          '🟩 Registered User: username=${user.username}, password=${user.password}',
+        );
+      }
       // Emit loaded state
       emit(FetchLoginUsersLoaded(loginUserList: loginUserList));
     } catch (e) {

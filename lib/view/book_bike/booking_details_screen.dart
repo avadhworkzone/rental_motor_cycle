@@ -302,7 +302,11 @@ class BookingDetailsScreen extends StatelessWidget {
             (booking.subtotal - booking.discount) * (booking.tax / 100);
 
         return Scaffold(
+          backgroundColor: isDarkTheme ? Colors.black : Colors.white,
+
           appBar: commonAppBar(
+            backgroundColor: isDarkTheme ? Colors.black : Colors.white,
+
             titleText: StringUtils.bookingDetails,
             context: context,
             isLeading: true,

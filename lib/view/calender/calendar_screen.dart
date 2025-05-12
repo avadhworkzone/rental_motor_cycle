@@ -679,6 +679,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
         }
       },
       child: Scaffold(
+        backgroundColor: isDarkTheme ? Colors.black : Colors.white,
+
         appBar: AppBar(
           automaticallyImplyLeading: false,
           toolbarHeight: 100.h,
@@ -844,8 +846,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
               final bikes = state.bikes;
               final bookings = state.bookings;
               logs("---bikes---${state.bikes}");
-              logs("---bikes--ID 1---${state.bikes.first.id}");
-              logs("---bikes--ID 2---${state.bikes[1].id}");
               logs("---bookings---${state.bookings}");
               if (bikes.isEmpty) {
                 return SizedBox(
