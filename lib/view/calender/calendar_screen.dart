@@ -644,6 +644,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final index = (centerOffset / cellWidth).floor();
 
     if (index >= 0 && index < calenderDates.length) {
+      logs("---Coming in IF");
       final date = calenderDates[index];
 
       if (selectedMonth.month != date.month ||
@@ -658,7 +659,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      updateSelectedMonthFromScroll(dateHeaderController.offset);
+      if (dateHeaderController.hasClients) {
+        updateSelectedMonthFromScroll(dateHeaderController.offset);
+      }
     });
     bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
