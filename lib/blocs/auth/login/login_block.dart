@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rental_motor_cycle/blocs/auth/signup/signup_block.dart';
@@ -48,7 +50,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       );
       await SharedPreferenceUtils.setValue(
         SharedPreferenceUtils.username,
-        user.username ?? '',
+        user.username,
       );
 
       emit(LoginSuccess());

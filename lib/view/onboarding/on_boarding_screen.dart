@@ -54,7 +54,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    Theme.of(context);
     final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
     return SafeArea(
